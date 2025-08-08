@@ -1,214 +1,185 @@
-import React from "react";
+import React, { JSX } from "react";
 import {
   View,
   Text,
-  ScrollView,
-  Image,
-  TouchableOpacity,
   StyleSheet,
+  ScrollView,
+  ViewStyle,
+  TextStyle,
 } from "react-native";
-import { Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
 import TabsHeader from "../../components/TabsHeader";
-import { Link, useRouter } from "expo-router";
-import styles from "@/assets/styles/home.styles";
 
-const StudentHome = () => {
-  const router = useRouter();
-
+export default function LecturerHomeScreen(): JSX.Element {
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.background, marginBottom: 16, }}>
-      {/* Fixed Header */}
+    <View style={styles.container}>
+  
       <TabsHeader />
 
-      {/* Scrollable Content */}
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: 30 }}
-        style={{ marginTop: 60 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Student Info Card */}
-        <View style={localStyles.infoCard}>
-          <View style={{ flex: 1 }}>
-            <Text style={localStyles.name}>PATRISCO GIVENCE</Text>
-            <Text style={localStyles.matricule}>
-              Username:{" "}
-              <Text style={{ fontStyle: "italic" }}>BU23-NUS-0023</Text>
-            </Text>
-          </View>
-          <Image
-            source={require("../../assets/images/icon.png")}
-            style={localStyles.avatar}
-          />
+     
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Welcome Section */}
+        <View style={styles.header}>
+          <Text style={styles.welcome}>Welcome back,</Text>
+          <Text style={styles.name}>Mr. Patrisco</Text>
         </View>
 
         {/* Announcements */}
-        <View style={styles.bookCard}>
-          <Text style={styles.bookTitle}>📣 Announcements</Text>
-          <Text style={styles.caption}>
-            📌 Orientation starts Sept 1st. Make sure to check your department schedule.
-          </Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>📢 Announcements</Text>
+          <View style={styles.announcementCard}>
+            <Text style={styles.announcementText}>
+              The quiz portal will close on Friday at 5 PM. Ensure all marks are uploaded before then.
+            </Text>
+          </View>
         </View>
 
-        {/* Upcoming */}
-        <View style={styles.bookCard}>
-          <Text style={styles.bookTitle}>🗓️ Upcoming</Text>
-          <Text style={styles.caption}>📘 Data Structures Quiz – Friday, 10AM</Text>
-          <Text style={styles.caption}>📗 Software Eng. Class – Thursday, 2PM</Text>
+        {/* Student Overview */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>📊 Student Overview</Text>
+          <View style={styles.statsRow}>
+            <View style={styles.statBox}>
+              <Ionicons name="people-outline" size={24} color={COLORS.primary} />
+              <Text style={styles.statValue}>120</Text>
+              <Text style={styles.statLabel}>Students</Text>
+            </View>
+            <View style={styles.statBox}>
+              <Ionicons name="checkmark-circle-outline" size={24} color={COLORS.success} />
+              <Text style={styles.statValue}>85%</Text>
+              <Text style={styles.statLabel}>Attendance</Text>
+            </View>
+            <View style={styles.statBox}>
+              <Ionicons name="trending-up-outline" size={24} color={COLORS.warning} />
+              <Text style={styles.statValue}>72%</Text>
+              <Text style={styles.statLabel}>Avg. Grade</Text>
+            </View>
+          </View>
         </View>
 
-        {/* Quick Action Boxes */}
-        <View style={localStyles.gridContainer}>
-          {[
-            {
-              label: "Results",
-              route: "results",
-              icon: <MaterialIcons name="school" size={24} color={COLORS.primary} />,
-            },
-            {
-              label: "Fees",
-              route: "/teacher/fee/fees",
-              icon: <Feather name="credit-card" size={24} color={COLORS.primary} />,
-            },
-            {
-              label: "My Courses",
-              route: "courses",
-              icon: <Ionicons name="book-outline" size={24} color={COLORS.primary} />,
-            },
-            {
-              label: "Complaints",
-              route: "/teacher/profile/complaint",
-              icon: <Ionicons name="alert-circle-outline" size={24} color={COLORS.primary} />,
-            },
-            {
-              label: "More",
-              route: "/teacher/more",
-              icon: <Ionicons name="ellipsis-horizontal" size={24} color={COLORS.primary} />,
-            },
-          ].map((item, index) => (
-            <Link href={item.route as any} asChild>
-              <TouchableOpacity style={localStyles.box}>
-                {item.icon}
-                <Text style={localStyles.boxLabel}>{item.label}</Text>
-              </TouchableOpacity>
-            </Link>
-
-            // <TouchableOpacity
-            //   key={index}
-            //   style={localStyles.box}
-            //   onPress={() => router.push(item?.route)}
-            // >
-            //   {item.icon}
-            //   <Text style={localStyles.boxLabel}>{item.label}</Text>
-            // </TouchableOpacity>
-          ))}
+        {/* Lecturer Overview */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>📚 Lecturer Overview</Text>
+          <View style={styles.statsRow}>
+            <View style={styles.statBox}>
+              <FontAwesome5 name="chalkboard-teacher" size={24} color={COLORS.info} />
+              <Text style={styles.statValue}>4</Text>
+              <Text style={styles.statLabel}>Courses</Text>
+            </View>
+            <View style={styles.statBox}>
+              <MaterialIcons name="class" size={24} color={COLORS.warning} />
+              <Text style={styles.statValue}>6</Text>
+              <Text style={styles.statLabel}>Classes</Text>
+            </View>
+            <View style={styles.statBox}>
+              <Ionicons name="book-outline" size={24} color={COLORS.primary} />
+              <Text style={styles.statValue}>3</Text>
+              <Text style={styles.statLabel}>Subjects</Text>
+            </View>
+          </View>
         </View>
 
-        {/* Quick Links */}
-        <View style={[styles.bookCard, { paddingVertical: 10 }]}>
-          <Text style={styles.bookTitle}>🚀 Quick Links</Text>
-
-          <TouchableOpacity style={styles.linkItem}>
-            <Ionicons name="book-outline" size={20} color={COLORS.textPrimary} />
-            <Text style={[styles.caption, { marginLeft: 10 }]}>View My Courses</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.linkItem}>
-            <Ionicons name="calendar-outline" size={20} color={COLORS.textPrimary} />
-            <Text style={[styles.caption, { marginLeft: 10 }]}>My Timetable</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.linkItem}>
-            <Ionicons name="bar-chart-outline" size={20} color={COLORS.textPrimary} />
-            <Text style={[styles.caption, { marginLeft: 10 }]}>View Results</Text>
-          </TouchableOpacity>
+        {/* Resits Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>🎓 Resits</Text>
+          <View style={styles.statsRow}>
+            <View style={styles.statBox}>
+              <Ionicons name="document-text-outline" size={24} color={COLORS.error} />
+              <Text style={styles.statValue}>12</Text>
+              <Text style={styles.statLabel}>Resits (Sem 1)</Text>
+            </View>
+            <View style={styles.statBox}>
+              <Ionicons name="document-text-outline" size={24} color={COLORS.error} />
+              <Text style={styles.statValue}>8</Text>
+              <Text style={styles.statLabel}>Resits (Sem 2)</Text>
+            </View>
+          </View>
         </View>
       </ScrollView>
     </View>
   );
-};
+}
 
-export default StudentHome;
-
-
-// Local Styles
-const localStyles = StyleSheet.create({
-  infoCard: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 10,
-    padding: 16,
-    margin: 16,
-    flexDirection: "row",
-    alignItems: "center",
+const styles = StyleSheet.create<{
+  container: ViewStyle;
+  scrollContent: ViewStyle;
+  header: ViewStyle;
+  welcome: TextStyle;
+  name: TextStyle;
+  section: ViewStyle;
+  sectionTitle: TextStyle;
+  announcementCard: ViewStyle;
+  announcementText: TextStyle;
+  statsRow: ViewStyle;
+  statBox: ViewStyle;
+  statValue: TextStyle;
+  statLabel: TextStyle;
+}>({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingBottom: 30,
+  },
+  header: {
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  welcome: {
+    fontSize: 16,
+    color: COLORS.textSecondary,
   },
   name: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
-    marginBottom: 4,
+    fontSize: 24,
+    fontWeight: "700",
+    color: COLORS.textPrimary,
   },
-  program: {
-    color: "white",
-    fontSize: 14,
-    marginBottom: 2,
+  section: {
+    marginTop: 20,
   },
-  level: {
-    color: "white",
-    fontSize: 13,
-    marginBottom: 2,
-  },
-  matricule: {
-    color: "white",
-    fontSize: 12,
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
     marginBottom: 10,
+    color: COLORS.textPrimary,
   },
-  performanceLabel: {
-    color: "white",
-    fontSize: 12,
-    marginBottom: 4,
+  announcementCard: {
+    backgroundColor: COLORS.cardBackground,
+    padding: 15,
+    borderRadius: 10,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.primary,
+    elevation: 1,
   },
-  progressBar: {
-    height: 6,
-    backgroundColor: "#ccc",
-    borderRadius: 5,
-    width: "90%",
-  },
-  progress: {
-    height: 6,
-    backgroundColor: "#00FFAA",
-    borderRadius: 5,
-  },
-  avatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginLeft: 10,
-    borderWidth: 2,
-    borderColor: "white",
-  },
-  gridContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-  },
-  box: {
-    width: "47%",
-    backgroundColor: "white",
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 16,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  boxLabel: {
-    marginTop: 10,
-    fontSize: 13,
-    fontWeight: "500",
+  announcementText: {
+    fontSize: 14,
     color: COLORS.textDark,
+  },
+  statsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  statBox: {
+    flex: 1,
+    alignItems: "center",
+    backgroundColor: COLORS.cardBackground,
+    paddingVertical: 20,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  statValue: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginTop: 8,
+    color: COLORS.textPrimary,
+  },
+  statLabel: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    textAlign: "center",
   },
 });

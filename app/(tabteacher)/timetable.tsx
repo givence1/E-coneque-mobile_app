@@ -1,87 +1,130 @@
-// app/student/timetable/index.jsx
-import React from "react";
-import { View, Text, FlatList, StyleSheet, ScrollView } from "react-native";
+import React, { JSX } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ViewStyle,
+  TextStyle,
+} from "react-native";
 import COLORS from "../../constants/colors";
-import TabsHeader from "../../components/TabsHeader";
+import { Ionicons } from "@expo/vector-icons";
+import TabsHeader from "../../components/TabsHeader"; // ✅ Import TabsHeader
 
-const timetableData = {
-  Monday: [
-    { time: "8:00 - 9:30", course: "Calculus", lecturer: "Dr. Smith", room: "A101" },
-    { time: "10:00 - 11:30", course: "English", lecturer: "Ms. Johnson", room: "B203" },
-  ],
-  Tuesday: [
-    { time: "9:00 - 10:30", course: "Physics", lecturer: "Mr. Lee", room: "C201" },
-  ],
-  // ... add rest of the week
+// Define types for the timetable data
+type Session = {
+  course: string;
+  time: string;
+  room: string;
 };
 
-const TimetableScreen = () => {
+type TimetableData = {
+  [day: string]: Session[];
+};
+
+const timetableData: TimetableData = {
+  Monday: [
+    { course: "Web Development", time: "9:00 AM - 11:00 AM", room: "Lab 2" },
+    { course: "Database Systems", time: "2:00 PM - 4:00 PM", room: "Room 101" },
+  ],
+  Wednesday: [
+    { course: "Data Structures", time: "11:00 AM - 1:00 PM", room: "Lab 1" },
+  ],
+  Friday: [
+    { course: "Computer Networks", time: "10:00 AM - 12:00 PM", room: "Room 202" },
+  ],
+};
+
+export default function LecturerTimetableScreen(): JSX.Element {
   return (
-     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-      {/* Fixed Header */}
+    <View style={styles.container}>
+      {/* ✅ Fixed Tabs Header */}
       <TabsHeader />
-     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingTop: 50 }}>
-      <Text style={styles.title}>Weekly Timetable</Text>
-      {Object.entries(timetableData).map(([day, classes]) => (
-        <View key={day} style={styles.daySection}>
-          <Text style={styles.dayTitle}>{day}</Text>
-          {classes.map((item, index) => (
-            <View key={index} style={styles.classCard}>
-              <Text style={styles.course}>{item.course}</Text>
-              <Text style={styles.details}>
-                {item.time} | {item.room} | {item.lecturer}
-              </Text>
-            </View>
-          ))}
-        </View>
-      ))}
-    </ScrollView>
-    </View>
+
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <Text style={styles.title}>📅 Weekly Timetable</Text>
+
+        {Object.entries(timetableData).map(([day, sessions]) => (
+          <View key={day} style={styles.daySection}>
+            <Text style={styles.dayTitle}>{day}</Text>
+            {sessions.map((session, idx) => (
+              <View key={idx} style={styles.card}>
+                <Ionicons
+                  name="book-outline"
+                  size={22}
+                  color={COLORS.primary}
+                />
+                <View style={styles.cardContent}>
+                  <Text style={styles.course}>{session.course}</Text>
+                  <Text style={styles.meta}>
+                    {session.time} • {session.room}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
-};
+}
 
-export default TimetableScreen;
-
-const styles = StyleSheet.create({
+// Define typed styles
+const styles = StyleSheet.create<{
+  container: ViewStyle;
+  scrollContent: ViewStyle;
+  title: TextStyle;
+  daySection: ViewStyle;
+  dayTitle: TextStyle;
+  card: ViewStyle;
+  cardContent: ViewStyle;
+  course: TextStyle;
+  meta: TextStyle;
+}>({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    padding: 16,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 100,
+    paddingBottom: 30,
   },
   title: {
     fontSize: 22,
     fontWeight: "700",
-    marginBottom: 16,
-    color: COLORS.primary,
-    textAlign: "center",
+    color: COLORS.textPrimary,
+    marginBottom: 15,
   },
   daySection: {
-    marginBottom: 20,
+    marginBottom: 25,
   },
   dayTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: COLORS.textPrimary,
-    marginBottom: 8,
+    color: COLORS.primary,
+    marginBottom: 10,
   },
-  classCard: {
+  card: {
     backgroundColor: COLORS.cardBackground,
     padding: 12,
-    borderRadius: 8,
-    marginBottom: 10,
-    borderColor: COLORS.border,
+    borderRadius: 10,
     borderWidth: 1,
+    borderColor: COLORS.border,
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  cardContent: {
+    marginLeft: 10,
   },
   course: {
     fontSize: 16,
     fontWeight: "600",
-    color: COLORS.textDark,
+    color: COLORS.textPrimary,
   },
-  details: {
-    fontSize: 14,
+  meta: {
+    fontSize: 13,
     color: COLORS.textSecondary,
-    marginTop: 4,
   },
 });

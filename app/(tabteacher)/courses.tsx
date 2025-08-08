@@ -1,165 +1,160 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import React, { JSX } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ViewStyle,
+  TextStyle,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
-import TabsHeader from "../../components/TabsHeader";
+import TabsHeader from "../../components/TabsHeader"; // ✅ Import TabsHeader
 
-const coursesByYear = [
+// Define the type for a course
+interface Course {
+  id: string;
+  title: string;
+  code: string;
+  students: number;
+}
+
+// Dummy data typed with the Course interface
+const dummyCourses: Course[] = [
   {
-    year: "2024/2025 Academic Year",
-    semesters: [
-      {
-        semester: "Semester I",
-        courses: [
-          { id: "1", name: "ADVANCED TECHNIQUES IN OBSTETRICS" },
-          { id: "2", name: "BLOOD TRANSFUSION" },
-          { id: "3", name: "CHILDCARE NUTRITION AND DIETETICS" },
-          { id: "4", name: "CLINICAL PHARMACOLOGY I" },
-          { id: "5", name: "COMMUNITY NURSING" },
-          { id: "6", name: "DYSTOCIA" },
-          { id: "7", name: "INTENSIVE CARE I" },
-          { id: "8", name: "MEDICAL PATHOLOGY I" },
-          { id: "9", name: "MEDICAL SURGICAL NURSING" },
-          { id: "10", name: "NURSING CARE PLANNING" },
-        ],
-      },
-      {
-        semester: "Semester II",
-        courses: [
-          { id: "11", name: "PAEDIATRIC NURSING" },
-          { id: "13", name: "GERIATRIC NURSING" },
-          { id: "14", name: "GERIATRIC NURSING" },
-          { id: "15", name: "GERIATRIC NURSING" },
-          { id: "16", name: "GERIATRIC NURSING" },
-          { id: "17", name: "GERIATRIC NURSING" },
-          { id: "18", name: "GERIATRIC NURSING" },
-          { id: "19", name: "GERIATRIC NURSING" },
-        ],
-      },
-    ],
+    id: "1",
+    title: "Computer Networks",
+    code: "CS301",
+    students: 45,
+  },
+  {
+    id: "2",
+    title: "Operating Systems",
+    code: "CS204",
+    students: 39,
   },
 ];
 
-export default function CoursesScreen() {
+export default function LecturerCoursesScreen(): JSX.Element {
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-      <TabsHeader />
+    <ScrollView
+      style={styles.container}
+    >
+      <TabsHeader /> 
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <Text style={styles.title}>My Courses</Text>
+      <Text style={styles.heading}>📚 My Courses</Text>
 
-        {coursesByYear.map((yearGroup) => (
-          <View key={yearGroup.year} style={styles.yearGroup}>
-            <Text style={styles.yearTitle}>{yearGroup.year}</Text>
-
-            {yearGroup.semesters.map((sem, indexSem) => (
-              <View key={sem.semester} style={styles.semesterGroup}>
-                <Text style={styles.semesterTitle}>{sem.semester}</Text>
-
-                <View style={styles.table}>
-                  <View style={styles.headerRow}>
-                    <Text style={[styles.cell, styles.headerCell, { flex: 1 }]}>
-                      #
-                    </Text>
-                    <Text style={[styles.cell, styles.headerCell, { flex: 6 }]}>
-                      Course Name
-                    </Text>
-                    <Text style={[styles.cell, styles.headerCell, { flex: 1 }]}>
-                      Sem
-                    </Text>
-                  </View>
-
-                  {sem.courses.map((course, index) => (
-                    <View
-                      key={course.id}
-                      style={[
-                        styles.row,
-                        index % 2 === 0 ? styles.rowEven : styles.rowOdd,
-                      ]}
-                    >
-                      <Text style={[styles.cell, { flex: 1 }]}>
-                        {index + 1}
-                      </Text>
-                      <Text style={[styles.cell, { flex: 6 }]}>
-                        {course.name}
-                      </Text>
-                      <Text style={[styles.cell, { flex: 1 }]}>{indexSem === 0 ? "I" : "II"}</Text>
-                    </View>
-                  ))}
-                </View>
-              </View>
-            ))}
+      {dummyCourses.map((course) => (
+        <View key={course.id} style={styles.courseCard}>
+          <View style={styles.courseInfo}>
+            <Text style={styles.courseTitle}>{course.title}</Text>
+            <Text style={styles.courseCode}>{course.code}</Text>
+            <Text style={styles.courseStudents}>
+              {course.students} Students
+            </Text>
           </View>
-        ))}
-      </ScrollView>
-    </View>
+
+          <View style={styles.actions}>
+            <TouchableOpacity style={styles.actionBtn}>
+              <Ionicons
+                name="document-text-outline"
+                size={18}
+                color={COLORS.primary}
+              />
+              <Text style={styles.actionText}>Notes</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.actionBtn}>
+              <Ionicons
+                name="videocam-outline"
+                size={18}
+                color={COLORS.primary}
+              />
+              <Text style={styles.actionText}>Videos</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.actionBtn}>
+              <Ionicons
+                name="clipboard-outline"
+                size={18}
+                color={COLORS.primary}
+              />
+              <Text style={styles.actionText}>Quiz</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ))}
+    </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
-  scrollContent: {
-    paddingTop: 80, // ensure content starts below TabsHeader
-    paddingHorizontal: 16,
-    paddingBottom: 40, // to allow full scroll to bottom
+// Define styles with explicit typing for TypeScript
+const styles = StyleSheet.create<{
+  container: ViewStyle;
+  heading: TextStyle;
+  courseCard: ViewStyle;
+  courseInfo: ViewStyle;
+  courseTitle: TextStyle;
+  courseCode: TextStyle;
+  courseStudents: TextStyle;
+  actions: ViewStyle;
+  actionBtn: ViewStyle;
+  actionText: TextStyle;
+}>({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: COLORS.primary,
-    marginBottom: 16,
-  },
-  yearGroup: {
-    marginBottom: 24,
-  },
-  yearTitle: {
-    fontSize: 18,
+  heading: {
+    fontSize: 22,
     fontWeight: "700",
     color: COLORS.textPrimary,
-    marginBottom: 8,
+    marginTop: 30,
+    marginBottom: 20,
   },
-  semesterGroup: {
-    marginBottom: 12,
-  },
-  semesterTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: COLORS.textDark,
-    marginBottom: 8,
-  },
-  table: {
+  courseCard: {
+    backgroundColor: COLORS.cardBackground,
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: COLORS.border,
-    borderRadius: 8,
-    overflow: "hidden",
+    padding: 15,
+    marginBottom: 15,
   },
-  headerRow: {
-    flexDirection: "row",
-    backgroundColor: COLORS.cardBackground,
-    borderBottomWidth: 1,
-    borderColor: COLORS.border,
+  courseInfo: {
+    marginBottom: 10,
   },
-  row: {
-    flexDirection: "row",
-    paddingVertical: 10,
-    paddingHorizontal: 6,
-  },
-  rowEven: {
-    backgroundColor: COLORS.background,
-  },
-  rowOdd: {
-    backgroundColor: COLORS.cardBackground,
-  },
-  cell: {
-    paddingHorizontal: 6,
-    fontSize: 13,
+  courseTitle: {
+    fontSize: 18,
+    fontWeight: "600",
     color: COLORS.textPrimary,
   },
-  headerCell: {
-    fontWeight: "700",
-    fontSize: 18,
+  courseCode: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  courseStudents: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginTop: 4,
+  },
+  actions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  actionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: COLORS.background,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+  },
+  actionText: {
+    fontSize: 14,
     color: COLORS.textDark,
-    paddingVertical: 8
   },
 });

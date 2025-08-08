@@ -1,0 +1,104 @@
+import React, { JSX } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  FlatList,
+  ViewStyle,
+  TextStyle,
+} from "react-native";
+import { useRouter } from "expo-router";
+import COLORS from "../../constants/colors";
+
+type AcademicYear = {
+  id: string;
+  school: string;
+  city: String;
+  campus: string;
+};
+
+const academicYears: AcademicYear[] = [
+    { id: "1",school:"BEST CHOISE UNIVERSITY INSTITUDE", city:"BAMENDA, BP CITE",  campus: "A" },
+    { id: "2", school: "BEST CHOISE UNIVERSITY INSTITUDE", city:"DOUALA, BUNABERI",   campus: "B" },
+    { id: "3", school: "BEST CHOISE UNIVERSITY INSTITUDE", city:"DOUALA, AKWA",  campus: "C" },
+];
+
+export default function SelectCampusScreen(): JSX.Element {
+  const router = useRouter();
+
+  const handleSelect = (item: AcademicYear): void => {
+    router.replace({
+      pathname: "/(tabteacher)",
+      params: { campus: item.campus },
+    });
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.header}>Select Campus</Text>
+
+      <FlatList
+        data={academicYears}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity style={styles.card} onPress={() => handleSelect(item)}>
+            <Text style={styles.title} >
+               {item.school}
+            </Text>
+            <Text style={styles.text}>
+             {item.city}
+            </Text>
+            <Text style={styles.text}>
+             {item.campus}
+            </Text>
+          </TouchableOpacity>
+        )}
+        contentContainerStyle={{ paddingVertical: 20 }}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create<{
+  container: ViewStyle;
+  header: TextStyle;
+  card: ViewStyle;
+  title: TextStyle;
+  text: TextStyle;
+}>({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    padding: 16,
+  },
+  header: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: COLORS.primary,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  card: {
+    backgroundColor: "#E3F0FF",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 3,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: COLORS.primary,
+    marginBottom: 8,
+  },
+  text: {
+    fontSize: 14,
+    color: "#333",
+    marginBottom: 4,
+  },
+});

@@ -1,15 +1,19 @@
 const COLORS = {
-  primary: "#00796B",           // Teal (rich, elegant primary)
-  textPrimary: "#004D40",       // Dark teal - excellent contrast for body text
-  textSecondary: "#00695C",     // Slightly lighter - for less dominant text
-  textDark: "#002D27",          // Very dark teal for headers/emphasis
-  placeholderText: "#757575",   // Standard neutral gray for placeholders
-  background: "#E0F2F1",        // Soft, refreshing mint green background
-  cardBackground: "#FFFFFF",    // Classic white cards for contrast
-  inputBackground: "#F1F8F7",   // Slightly green-tinted white for input clarity
-  border: "#B2DFDB",            // Muted teal border (soft on light BGs)
+  primary: "#00796B",           // Teal
+  textPrimary: "#004D40",
+  textSecondary: "#00695C",
+  textDark: "#002D27",
+  placeholderText: "#757575",
+  background: "#E0F2F1",
+  cardBackground: "#FFFFFF",
+  inputBackground: "#F1F8F7",
+  border: "#B2DFDB",
   white: "#FFFFFF",
   black: "#000000",
+  warning: "#CD3434FF",         // Already defined
+  success: "#2E7D32",           // Green for success
+  error: "#D32F2F",             // Red for errors
+  info: "#0288D1",              // Blue for info
 };
 
 // OCEAN BREEZE THEME

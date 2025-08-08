@@ -49,8 +49,8 @@ export default function RootLayout() {
       router.replace('/(auth)');
     } else if (isSignedIn && inAuthScreen) {
       if (role === "admin") router.replace('/(tabteacher)');
-      if (role === "student") router.replace('/(tabstudent)');
-      if (role === "teacher") router.replace('/(tabteacher)');
+      if (role === "student") router.replace('/(auth)/select-year');
+      if (role === "teacher") router.replace('/(auth)/select-campus');
       if (role === "parent") router.replace('/(tabparent)');
     }
 
