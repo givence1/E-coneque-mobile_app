@@ -30,7 +30,7 @@ export default function SelectYearScreen(): JSX.Element {
 
   const handleSelect = (item: AcademicYear): void => {
     router.replace({
-      pathname: "/(tabstudent)",
+      pathname: "/(tabstudent)/higher/tabs/index",
       params: { year: item.year, level: item.level },
     });
   };

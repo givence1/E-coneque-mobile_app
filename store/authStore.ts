@@ -1,6 +1,6 @@
 import { client } from '@/utils/graphql/client';
 import { JwtPayload } from '@/utils/interfaces';
-import { NodeSchoolHigherInfo } from '@/utils/schemas/interfaceGraphql';
+import { NodeSchoolHigherInfo, NodeSchoolIdentification } from '@/utils/schemas/interfaceGraphql';
 import { gql } from '@apollo/client';
 import { create } from 'zustand';
 import { jwtDecode } from 'jwt-decode';
@@ -10,26 +10,38 @@ import { jwtDecode } from 'jwt-decode';
 
 interface AuthStore {
   user: JwtPayload | null;
+  feesId: number | null;
+  profileId: number | null;
   token: string | null;
   isCheckingAuth: boolean;
   isLoading: boolean;
+  schoolIdentification: NodeSchoolIdentification | null;
+  campusInfo: NodeSchoolHigherInfo | null;
+  role: "student" | "teacher" | "parent" | "admin" | any;
+
   login: (loginData?: any) => Promise<{ token: string, refresh?: string }>;
   logout: () => void;
   checkAuth: () => void;
-  schoolInfo: NodeSchoolHigherInfo | null;
-  role: "student" | "teacher" | "parent" | "admin" | any;
+  storeFeesId: (id: number) => void;
+  storeProfileId: (id: number) => void;
+  storeCampusInfo: (data: NodeSchoolHigherInfo) => void;
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
+  feesId: null,
+  profileId: null,
   token: null,
   isCheckingAuth: false,
   isLoading: false,
-  schoolInfo: null,
+  schoolIdentification: null,
+  campusInfo: null,
   role: "student",
 
+  storeFeesId: async (feesId: number) => { set({ feesId })},
+  storeProfileId: async (profileId: number) => { set({ profileId })},
+  storeCampusInfo: async (campusInfo: NodeSchoolHigherInfo) => { set({ campusInfo })},
   login: async (loginData: any) => {
-    console.log(loginData);
     set({ isLoading: true });
 
     try {
@@ -73,18 +85,18 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const { data } = await client.query({
         query: querySchool,
       });
-      const school = data?.allSchoolInfos?.edges?.[0]?.node;
+      const school = data?.allSchoolInfos?.edges?.[0]?.node?.schoolIdentification;
 
       await new Promise((res) => setTimeout(res, 1000)); // ⏱️ delay 1s after fetch
 
       set({
-        schoolInfo: school,
+        schoolIdentification: school,
         isCheckingAuth: false,
       });
 
     } catch (error) {
       console.error("School info fetch failed", error);
-      set({ schoolInfo: null, isCheckingAuth: false });
+      set({ schoolIdentification: null, isCheckingAuth: false });
     }
   },
 }));
