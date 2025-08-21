@@ -25,11 +25,10 @@ export default function Login() {
   const [parent, setParent] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  const { isLoading, login, role, isCheckingAuth, schoolInfo, checkAuth } = useAuthStore();
+  const { isLoading, login, role, isCheckingAuth, schoolIdentification, checkAuth } = useAuthStore();
 
   const handleLogin = async () => {
     if (matricle.trim().length < 4) {
-      console.log("Invalid Input", "Matricle/Username must be at least 4 characters long.");
       alert("Matricle/Username must be at least 4 characters long.");
       Alert.alert("Invalid Input", "Matricle/Username must be at least 4 characters long.");
       return;
@@ -47,13 +46,13 @@ export default function Login() {
 
     try {
       const result = await login(loginData);
+      console.log(result);
 
       if (!result?.token || result.token.length < 10) {
         alert("Invalid credentials");
         Alert.alert("Login Failed", "Invalid credentials");
       }
     } catch (error) {
-      console.error("Login error:", error);
       alert(JSON.stringify(error));
       Alert.alert("Error", "Something went wrong. Please try again.");
     }
@@ -61,11 +60,11 @@ export default function Login() {
 
   if (isCheckingAuth) return null;
 
-  if (!schoolInfo) {
+  if (!schoolIdentification) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
         <Text style={{ fontSize: 18, color: 'red', marginBottom: 12 }}>
-          {schoolInfo || "Unable to load school information."}
+          {schoolIdentification || "Unable to load school information."}
         </Text>
         <TouchableOpacity onPress={() => checkAuth()} style={styles.button}>
           <Text style={styles.buttonText}>Retry</Text>
@@ -82,7 +81,7 @@ export default function Login() {
       {/* Header with Logo + School Name */}
       <View style={{ alignItems: "center", gap: 40, paddingTop: 50, paddingBottom: 30, backgroundColor: COLORS.background, }}>
         <Image
-          source={{ uri: `${protocol}${tenant}${RootApi}/media/${schoolInfo?.schoolIdentification?.logo}` }}
+          source={{ uri: `${protocol}${tenant}${RootApi}/media/${schoolIdentification?.logo}` }}
           style={{ width: 120, height: 120, borderRadius: 10, }}
           resizeMode="contain"
         />
@@ -95,7 +94,7 @@ export default function Login() {
             textAlign: "center",
           }}
         >
-          {schoolInfo?.schoolIdentification?.name || "Welcome"}
+          {schoolIdentification?.name || "Welcome"}
         </Text>
       </View>
 

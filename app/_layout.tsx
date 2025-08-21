@@ -33,12 +33,6 @@ export default function RootLayout() {
     }
   }, [isCheckingAuth]);
 
-  console.log(user);
-  console.log(token);
-  console.log(role);
-  
-
-  // Step 3: Once layout and auth are ready, navigate and hide splash
   useEffect(() => {
     if (!isLayoutReady) return;
 
@@ -49,7 +43,7 @@ export default function RootLayout() {
       router.replace('/(auth)');
     } else if (isSignedIn && inAuthScreen) {
       if (role === "admin") router.replace('/(tabteacher)');
-      if (role === "student") router.replace('/(auth)/select-year');
+      if (role === "student") router.replace('/(auth)/select-profile');
       if (role === "teacher") router.replace('/(auth)/select-campus');
       if (role === "parent") router.replace('/(tabparent)');
     }
@@ -61,7 +55,6 @@ export default function RootLayout() {
     return (
       <SafeAreaProvider>
         <SafeScreen>
-          {/* 💡 Replace with your custom splash/loading screen */}
           <BootingScreen />
         </SafeScreen>
       </SafeAreaProvider>
