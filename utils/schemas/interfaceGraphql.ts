@@ -327,6 +327,8 @@ export interface NodeCourse {
 
 
 export interface NodeResult {
+  publishResit: boolean;
+  publishExam: boolean;
   id: string;
   student: NodeUserProfile,
   course: NodeCourse,
