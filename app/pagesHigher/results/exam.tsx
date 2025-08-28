@@ -34,17 +34,20 @@ export default function ExamResults() {
   }, [semester, dataResults]);
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       <Header placeholder="" />
-      <View>
-        <Picker
-          selectedValue={semester}
-          onValueChange={(value) => setSemester(value)}
-        >
-          <Picker.Item label="Select Semester" value={null} />
-          <Picker.Item label="I" value="I" />
-          <Picker.Item label="II" value="II" />
-        </Picker>
+      <View style={styles.dropdownWrapper}>
+      <Picker
+    selectedValue={semester}
+    onValueChange={(value) => setSemester(value)}
+    style={styles.picker}       
+    itemStyle={styles.pickerItem}      
+    dropdownIconColor={COLORS.primary} 
+  >
+    <Picker.Item label="Select semester" value={null} style={styles.optionPlaceholder} />
+    <Picker.Item label="I" value="I" style={styles.optionItem} />
+    <Picker.Item label="II" value="II" style={styles.optionItem} />
+  </Picker>
       </View>
       {!searchResults ?
         <DisplayResults
@@ -69,6 +72,35 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 10,
   },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 60, 
+  },
+  dropdownWrapper: {
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 8,
+    backgroundColor: COLORS.cardBackground,
+    marginBottom: 20,
+  },  
+  picker: {
+    height: 50,
+    paddingHorizontal: 10,
+    color: COLORS.textPrimary,
+  },
+  pickerItem: {
+    fontSize: 16,
+    color: COLORS.textPrimary,
+  },
+  optionPlaceholder: {
+    fontSize: 16,
+    color: COLORS.textSecondary, 
+  },
+  optionItem: {
+    fontSize: 16,
+    color: COLORS.textDark, 
+  },
+
 });
 
 const GET_EXAM_RESULTS = gql`

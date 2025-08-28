@@ -1,45 +1,98 @@
 import React from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  ActivityIndicator,
+} from "react-native";
 import TabsHeader from "../../../components/TabsHeader";
 import COLORS from "../../../constants/colors";
+import { gql, useQuery } from "@apollo/client";
+import { useAuthStore } from "@/store/authStore";
 
-const coursesByYear = [
-  {
-    year: "2024/2025 Academic Year",
-    semesters: [
-      {
-        semester: "Semester I",
-        courses: [
-          { id: "1", name: "ADVANCED TECHNIQUES IN OBSTETRICS" },
-          { id: "2", name: "BLOOD TRANSFUSION" },
-          { id: "3", name: "CHILDCARE NUTRITION AND DIETETICS" },
-          { id: "4", name: "CLINICAL PHARMACOLOGY I" },
-          { id: "5", name: "COMMUNITY NURSING" },
-          { id: "6", name: "DYSTOCIA" },
-          { id: "7", name: "INTENSIVE CARE I" },
-          { id: "8", name: "MEDICAL PATHOLOGY I" },
-          { id: "9", name: "MEDICAL SURGICAL NURSING" },
-          { id: "10", name: "NURSING CARE PLANNING" },
-        ],
-      },
-      {
-        semester: "Semester II",
-        courses: [
-          { id: "11", name: "PAEDIATRIC NURSING" },
-          { id: "13", name: "GERIATRIC NURSING" },
-          { id: "14", name: "GERIATRIC NURSING" },
-          { id: "15", name: "GERIATRIC NURSING" },
-          { id: "16", name: "GERIATRIC NURSING" },
-          { id: "17", name: "GERIATRIC NURSING" },
-          { id: "18", name: "GERIATRIC NURSING" },
-          { id: "19", name: "GERIATRIC NURSING" },
-        ],
-      },
-    ],
-  },
-];
+// GraphQL query
+const GET_COURSES = gql`
+  query GetStudentCourses($specialtyId: Decimal!) {
+    allCourses(specialtyId: $specialtyId) {
+      edges {
+        node {
+          courseCode
+          semester
+          specialty {
+            academicYear
+          }
+          mainCourse {
+            courseName
+          }
+        }
+      }
+    }
+  }
+`;
+
+type CourseNode = {
+  courseCode: string;
+  semester: "I" | "II" | string;
+  specialty?: {
+    academicYear?: string;
+  };
+  mainCourse?: {
+    courseName?: string;
+  };
+};
 
 export default function CoursesScreen() {
+  const { profileId } = useAuthStore();
+
+  // ⚠️ Replace this with actual specialtyId from profile
+  const specialtyId = 1;
+
+  const { data, loading, error } = useQuery(GET_COURSES, {
+    variables: { specialtyId: Number(specialtyId) },
+    skip: !specialtyId,
+  });
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={{ color: "red" }}>Failed to load courses</Text>
+      </View>
+    );
+  }
+
+  // Group courses by academic year and semester
+  const coursesByYear: {
+    year: string;
+    semesters: { I: { id: string; name: string }[]; II: { id: string; name: string }[] };
+  }[] = [];
+
+  (data?.allCourses?.edges || []).forEach(({ node }: { node: CourseNode }, index: number) => {
+    const year = node.specialty?.academicYear || "Unknown Year";
+    const semester = node.semester === "II" ? "II" : "I";
+
+    let yearGroup = coursesByYear.find((y) => y.year === year);
+    if (!yearGroup) {
+      yearGroup = { year, semesters: { I: [], II: [] } };
+      coursesByYear.push(yearGroup);
+    }
+
+    // Create a unique composite key: courseCode-semester-year-index
+    const uniqueId = `${node.courseCode}-${semester}-${year}-${index}`;
+    yearGroup.semesters[semester].push({
+      id: uniqueId,
+      name: node.mainCourse?.courseName || "N/A",
+    });
+  });
+
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       <TabsHeader />
@@ -52,45 +105,23 @@ export default function CoursesScreen() {
 
         {coursesByYear.map((yearGroup) => (
           <View key={yearGroup.year} style={styles.yearGroup}>
-            <Text style={styles.yearTitle}>{yearGroup.year}</Text>
+            <Text style={styles.yearTitle}>Academic Year {yearGroup.year}</Text>
 
-            {yearGroup.semesters.map((sem, indexSem) => (
-              <View key={sem.semester} style={styles.semesterGroup}>
-                <Text style={styles.semesterTitle}>{sem.semester}</Text>
-
-                <View style={styles.table}>
-                  <View style={styles.headerRow}>
-                    <Text style={[styles.cell, styles.headerCell, { flex: 1 }]}>
-                      #
-                    </Text>
-                    <Text style={[styles.cell, styles.headerCell, { flex: 6 }]}>
-                      Course Name
-                    </Text>
-                    <Text style={[styles.cell, styles.headerCell, { flex: 1 }]}>
-                      Sem
-                    </Text>
-                  </View>
-
-                  {sem.courses.map((course, index) => (
-                    <View
-                      key={course.id}
-                      style={[
-                        styles.row,
-                        index % 2 === 0 ? styles.rowEven : styles.rowOdd,
-                      ]}
-                    >
-                      <Text style={[styles.cell, { flex: 1 }]}>
-                        {index + 1}
-                      </Text>
-                      <Text style={[styles.cell, { flex: 6 }]}>
-                        {course.name}
-                      </Text>
-                      <Text style={[styles.cell, { flex: 1 }]}>{indexSem === 0 ? "I" : "II"}</Text>
-                    </View>
-                  ))}
-                </View>
+            {/* Semester I */}
+            {yearGroup.semesters.I.length > 0 && (
+              <View style={styles.semesterGroup}>
+                <Text style={styles.semesterTitle}>Semester I</Text>
+                {renderTable(yearGroup.semesters.I, "I")}
               </View>
-            ))}
+            )}
+
+            {/* Semester II */}
+            {yearGroup.semesters.II.length > 0 && (
+              <View style={styles.semesterGroup}>
+                <Text style={styles.semesterTitle}>Semester II</Text>
+                {renderTable(yearGroup.semesters.II, "II")}
+              </View>
+            )}
           </View>
         ))}
       </ScrollView>
@@ -98,11 +129,45 @@ export default function CoursesScreen() {
   );
 }
 
+function renderTable(courses: { id: string; name: string }[], semester: string) {
+  return (
+    <View style={styles.table}>
+      <View style={styles.headerRow}>
+        <Text style={[styles.cell, styles.headerCell, { flex: 1 }]}>#</Text>
+        <Text style={[styles.cell, styles.headerCell, { flex: 6 }]}>
+          Course Name
+        </Text>
+        <Text style={[styles.cell, styles.headerCell, { flex: 1 }]}>Sem</Text>
+      </View>
+
+      {courses.map((course, index) => (
+        <View
+          key={course.id} // ✅ unique key now
+          style={[
+            styles.row,
+            index % 2 === 0 ? styles.rowEven : styles.rowOdd,
+          ]}
+        >
+          <Text style={[styles.cell, { flex: 1 }]}>{index + 1}</Text>
+          <Text style={[styles.cell, { flex: 6 }]}>{course.name}</Text>
+          <Text style={[styles.cell, { flex: 1 }]}>{semester}</Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   scrollContent: {
-    paddingTop: 80, // ensure content starts below TabsHeader
+    paddingTop: 80,
     paddingHorizontal: 16,
-    paddingBottom: 40, // to allow full scroll to bottom
+    paddingBottom: 40,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: COLORS.background,
   },
   title: {
     fontSize: 24,
@@ -120,7 +185,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   semesterGroup: {
-    marginBottom: 12,
+    marginBottom: 16,
   },
   semesterTitle: {
     fontSize: 16,
@@ -158,8 +223,8 @@ const styles = StyleSheet.create({
   },
   headerCell: {
     fontWeight: "700",
-    fontSize: 18,
+    fontSize: 16,
     color: COLORS.textDark,
-    paddingVertical: 8
+    paddingVertical: 8,
   },
 });

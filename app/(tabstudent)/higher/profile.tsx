@@ -3,24 +3,50 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
+  ActivityIndicator,
   Image,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import TabsHeader from "../../../components/TabsHeader";
 import COLORS from "../../../constants/colors";
+import { gql, useQuery } from "@apollo/client";
 
 export default function StudentProfileScreen() {
-  const { logout } = useAuthStore();
+  const { logout, profileId } = useAuthStore();
   const router = useRouter();
 
   const handleLogout = () => {
     const confirmed = confirm("Are you sure you want to logout?");
     if (confirmed) logout();
   };
+
+  // Fetch student profile from backend
+  const { data, loading, error } = useQuery(GET_PROFILE, {
+    variables: { id: profileId },
+    skip: !profileId,
+  });
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
+        <Text style={{ color: "red" }}>Failed to load profile</Text>
+      </View>
+    );
+  }
+
+  const profile = data?.allUserProfiles?.edges?.[0]?.node || {};
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
@@ -30,52 +56,69 @@ export default function StudentProfileScreen() {
       {/* Scrollable Content */}
       <ScrollView
         style={styles.container}
-        contentContainerStyle={{ paddingTop: 80, paddingBottom: 30 }}
+        contentContainerStyle={{ paddingTop: 80, paddingBottom: 50 }}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
+        {/* Profile Header */}
+        <View style={styles.headerCard}>
           <Image
-            source={{ uri: "https://via.placeholder.com/120" }}
+            source={{ uri: profile?.customuser?.photo || "https://via.placeholder.com/120" }}
             style={styles.avatar}
           />
-          <Text style={styles.name}>Patrisco Givence</Text>
-          <Text style={styles.subtext}>Matric: ICT20230001</Text>
+          <Text style={styles.name}>{profile?.customuser?.fullName || "Not Available"}</Text>
+          <Text style={styles.matric}>Matric: {profile?.customuser?.matricle}</Text>
         </View>
 
-        <View style={styles.section}>
-          <TouchableOpacity
-            style={styles.actionBtn}
-            onPress={() => router.push("/student/profile/edit")}
-          >
-            <Ionicons name="create-outline" size={20} color={COLORS.primary} />
-            <Text style={styles.actionText}>Edit Profile</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionBtn}
-            onPress={() => router.push("/student/profile/attendance")}
-          >
-            <Ionicons name="clipboard-outline" size={20} color={COLORS.primary} />
-            <Text style={styles.actionText}>View Attendance</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionBtn}
-            onPress={() => router.push("/student/profile/complaint")}
-          >
-            <Ionicons name="chatbox-ellipses-outline" size={20} color={COLORS.primary} />
-            <Text style={styles.actionText}>Submit Complaint</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.actionBtn}
-            onPress={() => router.push("/student/profile/ComplaintHistory")}
-          >
-            <Ionicons name="document-text-outline" size={20} color={COLORS.primary} />
-            <Text style={styles.actionText}>Complaint History</Text>
-          </TouchableOpacity>
+        {/* Contact Info */}
+        <View style={styles.infoCard}>
+          <Text style={styles.sectionTitle}>📞 Contact Info</Text>
+          <InfoRow label="Email" value={profile?.customuser?.email} />
+          <InfoRow label="Phone" value={profile?.customuser?.telephone} />
         </View>
 
+        {/* Parent Info */}
+        <View style={styles.infoCard}>
+          <Text style={styles.sectionTitle}>👨‍👩‍👧 Parent / Guardian Info</Text>
+          <InfoRow label="Father" value={profile?.customuser?.fatherName} />
+          <InfoRow label="Father Tel" value={profile?.customuser?.fatherTelephone} />
+          <InfoRow label="Mother" value={profile?.customuser?.motherName} />
+          <InfoRow label="Mother Tel" value={profile?.customuser?.motherTelephone} />
+        </View>
+
+        {/* Academic Info */}
+        <View style={styles.infoCard}>
+          <Text style={styles.sectionTitle}>🎓 Academic Info</Text>
+          <InfoRow label="Program" value={profile?.program?.name} />
+          <InfoRow label="Level" value={profile?.specialty?.level?.level} />
+          <InfoRow label="Department" value={profile?.specialty?.mainSpecialty?.specialtyName} />
+          <InfoRow label="Year" value={profile?.specialty?.academicYear} />
+        </View>
+
+        {/* Action Buttons (2-column grid) */}
+        <View style={styles.actionsGrid}>
+          <ActionButton
+            icon="create-outline"
+            label="Edit Profile"
+            onPress={() => router.push("/pagesHigher/profile/edit")}
+          />
+          <ActionButton
+            icon="clipboard-outline"
+            label="Attendance"
+            onPress={() => router.push("/pagesHigher/profile/attendance")}
+          />
+          <ActionButton
+            icon="chatbox-ellipses-outline"
+            label="Complaint"
+            onPress={() => router.push("/pagesHigher/profile/complaint")}
+          />
+          <ActionButton
+            icon="document-text-outline"
+            label="History"
+            onPress={() => router.push("/pagesHigher/profile/ComplaintHistory")}
+          />
+        </View>
+
+        {/* Logout Button */}
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
           <Ionicons name="log-out-outline" size={20} color={COLORS.white} />
           <Text style={styles.logoutText}>Logout</Text>
@@ -85,48 +128,115 @@ export default function StudentProfileScreen() {
   );
 }
 
+/* ✅ Reusable Row Component */
+const InfoRow = ({ label, value }: { label: string; value?: string }) => (
+  <View style={styles.infoRow}>
+    <Text style={styles.infoLabel}>{label}:</Text>
+    <Text style={styles.infoValue}>{value || "N/A"}</Text>
+  </View>
+);
+
+/* ✅ Reusable Action Button */
+const ActionButton = ({
+  icon,
+  label,
+  onPress,
+}: {
+  icon: any;
+  label: string;
+  onPress: () => void;
+}) => (
+  <TouchableOpacity style={styles.actionBtn} onPress={onPress}>
+    <Ionicons name={icon} size={22} color={COLORS.primary} />
+    <Text style={styles.actionText}>{label}</Text>
+  </TouchableOpacity>
+);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
     paddingHorizontal: 16,
   },
-  header: {
+  headerCard: {
     alignItems: "center",
+    backgroundColor: COLORS.cardBackground,
+    borderRadius: 15,
+    padding: 20,
     marginBottom: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   avatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: COLORS.border,
+    width: 110,
+    height: 110,
+    borderRadius: 55,
     marginBottom: 10,
+    borderWidth: 3,
+    borderColor: COLORS.primary,
   },
   name: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "700",
     color: COLORS.textPrimary,
   },
-  subtext: {
+  matric: {
     fontSize: 14,
     color: COLORS.textSecondary,
   },
-  section: {
-    marginTop: 20,
-  },
-  actionBtn: {
+  infoCard: {
     backgroundColor: COLORS.cardBackground,
+    borderRadius: 12,
     padding: 15,
-    borderRadius: 10,
-    marginBottom: 12,
+    marginBottom: 15,
     borderWidth: 1,
     borderColor: COLORS.border,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 8,
+    color: COLORS.textPrimary,
+  },
+  infoRow: {
     flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 6,
+  },
+  infoLabel: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+  infoValue: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: COLORS.textPrimary,
+  },
+  actionsGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  actionBtn: {
+    width: "48%",
+    backgroundColor: COLORS.cardBackground,
+    paddingVertical: 18,
+    borderRadius: 12,
+    marginBottom: 12,
+    flexDirection: "column",
     alignItems: "center",
-    gap: 10,
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   actionText: {
-    fontSize: 16,
+    marginTop: 6,
+    fontSize: 14,
+    fontWeight: "500",
     color: COLORS.textDark,
   },
   logoutBtn: {
@@ -134,9 +244,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: COLORS.primary,
-    marginTop: 40,
-    marginHorizontal: 60,
-    padding: 12,
+    marginTop: 20,
+    marginHorizontal: 40,
+    padding: 14,
     borderRadius: 30,
   },
   logoutText: {
@@ -146,3 +256,33 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
+
+// GraphQL query
+const GET_PROFILE = gql`
+  query GetProfile($id: ID!) {
+    allUserProfiles(id: $id) {
+      edges {
+        node {
+          id
+          program { name }
+          specialty {
+            academicYear
+            level { level }
+            mainSpecialty { specialtyName }
+          }
+          customuser {
+            fullName
+            matricle
+            email
+            telephone
+            photo
+            fatherName
+            fatherTelephone
+            motherName
+            motherTelephone
+          }
+        }
+      }
+    }
+  }
+`;
