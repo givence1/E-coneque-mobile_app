@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   View,
   Text,
@@ -6,21 +6,61 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Image,
 } from "react-native";
 import { useQuery, gql } from "@apollo/client";
 import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import TabsHeader from "../../../components/TabsHeader";
 import COLORS from "../../../constants/colors";
+import { useAuthStore } from "@/store/authStore"; 
 
-const GET_RESULTS = gql`
-  query GetData($studentId: Decimal!) {
+const GET_RESULTS_DATA = gql`
+  query GetData($studentId: Decimal!, $schoolInfoId: ID!, $feeId: ID!) {
+    allSchoolInfos(id: $schoolInfoId) {
+      edges {
+        node {
+          schoolName
+          town
+          campus
+          address
+          telephone
+          logoCampus
+        }
+      }
+    }
+
+    allSchoolFees(id: $feeId) {
+      edges {
+        node {
+          id
+          platformPaid
+          userprofile {
+            id
+            customuser {
+              id
+              matricle
+              fullName
+            }
+            specialty {
+              academicYear
+              level {
+                level
+              }
+              mainSpecialty {
+                specialtyName
+              }
+            }
+          }
+        }
+      }
+    }
+
     allResults(studentId: $studentId) {
       edges {
         node {
           id
           course {
-            courseCode
             mainCourse {
               courseName
             }
@@ -38,11 +78,33 @@ const GET_RESULTS = gql`
   }
 `;
 
-export default function ResultsScreen({ route }: any) {
-  const studentId = 1; // ✅ Replace with logged-in student ID dynamically
+export default function ResultsScreen() {
+  const { user, feesId, profileId, campusInfo } = useAuthStore();
 
-  const { data, loading, error } = useQuery(GET_RESULTS, {
-    variables: { studentId },
+  // 👀 Debug logs
+  console.log("Auth Store Data =>", { user, feesId, profileId, campusInfo });
+
+  // IDs
+  const studentId = profileId || user?.id; // Decimal!
+  const schoolInfoId = campusInfo?.id; // Relay ID (string)
+  const feeId = feesId ? String(feesId) : null; // must be string for ID!
+
+  console.log("IDs passed to query =>", { studentId, schoolInfoId, feeId });
+
+  // Guard until values are ready
+  if (!studentId || !schoolInfoId || !feeId) {
+    return (
+      <View style={styles.center}>
+        <Text>⏳ Waiting for student/session data...</Text>
+        <Text>studentId: {studentId ?? "null"}</Text>
+        <Text>schoolInfoId: {schoolInfoId ?? "null"}</Text>
+        <Text>feeId: {feeId ?? "null"}</Text>
+      </View>
+    );
+  }
+
+  const { data, loading, error } = useQuery(GET_RESULTS_DATA, {
+    variables: { studentId, schoolInfoId, feeId },
   });
 
   if (loading) {
@@ -53,69 +115,140 @@ export default function ResultsScreen({ route }: any) {
     );
   }
   if (error) {
+    console.log("GraphQL Error =>", error);
     return (
       <View style={styles.center}>
-        <Text>Error loading results 😔</Text>
+        <Text>⚠️ Error loading results</Text>
+        <Text>{error.message}</Text>
       </View>
     );
   }
 
-  const results = data?.allResults?.edges?.map((edge: any) => edge.node) || [];
+  console.log("GraphQL Data =>", data);
+
+  // ✅ Extract data
+  const school = data?.allSchoolInfos?.edges?.[0]?.node;
+  const fee = data?.allSchoolFees?.edges?.[0]?.node;
+  const student = fee?.userprofile;
+  const results = data?.allResults?.edges?.map((e: any) => e.node) || [];
+
+  // 👀 Debug results
+  console.log("School Info =>", school);
+  console.log("Student Info =>", student);
+  console.log("Results (raw) =>", results);
+
+  results.forEach((r: any) => {
+    console.log(
+      `Course: ${r.course?.mainCourse?.courseName}, CA: ${r.publishCa}, Exam: ${r.publishExam}, Resit: ${r.publishResit}`
+    );
+  });
 
   const semester1 = results.filter((r: any) => r.course.semester === 1);
   const semester2 = results.filter((r: any) => r.course.semester === 2);
 
-  // ✅ Format status
-  const getStatus = (ca: any, exam: any, resit: any) => {
-    if (resit !== null) return "Resit Published";
-    if (exam !== null) return "Exam Published";
-    if (ca !== null) return "CA Published";
-    return "Pending";
+  // ✅ Compute total and grade
+  const getTotalAndGrade = (ca: number, exam: number, resit: number) => {
+    let total = (ca || 0) + (resit !== null ? resit : exam || 0);
+    let grade = "-";
+
+    if (total >= 80) grade = "A";
+    else if (total >= 70) grade = "B+";
+    else if (total >= 60) grade = "B";
+    else if (total >= 55) grade = "C+";
+    else if (total >= 50) grade = "C";
+    else if (total >= 45) grade = "D+";
+    else if (total >= 40) grade = "D";
+    else grade = "F";
+
+    return { total, grade };
   };
 
-  // ✅ Generate HTML for printing / download
+  const renderTable = (data: any[], semesterTitle: string) => (
+    <View style={styles.tableContainer}>
+      <Text style={styles.semesterTitle}>{semesterTitle} - Result Slip</Text>
+      <View style={styles.tableHeader}>
+        <Text style={styles.cellHeader}>Course Name</Text>
+        <Text style={styles.cellHeader}>CA</Text>
+        <Text style={styles.cellHeader}>Exam</Text>
+        <Text style={styles.cellHeader}>Resit</Text>
+        <Text style={styles.cellHeader}>Total</Text>
+        <Text style={styles.cellHeader}>Grade</Text>
+      </View>
+      {data.map((r: any) => {
+        const { total, grade } = getTotalAndGrade(
+          r.publishCa,
+          r.publishExam,
+          r.publishResit
+        );
+        return (
+          <View key={r.id} style={styles.tableRow}>
+            <Text style={styles.cell}>{r.course.mainCourse.courseName}</Text>
+            <Text style={styles.cell}>{r.publishCa ?? "-"}</Text>
+            <Text style={styles.cell}>{r.publishExam ?? "-"}</Text>
+            <Text style={styles.cell}>{r.publishResit ?? "-"}</Text>
+            <Text style={styles.cell}>{total}</Text>
+            <Text style={styles.cell}>{grade}</Text>
+          </View>
+        );
+      })}
+    </View>
+  );
+
+  // ✅ Generate PDF/Print slip
   const generateHTML = () => {
     const makeTable = (semData: any, title: string) => `
-      <h2>${title}</h2>
+      <h2>${title} - Result Slip</h2>
       <table border="1" cellspacing="0" cellpadding="6" width="100%">
         <tr>
-          <th>Code</th>
-          <th>Course</th>
+          <th>Course Name</th>
           <th>CA</th>
           <th>Exam</th>
           <th>Resit</th>
-          <th>grade</th>
+          <th>Total</th>
+          <th>Grade</th>
         </tr>
         ${semData
-          .map(
-            (r: any) => `
-          <tr>
-            <td>${r.course.courseCode}</td>
-            <td>${r.course.mainCourse.courseName}</td>
-            <td>${r.publishCa ?? "-"}</td>
-            <td>${r.publishExam ?? "-"}</td>
-            <td>${r.publishResit ?? "-"}</td>
-            <td>${getStatus(r.publishCa, r.publishExam, r.publishResit)}</td>
-          </tr>
-        `
-          )
+          .map((r: any) => {
+            const { total, grade } = getTotalAndGrade(
+              r.publishCa,
+              r.publishExam,
+              r.publishResit
+            );
+            return `
+              <tr>
+                <td>${r.course.mainCourse.courseName}</td>
+                <td>${r.publishCa ?? "-"}</td>
+                <td>${r.publishExam ?? "-"}</td>
+                <td>${r.publishResit ?? "-"}</td>
+                <td>${total}</td>
+                <td>${grade}</td>
+              </tr>
+            `;
+          })
           .join("")}
       </table>
     `;
 
     return `
       <html>
-      <body>
-        <h1>My Results</h1>
-        ${makeTable(semester1, "Semester I")}
-        <br/>
-        ${makeTable(semester2, "Semester II")}
-      </body>
+        <body>
+          <h1 style="text-align:center;">${school?.schoolName}</h1>
+          <p style="text-align:center;">Town: ${school?.town} | Campus: ${school?.campus}</p>
+          <p style="text-align:center;">Tel: ${school?.telephone}</p>
+          <br/>
+          <h3>Student Name: ${student?.customuser?.fullName}</h3>
+          <p>Matricule: ${student?.customuser?.matricle}</p>
+          <p>Specialty: ${student?.specialty?.mainSpecialty?.specialtyName} |
+             Level: ${student?.specialty?.level?.level} |
+             Academic Year: ${student?.specialty?.academicYear}</p>
+          ${makeTable(semester1, "Semester I")}
+          <br/>
+          ${makeTable(semester2, "Semester II")}
+        </body>
       </html>
     `;
   };
 
-  // ✅ Print
   const handlePrint = async () => {
     try {
       await Print.printAsync({ html: generateHTML() });
@@ -124,52 +257,45 @@ export default function ResultsScreen({ route }: any) {
     }
   };
 
-  // ✅ Download & Share PDF
   const handleDownload = async () => {
     try {
-      const { uri } = await Print.printToFileAsync({
-        html: generateHTML(),
-      });
+      const { uri } = await Print.printToFileAsync({ html: generateHTML() });
       await Sharing.shareAsync(uri);
     } catch (err) {
       Alert.alert("Error", "Unable to download");
     }
   };
 
-  const renderTable = (data: any[], semesterTitle: string) => (
-    <View style={styles.tableContainer}>
-      <Text style={styles.semesterTitle}>{semesterTitle}</Text>
-      <View style={styles.tableHeader}>
-        <Text style={styles.cellHeader}>Code</Text>
-        <Text style={styles.cellHeader}>Course</Text>
-        <Text style={styles.cellHeader}>CA</Text>
-        <Text style={styles.cellHeader}>Exam</Text>
-        <Text style={styles.cellHeader}>Resit</Text>
-        <Text style={styles.cellHeader}>Grade</Text>
-      </View>
-      {data.map((r: any) => (
-        <View key={r.id} style={styles.tableRow}>
-          <Text style={styles.cell}>{r.course.courseCode}</Text>
-          <Text style={styles.cell}>{r.course.mainCourse.courseName}</Text>
-          <Text style={styles.cell}>{r.publishCa ?? "-"}</Text>
-          <Text style={styles.cell}>{r.publishExam ?? "-"}</Text>
-          <Text style={styles.cell}>{r.publishResit ?? "-"}</Text>
-          <Text style={styles.cell}>
-            {getStatus(r.publishCa, r.publishExam, r.publishResit)}
-          </Text>
-        </View>
-      ))}
-    </View>
-  );
-
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       <TabsHeader />
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>My Results</Text>
+        {/* School Header */}
+        {school?.logoCampus ? (
+          <Image source={{ uri: school.logoCampus }} style={styles.logo} />
+        ) : null}
+        <Text style={styles.schoolTitle}>{school?.schoolName}</Text>
+        <Text style={styles.subHeader}>
+          Town: {school?.town} | Campus: {school?.campus}
+        </Text>
+        <Text style={styles.subHeader}>Tel: {school?.telephone}</Text>
+
+        {/* Student Info */}
+        <Text style={styles.studentInfo}>
+          {student?.customuser?.fullName} - Matricule:{" "}
+          {student?.customuser?.matricle}
+        </Text>
+        <Text style={styles.studentInfo}>
+          {student?.specialty?.mainSpecialty?.specialtyName} | Level:{" "}
+          {student?.specialty?.level?.level} | Academic Year:{" "}
+          {student?.specialty?.academicYear}
+        </Text>
+
+        {/* Tables */}
         {renderTable(semester1, "Semester I")}
         {renderTable(semester2, "Semester II")}
 
+        {/* Actions */}
         <View style={styles.buttonRow}>
           <TouchableOpacity style={styles.button} onPress={handleDownload}>
             <Text style={styles.buttonText}>Download</Text>
@@ -194,18 +320,36 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: COLORS.primary,
+  logo: {
+    width: 70,
+    height: 70,
+    resizeMode: "contain",
+    alignSelf: "center",
+    marginBottom: 8,
+  },
+  schoolTitle: {
+    fontSize: 20,
+    fontWeight: "800",
     textAlign: "center",
-    marginBottom: 16,
+    color: COLORS.primary,
+  },
+  subHeader: {
+    textAlign: "center",
+    fontSize: 13,
+    color: COLORS.textSecondary,
+  },
+  studentInfo: {
+    marginTop: 10,
+    fontSize: 14,
+    fontWeight: "600",
+    textAlign: "center",
   },
   semesterTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "700",
     color: COLORS.primary,
     marginVertical: 10,
+    textAlign: "center",
   },
   tableContainer: {
     borderWidth: 1,
@@ -233,7 +377,7 @@ const styles = StyleSheet.create({
   },
   cell: {
     flex: 1,
-    fontSize: 13,
+    fontSize: 12,
     color: COLORS.textDark,
   },
   buttonRow: {
