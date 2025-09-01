@@ -13,7 +13,6 @@ import * as Print from "expo-print";
 import * as Sharing from "expo-sharing";
 import TabsHeader from "../../../components/TabsHeader";
 import COLORS from "../../../constants/colors";
-import { useAuthStore } from "@/store/authStore"; 
 
 const GET_RESULTS_DATA = gql`
   query GetData($studentId: Decimal!, $schoolInfoId: ID!, $feeId: ID!) {
@@ -69,6 +68,7 @@ const GET_RESULTS_DATA = gql`
               academicYear
             }
           }
+          infoData
           publishCa
           publishExam
           publishResit
@@ -78,30 +78,11 @@ const GET_RESULTS_DATA = gql`
   }
 `;
 
-export default function ResultsScreen() {
-  const { user, feesId, profileId, campusInfo } = useAuthStore();
-
-  // 👀 Debug logs
-  console.log("Auth Store Data =>", { user, feesId, profileId, campusInfo });
-
-  // IDs
-  const studentId = profileId || user?.id; // Decimal!
-  const schoolInfoId = campusInfo?.id; // Relay ID (string)
-  const feeId = feesId ? String(feesId) : null; // must be string for ID!
-
-  console.log("IDs passed to query =>", { studentId, schoolInfoId, feeId });
-
-  // Guard until values are ready
-  if (!studentId || !schoolInfoId || !feeId) {
-    return (
-      <View style={styles.center}>
-        <Text>⏳ Waiting for student/session data...</Text>
-        <Text>studentId: {studentId ?? "null"}</Text>
-        <Text>schoolInfoId: {schoolInfoId ?? "null"}</Text>
-        <Text>feeId: {feeId ?? "null"}</Text>
-      </View>
-    );
-  }
+export default function ResultsScreen({ route }: any) {
+  // ✅ Normally you pass these as params from login/session
+  const studentId = 1; // Example
+  const schoolInfoId = "1"; // Example
+  const feeId = "1"; // Example
 
   const { data, loading, error } = useQuery(GET_RESULTS_DATA, {
     variables: { studentId, schoolInfoId, feeId },
@@ -115,33 +96,18 @@ export default function ResultsScreen() {
     );
   }
   if (error) {
-    console.log("GraphQL Error =>", error);
     return (
       <View style={styles.center}>
-        <Text>⚠️ Error loading results</Text>
-        <Text>{error.message}</Text>
+        <Text>Error loading results 😔</Text>
       </View>
     );
   }
-
-  console.log("GraphQL Data =>", data);
 
   // ✅ Extract data
   const school = data?.allSchoolInfos?.edges?.[0]?.node;
   const fee = data?.allSchoolFees?.edges?.[0]?.node;
   const student = fee?.userprofile;
   const results = data?.allResults?.edges?.map((e: any) => e.node) || [];
-
-  // 👀 Debug results
-  console.log("School Info =>", school);
-  console.log("Student Info =>", student);
-  console.log("Results (raw) =>", results);
-
-  results.forEach((r: any) => {
-    console.log(
-      `Course: ${r.course?.mainCourse?.courseName}, CA: ${r.publishCa}, Exam: ${r.publishExam}, Resit: ${r.publishResit}`
-    );
-  });
 
   const semester1 = results.filter((r: any) => r.course.semester === 1);
   const semester2 = results.filter((r: any) => r.course.semester === 2);
