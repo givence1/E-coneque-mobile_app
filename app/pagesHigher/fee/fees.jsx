@@ -12,6 +12,7 @@ import {
 import Header from "../../../components/Header";
 import COLORS from "../../../constants/colors";
 
+
 const transactions = [
   { no: 1, reason: "TUITION", amount: "100,000 F" },
   { no: 2, reason: "TUITION", amount: "200,000 F" },
@@ -20,7 +21,7 @@ const transactions = [
 ];
 
 const Fees = () => {
-  const [modalVisible, setModalVisible] = useState(false);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
