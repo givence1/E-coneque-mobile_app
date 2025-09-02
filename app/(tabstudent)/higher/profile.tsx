@@ -2,6 +2,7 @@ import { useAuthStore } from "@/store/authStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
+import { Alert } from "react-native";  // 👈 import Alert
 import {
   ActivityIndicator,
   Image,
@@ -11,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Header from "@/components/Header";
 import TabsHeader from "../../../components/TabsHeader";
 import COLORS from "../../../constants/colors";
 import { gql, useQuery } from "@apollo/client";
@@ -20,9 +22,15 @@ export default function StudentProfileScreen() {
   const router = useRouter();
 
   const handleLogout = () => {
-    const confirmed = confirm("Are you sure you want to logout?");
-    if (confirmed) logout();
-  };
+  Alert.alert(
+    "Logout",
+    "Are you sure you want to logout?",
+    [
+      { text: "Cancel", style: "cancel" },
+      { text: "Yes, Logout", style: "destructive", onPress: () => logout() },
+    ]
+  );
+};
 
   // Fetch student profile from backend
   const { data, loading, error } = useQuery(GET_PROFILE, {
@@ -99,22 +107,22 @@ export default function StudentProfileScreen() {
           <ActionButton
             icon="create-outline"
             label="Edit Profile"
-            onPress={() => router.push("/pagesHigher/profile/edit")}
+            onPress={() => router.push("../pagesHigher/profile/edit")}
           />
           <ActionButton
             icon="clipboard-outline"
             label="Attendance"
-            onPress={() => router.push("/pagesHigher/profile/attendance")}
+            onPress={() => router.push("../pagesHigher/profile/attendance")}
           />
           <ActionButton
             icon="chatbox-ellipses-outline"
             label="Complaint"
-            onPress={() => router.push("/pagesHigher/profile/complaint")}
+            onPress={() => router.push("../pagesHigher/profile/complaint")}
           />
           <ActionButton
             icon="document-text-outline"
             label="History"
-            onPress={() => router.push("/pagesHigher/profile/ComplaintHistory")}
+            onPress={() => router.push("../pagesHigher/profile/ComplaintHistory")}
           />
         </View>
 

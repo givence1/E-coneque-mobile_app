@@ -6,30 +6,12 @@ import {
   View,
   ActivityIndicator,
 } from "react-native";
-import TabsHeader from "../../../components/TabsHeader";
+import TabsHeader from "@/components/TabsHeader";
 import COLORS from "../../../constants/colors";
 import { gql, useQuery } from "@apollo/client";
 import { useAuthStore } from "@/store/authStore";
+import { EdgeCourse } from "@/utils/schemas/interfaceGraphql";
 
-// GraphQL query
-const GET_COURSES = gql`
-  query GetStudentCourses($specialtyId: Decimal!) {
-    allCourses(specialtyId: $specialtyId) {
-      edges {
-        node {
-          courseCode
-          semester
-          specialty {
-            academicYear
-          }
-          mainCourse {
-            courseName
-          }
-        }
-      }
-    }
-  }
-`;
 
 type CourseNode = {
   courseCode: string;
@@ -69,30 +51,6 @@ export default function CoursesScreen() {
     );
   }
 
-  // Group courses by academic year and semester
-  const coursesByYear: {
-    year: string;
-    semesters: { I: { id: string; name: string }[]; II: { id: string; name: string }[] };
-  }[] = [];
-
-  (data?.allCourses?.edges || []).forEach(({ node }: { node: CourseNode }, index: number) => {
-    const year = node.specialty?.academicYear || "Unknown Year";
-    const semester = node.semester === "II" ? "II" : "I";
-
-    let yearGroup = coursesByYear.find((y) => y.year === year);
-    if (!yearGroup) {
-      yearGroup = { year, semesters: { I: [], II: [] } };
-      coursesByYear.push(yearGroup);
-    }
-
-    // Create a unique composite key: courseCode-semester-year-index
-    const uniqueId = `${node.courseCode}-${semester}-${year}-${index}`;
-    yearGroup.semesters[semester].push({
-      id: uniqueId,
-      name: node.mainCourse?.courseName || "N/A",
-    });
-  });
-
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       <TabsHeader />
@@ -103,33 +61,27 @@ export default function CoursesScreen() {
       >
         <Text style={styles.title}>My Courses</Text>
 
-        {coursesByYear.map((yearGroup) => (
-          <View key={yearGroup.year} style={styles.yearGroup}>
-            <Text style={styles.yearTitle}>Academic Year {yearGroup.year}</Text>
-
+          <View key={data?.allCourses?.edges[0].node?.specialty?.academicYear} style={styles.yearGroup}>
+            <Text style={styles.yearTitle}>Academic Year {data?.allCourses?.edges[0].node?.specialty?.academicYear}</Text>
+            
             {/* Semester I */}
-            {yearGroup.semesters.I.length > 0 && (
               <View style={styles.semesterGroup}>
                 <Text style={styles.semesterTitle}>Semester I</Text>
-                {renderTable(yearGroup.semesters.I, "I")}
+                {renderTable(data?.allCourses?.edges.filter((c: EdgeCourse) => c.node.semester === "I"), "I")}
               </View>
-            )}
 
             {/* Semester II */}
-            {yearGroup.semesters.II.length > 0 && (
               <View style={styles.semesterGroup}>
                 <Text style={styles.semesterTitle}>Semester II</Text>
-                {renderTable(yearGroup.semesters.II, "II")}
+                {renderTable(data?.allCourses?.edges.filter((c: EdgeCourse) => c.node.semester === "II"), "II")}
               </View>
-            )}
           </View>
-        ))}
       </ScrollView>
     </View>
   );
 }
 
-function renderTable(courses: { id: string; name: string }[], semester: string) {
+function renderTable(courses: EdgeCourse[], semester: string) {
   return (
     <View style={styles.table}>
       <View style={styles.headerRow}>
@@ -142,20 +94,45 @@ function renderTable(courses: { id: string; name: string }[], semester: string) 
 
       {courses.map((course, index) => (
         <View
-          key={course.id} // ✅ unique key now
+          key={course.node.id} // ✅ unique key now
           style={[
             styles.row,
             index % 2 === 0 ? styles.rowEven : styles.rowOdd,
           ]}
         >
           <Text style={[styles.cell, { flex: 1 }]}>{index + 1}</Text>
-          <Text style={[styles.cell, { flex: 6 }]}>{course.name}</Text>
-          <Text style={[styles.cell, { flex: 1 }]}>{semester}</Text>
+          <Text style={[styles.cell, { flex: 6 }]}>{course.node.mainCourse?.courseName}</Text>
+          <Text style={[styles.cell, { flex: 1 }]}>{course?.node?.semester}</Text>
         </View>
       ))}
     </View>
   );
 }
+
+
+const GET_COURSES = gql`
+  query GetStudentCourses(
+    $specialtyId: Decimal!
+  ) {
+    allCourses(
+    specialtyId: $specialtyId
+  ) {
+      edges {
+        node {
+        id
+          courseCode
+          semester
+          specialty {
+            academicYear
+          }
+          mainCourse {
+            courseName
+          }
+        }
+      }
+    }
+  }
+`;
 
 const styles = StyleSheet.create({
   scrollContent: {

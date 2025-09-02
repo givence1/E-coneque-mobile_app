@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import TabsHeader from "../../../components/TabsHeader";
+import Header from "../../components/Header";
 import COLORS from "../../../constants/colors";
 
 const resultsData = [

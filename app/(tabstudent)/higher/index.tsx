@@ -8,11 +8,11 @@ import {
   StyleSheet,
 } from "react-native";
 import { Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
-import TabsHeader from "../../../components/TabsHeader";
+import TabsHeader from "@/components/TabsHeader";
 import { useRouter } from "expo-router";
 import COLORS from "@/constants/colors";
 import styles from "@/assets/styles/home.styles";
-import Header from "../Header";
+import Header from "../../profileHeader/Header";
 import { gql, useQuery } from "@apollo/client";
 import { useAuthStore } from "@/store/authStore";
 
@@ -72,7 +72,7 @@ const StudentHome = () => {
             },
             {
               label: "Exam",
-              route: "/pagesHigher/results/exam",
+              route: "/pagesHigher/results/results",
               icon: <MaterialIcons name="edit" size={24} color={COLORS.primary} />,
             },
             {
@@ -87,13 +87,8 @@ const StudentHome = () => {
             },
             {
               label: "Fees",
-              route: "/pagesHigher/fee/fees",
+              route: "/pagesHigher/fee/fee",
               icon: <Feather name="credit-card" size={24} color={COLORS.primary} />,
-            },
-            {
-              label: "Courses",
-              route: "courses",
-              icon: <Ionicons name="book-outline" size={24} color={COLORS.primary} />,
             },
             {
               label: "Transcript",
