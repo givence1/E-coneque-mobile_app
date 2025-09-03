@@ -14,6 +14,7 @@ import { EdgeResult } from "@/utils/schemas/interfaceGraphql";
 import DisplayResults from "./DisplayResults";
 import { Picker } from "@react-native-picker/picker";
 
+
 // Exam Results screen for Higher Education
 export default function ExamResults() {
   const [semester, setSemester] = useState<"I" | "II" | null>(null);
