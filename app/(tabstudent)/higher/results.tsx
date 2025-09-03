@@ -1,18 +1,17 @@
+import Header from "@/components/Header";
+import { useAuthStore } from "@/store/authStore";
+import { EdgeResult } from "@/utils/schemas/interfaceGraphql";
+import { gql, useQuery } from "@apollo/client";
+import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
   StyleSheet,
-  Text,
   View
 } from "react-native";
-import Header from "@/components/Header";
 import COLORS from "../../../constants/colors";
-import { gql, useQuery } from "@apollo/client";
-import { useAuthStore } from "@/store/authStore";
-import { EdgeResult } from "@/utils/schemas/interfaceGraphql";
-import DisplayResults from "@/components/pagesHigher/results/DisplayResults";
-import { Picker } from "@react-native-picker/picker";
+import DisplayResults from "../../pagesHigher/results/DisplayResults";
 
 // Exam Results screen for Higher Education
 export default function ExamResults() {

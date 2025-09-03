@@ -1,21 +1,18 @@
+import { useAuthStore } from "@/store/authStore";
+import { NodeSchoolFees } from "@/utils/schemas/interfaceGraphql";
+import { gql, useQuery } from "@apollo/client";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
-  Modal,
   ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import Header from "../../../components/Header";
 import COLORS from "../../../constants/colors";
-import { gql, useQuery } from "@apollo/client";
-import { useAuthStore } from "@/store/authStore";
-import { NodeSchoolFees } from "@/utils/schemas/interfaceGraphql";
-import { decodeUrlID } from "@/utils/functions";
 import ModalMoratorium from "../../pagesHigher/fee/ModalMoratorium";
 
 
@@ -31,6 +28,8 @@ const Fees = () => {
 
   const [modalVisible, setModalVisible] = useState(false);
   const [fees, setFees] = useState<NodeSchoolFees>();
+  const [moratoriumStatus, setMoratoriumStatus] = useState(null);
+
 
   useEffect(() => {
     if (dataFees?.allSchoolFees?.edges?.length) {
@@ -142,6 +141,8 @@ const Fees = () => {
         fees={fees}
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
+        setMoratoriumStatus={setMoratoriumStatus}
+
       /> : null}
 
     </View>
