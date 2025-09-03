@@ -6,16 +6,26 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity
+  TouchableOpacity,
+  ViewStyle,
+  TextStyle,
+  TextInputProps,
 } from "react-native";
-import DropDownPicker from "react-native-dropdown-picker";
+import DropDownPicker, { ItemType } from "react-native-dropdown-picker";
 import Header from "../../../components/Header";
 import COLORS from "../../../constants/colors";
 
-const Complaint = () => {
-  const [open, setOpen] = useState(false);
-  const [type, setType] = useState(null);
-  const [items, setItems] = useState([
+type ComplaintType = string | null;
+
+type DropDownItem = {
+  label: string;
+  value: string;
+};
+
+const Complaint: React.FC = () => {
+  const [open, setOpen] = useState<boolean>(false);
+  const [type, setType] = useState<ComplaintType>(null);
+  const [items, setItems] = useState<DropDownItem[]>([
     { label: "Fee Issue", value: "fee" },
     { label: "Result Problem", value: "result" },
     { label: "Lecturer Misconduct", value: "lecturer" },
@@ -23,7 +33,7 @@ const Complaint = () => {
     { label: "Other", value: "other" },
   ]);
 
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<string>("");
 
   const handleSubmit = () => {
     if (!type || !message.trim()) {
@@ -74,18 +84,30 @@ const Complaint = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container:
-  {
+type Style = {
+  container: ViewStyle;
+  label: TextStyle;
+  dropdown: ViewStyle;
+  input: TextStyle;
+  button: ViewStyle;
+  buttonText?: TextStyle;
+};
+
+const styles = StyleSheet.create<Style>({
+  container: {
     backgroundColor: COLORS.cardBackground,
     padding: 16,
-    flex: 1
+    flex: 1,
   },
-  label: { fontWeight: "600", marginTop: 16, marginBottom: 6 },
+  label: {
+    fontWeight: "600",
+    marginTop: 16,
+    marginBottom: 6,
+  },
   dropdown: {
     borderColor: "#ccc",
     marginBottom: 10,
-    zIndex: 1000, // Prevent dropdown from hiding behind other views
+    zIndex: 1000,
   },
   input: {
     borderWidth: 1,
@@ -100,6 +122,10 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 8,
     alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "600",
   },
 });
 

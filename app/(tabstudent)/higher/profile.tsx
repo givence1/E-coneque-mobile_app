@@ -1,21 +1,18 @@
 import { useAuthStore } from "@/store/authStore";
+import { gql, useQuery } from "@apollo/client";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Alert } from "react-native";  // 👈 import Alert
 import {
-  ActivityIndicator,
-  Image,
+  ActivityIndicator, Alert, Image,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
-} from "react-native";
-import Header from "@/components/Header";
+  View
+} from "react-native"; // 👈 import Alert
 import TabsHeader from "../../../components/TabsHeader";
 import COLORS from "../../../constants/colors";
-import { gql, useQuery } from "@apollo/client";
 
 export default function StudentProfileScreen() {
   const { logout, profileId } = useAuthStore();
@@ -107,22 +104,22 @@ export default function StudentProfileScreen() {
           <ActionButton
             icon="create-outline"
             label="Edit Profile"
-            onPress={() => router.push("../pagesHigher/profile/edit")}
+            onPress={() => router.push("../../pagesHigher/profile/edit")}
           />
           <ActionButton
             icon="clipboard-outline"
             label="Attendance"
-            onPress={() => router.push("../pagesHigher/profile/attendance")}
+            onPress={() => router.push("../../pagesHigher/profile/attendance")}
           />
           <ActionButton
             icon="chatbox-ellipses-outline"
             label="Complaint"
-            onPress={() => router.push("../pagesHigher/profile/complaint")}
+            onPress={() => router.push("../../pagesHigher/profile/complaint")}
           />
           <ActionButton
             icon="document-text-outline"
             label="History"
-            onPress={() => router.push("../pagesHigher/profile/ComplaintHistory")}
+            onPress={() => router.push("../../pagesHigher/profile/ComplaintHistory")}
           />
         </View>
 

@@ -1,15 +1,21 @@
 import React from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
 import Header from '../../../components/Header';
 import COLORS from '../../../constants/colors';
 
-const attendanceData = [
+type AttendanceItem = {
+  course: string;
+  present: number;
+  total: number;
+};
+
+const attendanceData: AttendanceItem[] = [
   { course: 'Mathematics', present: 18, total: 20 },
   { course: 'Physics', present: 15, total: 20 },
   { course: 'Biology', present: 10, total: 20 },
 ];
 
-const Attendance = () => {
+const Attendance: React.FC = () => {
   return (
     <View style={styles.container}>
       <Header placeholder="Search attendance..." />
@@ -18,7 +24,7 @@ const Attendance = () => {
         data={attendanceData}
         keyExtractor={(item) => item.course}
         contentContainerStyle={{ paddingBottom: 16 }}
-        renderItem={({ item }) => {
+        renderItem={({ item }: { item: AttendanceItem }) => {
           const percentage = ((item.present / item.total) * 100).toFixed(1);
           return (
             <View style={styles.card}>
@@ -34,7 +40,15 @@ const Attendance = () => {
   );
 };
 
-const styles = StyleSheet.create({
+type Style = {
+  container: ViewStyle;
+  header: TextStyle;
+  card: ViewStyle;
+  name: TextStyle;
+  details: TextStyle;
+};
+
+const styles = StyleSheet.create<Style>({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
@@ -57,7 +71,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  course: {
+  name: {
     fontSize: 18,
     fontWeight: '600',
     color: '#1F2937',

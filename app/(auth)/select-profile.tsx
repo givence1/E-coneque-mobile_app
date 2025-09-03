@@ -1,22 +1,22 @@
-import React, { JSX } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  FlatList,
-  ViewStyle,
-  TextStyle,
-} from "react-native";
+import { useAuthStore } from "@/store/authStore";
+import { decodeUrlID } from "@/utils/functions";
+import { EdgeSchoolFees, NodeSchoolHigherInfo } from "@/utils/schemas/interfaceGraphql";
+import { EdgeSchoolFeesPrim } from "@/utils/schemas/interfaceGraphqlPrimary";
+import { EdgeSchoolFeesSec } from "@/utils/schemas/interfaceGraphqlSecondary";
+import { gql, useQuery } from "@apollo/client";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import React, { JSX } from "react";
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from "react-native";
 import COLORS from "../../constants/colors";
-import { gql, useQuery } from "@apollo/client";
-import { useAuthStore } from "@/store/authStore";
-import { EdgeSchoolFees, NodeSchoolHigherInfo } from "@/utils/schemas/interfaceGraphql";
-import { EdgeSchoolFeesSec } from "@/utils/schemas/interfaceGraphqlSecondary";
-import { EdgeSchoolFeesPrim } from "@/utils/schemas/interfaceGraphqlPrimary";
-import { decodeUrlID } from "@/utils/functions";
 
 
 
@@ -88,7 +88,7 @@ export default function SelectYearScreen(): JSX.Element {
                   </Text>
                 ) : (
                   <Text style={{ color: "red", fontWeight: "bold", flexDirection: "row", alignItems: "center" }}>
-                    <Ionicons name="close-circle" size={16} color="red" /> In-Active
+                    <Ionicons name="close-circle" size={16} color="red" /> Inactive
                   </Text>
                 )}
               </Text>

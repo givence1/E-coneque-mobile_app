@@ -3,15 +3,28 @@ import React from "react";
 import {
   FlatList,
   Image,
+  ImageStyle,
+  ListRenderItem,
   StyleSheet,
   Text,
+  TextStyle,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from "react-native";
 import Header from "../../../components/Header";
 import COLORS from "../../../constants/colors";
 
-const complaintHistory = [
+// Define the type for each complaint
+type ComplaintItem = {
+  id: string;
+  type: string;
+  date: string;
+  status: "Pending" | "Resolved" | "In Review";
+  attachment: string | null;
+};
+
+const complaintHistory: ComplaintItem[] = [
   {
     id: "1",
     type: "Result Issue",
@@ -24,8 +37,7 @@ const complaintHistory = [
     type: "Fee Dispute",
     date: "2025-07-15",
     status: "Resolved",
-    attachment:
-      "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+    attachment: "https://res.cloudinary.com/demo/image/upload/sample.jpg",
   },
   {
     id: "3",
@@ -36,8 +48,8 @@ const complaintHistory = [
   },
 ];
 
-export default function ComplaintHistory() {
-  const renderComplaint = ({ item }) => (
+const ComplaintHistory: React.FC = () => {
+  const renderComplaint: ListRenderItem<ComplaintItem> = ({ item }) => (
     <View style={styles.card}>
       <View style={styles.row}>
         <Text style={styles.label}>Type:</Text>
@@ -57,8 +69,8 @@ export default function ComplaintHistory() {
             item.status === "Pending"
               ? styles.pending
               : item.status === "Resolved"
-                ? styles.resolved
-                : styles.inReview,
+              ? styles.resolved
+              : styles.inReview,
           ]}
         >
           {item.status}
@@ -90,8 +102,28 @@ export default function ComplaintHistory() {
       />
     </View>
   );
-}
-const styles = StyleSheet.create({
+};
+
+export default ComplaintHistory;
+
+// ---------- Styles Types ----------
+type Styles = {
+  container: ViewStyle;
+  title: TextStyle;
+  card: ViewStyle;
+  row: ViewStyle;
+  label: TextStyle;
+  value: TextStyle;
+  status: TextStyle;
+  pending: TextStyle;
+  resolved: TextStyle;
+  inReview: TextStyle;
+  attachment: ViewStyle;
+  imagePreview: ImageStyle;
+  attachmentText: TextStyle;
+};
+
+const styles = StyleSheet.create<Styles>({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,

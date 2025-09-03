@@ -6,25 +6,31 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TextStyle,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from "react-native";
 import Header from "../../../components/Header";
 import COLORS from "../../../constants/colors";
 
-export default function EditProfileScreen() {
-  const [name, setName] = useState("Patrisco Givence");
-  const [email, setEmail] = useState("npatrisco@gmail.com");
-  const [phone, setPhone] = useState("673351854");
-  const [department, setDepartment] = useState("Software Engineering");
+const EditProfileScreen: React.FC = () => {
+  const [name, setName] = useState<string>("Patrisco Givence");
+  const [email, setEmail] = useState<string>("npatrisco@gmail.com");
+  const [phone, setPhone] = useState<string>("673351854");
+  const [department, setDepartment] = useState<string>("Software Engineering");
 
   const handleSubmit = () => {
     Alert.alert("Success", "Profile updated successfully.");
-    // Later: call backend update API here
+    // Future: integrate backend API here
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 40 }}
+      keyboardShouldPersistTaps="handled"
+    >
       <Header placeholder="Search profile..." />
       <Text style={styles.title}>Edit Profile</Text>
 
@@ -80,9 +86,22 @@ export default function EditProfileScreen() {
       </TouchableOpacity>
     </ScrollView>
   );
-}
+};
 
-const styles = StyleSheet.create({
+export default EditProfileScreen;
+
+// ---------- Styles Types ----------
+type Styles = {
+  container: ViewStyle;
+  title: TextStyle;
+  inputGroup: ViewStyle;
+  label: TextStyle;
+  input: TextStyle;
+  saveButton: ViewStyle;
+  saveButtonText: TextStyle;
+};
+
+const styles = StyleSheet.create<Styles>({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
