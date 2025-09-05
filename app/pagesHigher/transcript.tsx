@@ -7,7 +7,7 @@ import COLORS from "../../constants/colors"; // adjust path if needed
 export default function TranscriptScreen() {
   return (
     <View style={styles.container}>
-      <TabsHeader title="Transcript" />
+      <TabsHeader  />
 
       <View style={styles.content}>
         <Ionicons name="document-text-outline" size={64} color={COLORS.primary} />

@@ -45,7 +45,7 @@ const Fees = () => {
 
       {!loading ?
         fees?.id ?
-          <ScrollView contentContainerStyle={{ padding: 16, paddingTop: 80 }}>
+          <ScrollView contentContainerStyle={{ padding: 10, }}>
             <Text style={styles.title}>{fees?.userprofile?.customuser?.fullName}</Text>
             <Text style={styles.title}>Matricle: {fees?.userprofile?.customuser?.matricle}</Text>
             <Text style={styles.subtitle}>Specialty: {fees.userprofile?.specialty?.mainSpecialty?.specialtyName}</Text>

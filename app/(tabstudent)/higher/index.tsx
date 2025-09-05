@@ -20,20 +20,20 @@ const StudentHome = () => {
   const { feesId } = useAuthStore();
 
   const { data: dataFees, loading, error } = useQuery(GET_FEES, {
-    variables: {
-      id: feesId,
-    },
+    variables: { id: feesId },
   });
 
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.background, marginBottom: 16 }}>
+    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       {/* Fixed Header */}
       <TabsHeader />
 
       {/* Scrollable Content */}
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 30 }}
-        style={{ marginTop: 80 }}
+        contentContainerStyle={{
+          paddingTop: 80, // 👈 space for header
+          paddingBottom: 30,
+        }}
         showsVerticalScrollIndicator={false}
       >
         {/* Student Info Card */}
@@ -42,23 +42,8 @@ const StudentHome = () => {
             dataFees?.allSchoolFees?.edges[0] ||
             dataFees?.allSchoolFeesSec?.edges[0] ||
             dataFees?.allSchoolFeesPrim?.edges[0]
-        }
+          }
         />
-
-        {/* Announcements */}
-        {/* <View style={[styles.bookCard, { marginHorizontal: 16 }]}>
-          <Text style={styles.bookTitle}>📣 Announcements</Text>
-          <Text style={styles.caption}>
-            📌 Orientation starts Sept 1st. Make sure to check your department schedule.
-          </Text>
-        </View> */}
-
-        {/* Upcoming */}
-        {/* <View style={[styles.bookCard, { marginHorizontal: 16 }]}>
-          <Text style={styles.bookTitle}>🗓️ Upcoming</Text>
-          <Text style={styles.caption}>📘 Data Structures Quiz – Friday, 10AM</Text>
-          <Text style={styles.caption}>📗 Software Eng. Class – Thursday, 2PM</Text>
-        </View> */}
 
         {/* Quick Action Boxes */}
         <View style={localStyles.gridContainer}>
@@ -114,30 +99,11 @@ const StudentHome = () => {
             </TouchableOpacity>
           ))}
         </View>
-
-        {/* Quick Links */}
-        {/* <View style={[styles.bookCard, { paddingVertical: 10, marginHorizontal: 16 }]}>
-          <Text style={styles.bookTitle}>🚀 Quick Links</Text>
-
-          <TouchableOpacity style={styles.linkItem}>
-            <Ionicons name="book-outline" size={20} color={COLORS.textPrimary} />
-            <Text style={[styles.caption, { marginLeft: 10 }]}>View My Courses</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.linkItem}>
-            <Ionicons name="calendar-outline" size={20} color={COLORS.textPrimary} />
-            <Text style={[styles.caption, { marginLeft: 10 }]}>My Timetable</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.linkItem}>
-            <Ionicons name="bar-chart-outline" size={20} color={COLORS.textPrimary} />
-            <Text style={[styles.caption, { marginLeft: 10 }]}>View Results</Text>
-          </TouchableOpacity>
-        </View> */}
       </ScrollView>
     </View>
   );
 };
+
 
 export default StudentHome;
 

@@ -1,21 +1,61 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-import TabsHeader from "../../components/TabsHeader"; // adjust path if needed
-import COLORS from "../../constants/colors"; // adjust path if needed
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import TabsHeader from "../../components/TabsHeader";
+import COLORS from "../../constants/colors";
 
 export default function TranscriptScreen() {
+  const router = useRouter();
+
   return (
     <View style={styles.container}>
-      <TabsHeader title="Transcript" />
+      <TabsHeader  />
 
-      <View style={styles.content}>
-        <Ionicons name="document-text-outline" size={64} color={COLORS.primary} />
-        <Text style={styles.title}>Coming Soon</Text>
-        <Text style={styles.subtitle}>
-          This feature is under development.
-        </Text>
-      </View>
+      <ScrollView
+        contentContainerStyle={{
+          paddingTop: 80, // space for header
+          paddingBottom: 30,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Quick Action Boxes */}
+        <View style={styles.gridContainer}>
+          {[
+            {
+              label: "History",
+              route: "/pagesHigher/profile/ComplaintHistory",
+              icon: (
+                <Ionicons
+                  name="document-text-outline"
+                  size={24}
+                  color={COLORS.primary}
+                />
+              ),
+            },
+            // {
+            //   label: "Request",
+            //   route: "/pagesHigher/transcript/request",
+            //   icon: (
+            //     <Ionicons
+            //       name="download-outline"
+            //       size={24}
+            //       color={COLORS.primary}
+            //     />
+            //   ),
+            // },
+          ].map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.box}
+              onPress={() => router.push(item.route as any)}
+            >
+              {item.icon}
+              <Text style={styles.boxLabel}>{item.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -23,24 +63,31 @@ export default function TranscriptScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.background,
   },
-  content: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+  gridContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+  },
+  box: {
+    width: "47%",
+    backgroundColor: "white",
+    borderRadius: 16,
     padding: 20,
+    marginBottom: 16,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 2,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
+  boxLabel: {
+    marginTop: 10,
+    fontSize: 13,
+    fontWeight: "500",
     color: COLORS.textDark,
-    marginTop: 16,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: COLORS.textPrimary,
-    marginTop: 6,
-    textAlign: "center",
   },
 });

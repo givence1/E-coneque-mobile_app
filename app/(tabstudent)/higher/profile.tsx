@@ -116,11 +116,11 @@ export default function StudentProfileScreen() {
             label="Complaint"
             onPress={() => router.push("../../pagesHigher/profile/complaint")}
           /> */}
-          <ActionButton
+          {/* <ActionButton
             icon="document-text-outline"
             label="History"
             onPress={() => router.push("../../pagesHigher/profile/ComplaintHistory")}
-          />
+          /> */}
         </View>
 
         {/* Logout Button */}
