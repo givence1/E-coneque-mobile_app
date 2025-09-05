@@ -1,20 +1,84 @@
+// const COLORS = {
+//   primary: "#00796B",           // Teal
+//   textPrimary: "#004D40",
+//   textSecondary: "#00695C",
+//   textDark: "#002D27",
+//   placeholderText: "#757575",
+//   background: "#E0F2F1",
+//   cardBackground: "#FFFFFF",
+//   inputBackground: "#F1F8F7",
+//   border: "#B2DFDB",
+//   white: "#FFFFFF",
+//   black: "#000000",
+//   warning: "#CD3434FF",         // Already defined
+//   success: "#2E7D32",           // Green for success
+//   error: "#D32F2F",             // Red for errors
+//   info: "#0288D1",              // Blue for info
+// };
+
+// <<<<< THE BRAINS >>>>>
 const COLORS = {
-  primary: "#00796B",           // Teal
-  textPrimary: "#004D40",
-  textSecondary: "#00695C",
+  primary: '#1A4B8C',           // Deep blue
+  secondary: '#FFD700',         // Gold
+  accent: '#CC0000',            // Crimson red
+  textPrimary: '#2C3E50',
+  textSecondary: '#546E7A',
   textDark: "#002D27",
   placeholderText: "#757575",
-  background: "#E0F2F1",
-  cardBackground: "#FFFFFF",
-  inputBackground: "#F1F8F7",
-  border: "#B2DFDB",
-  white: "#FFFFFF",
-  black: "#000000",
-  warning: "#CD3434FF",         // Already defined
-  success: "#2E7D32",           // Green for success
-  error: "#D32F2F",             // Red for errors
-  info: "#0288D1",              // Blue for info
+  background: '#F5F7FA',
+  cardBackground: '#FFFFFF',
+  inputBackground: '#E8EAF6',
+  border: '#B0BEC5',
+  white: '#FFFFFF',
+  black: '#000000',
+  success: '#2E7D32',
+  warning: '#F57C00',
+  error: '#D32F2F',
+  info: '#0288D1'
 };
+
+// <<<<< ST JOAN >>>>>
+// const COLORS = { 
+//   primary: "#C8102E",           
+//   textPrimary: "#1A2BA3",       
+//   textSecondary: "#0A0A2A",     
+//   textDark: "#2B2B2B",          
+//   placeholderText: "#757575",  
+//   background: "#FFFFFF",        
+//   cardBackground: "#F9F9F9",    
+//   inputBackground: "#F1F3F6",   
+//   border: "#C8102E",            
+//   white: "#FFFFFF",
+//   black: "#000000",
+//   warning: "#f9ed05ff",           
+//   success: "#2E7D32",           
+//   error: "#B71C1C",             
+//   info: "#0288D1",              
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // OCEAN BREEZE THEME
 // const COLORS = {

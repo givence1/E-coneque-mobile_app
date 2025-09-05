@@ -1,22 +1,20 @@
+import { useAuthStore } from "@/store/authStore";
+import { Ionicons } from "@expo/vector-icons";
+import { Link } from "expo-router";
+import { useState } from "react";
 import {
-  View,
-  Text,
-  Image,
-  TextInput,
-  TouchableOpacity,
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
 } from "react-native";
-import { Link } from "expo-router";
 import styles from "../../assets/styles/login.styles";
-import { useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
-import { useAuthStore } from "@/store/authStore";
-import { protocol, RootApi, tenant } from "@/utils/config";
 
 export default function Login() {
   const [matricle, setMatricle] = useState<string>("");
@@ -54,7 +52,7 @@ export default function Login() {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
         <Text style={{ fontSize: 18, color: "red", marginBottom: 12 }}>
-          {schoolIdentification || "Unable to load school information."}
+          {schoolIdentification || "Check Your Internet Connection."}
         </Text>
         <TouchableOpacity onPress={() => checkAuth()} style={styles.button}>
           <Text style={styles.buttonText}>Retry</Text>
@@ -74,7 +72,7 @@ export default function Login() {
         keyboardShouldPersistTaps="handled"
       >
         {/* Header with Logo + School Name */}
-        <View
+        {/* <View
           style={{
             alignItems: "center",
             gap: 40,
@@ -82,13 +80,13 @@ export default function Login() {
             paddingBottom: 30,
             backgroundColor: COLORS.background,
           }}
-        >
-          <Image
+        > */}
+          {/* <Image
             source={{ uri: `${protocol}${tenant}${RootApi}/media/${schoolIdentification?.logo}` }}
             style={{ width: 120, height: 120, borderRadius: 10 }}
             resizeMode="contain"
-          />
-          <Text
+          /> */}
+          {/* <Text
             style={{
               color: COLORS.primary,
               fontSize: 28,
@@ -98,8 +96,8 @@ export default function Login() {
             }}
           >
             {schoolIdentification?.name || "Welcome"}
-          </Text>
-        </View>
+          </Text> */}
+        {/* </View> */}  
 
         {/* Form Card */}
         <View style={styles.container}>
@@ -114,9 +112,7 @@ export default function Login() {
                   marginBottom: 16,
                 }}
               >
-                <Text style={{ color: COLORS.primary, marginRight: 10 }}>
-                  {role === "student" ? "Student" : "Lecturer"}
-                </Text>
+                <Text style={{ color: COLORS.primary, marginRight: 10 }}> Login </Text>
               </View>
 
               {/* Username */}
@@ -201,7 +197,7 @@ export default function Login() {
 
               {/* Footer */}
               <View style={styles.footer}>
-                <Text style={styles.footerText}>Pre Enrollment</Text>
+                {/* <Text style={styles.footerText}>Pre Enrollment</Text> */}
                 <Link href="/signup" asChild>
                   <TouchableOpacity>
                     <Text style={styles.link}>Register</Text>

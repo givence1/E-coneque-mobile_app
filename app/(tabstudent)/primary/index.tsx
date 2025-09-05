@@ -1,19 +1,20 @@
-import styles from "@/assets/styles/home.styles";
-import TabsHeader from "@/components/TabsHeader";
-import COLORS from "@/constants/colors";
-import { useAuthStore } from "@/store/authStore";
-import { gql, useQuery } from "@apollo/client";
-import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import React from "react";
 import {
-  ScrollView,
-  StyleSheet,
+  View,
   Text,
+  ScrollView,
+  Image,
   TouchableOpacity,
-  View
+  StyleSheet,
 } from "react-native";
-import Header from "../../profileHeader/Header";
+import { Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
+import TabsHeader from "../../../components/TabsHeader";
+import { useRouter } from "expo-router";
+import COLORS from "@/constants/colors";
+import styles from "@/assets/styles/home.styles";
+import Header from "../Header";
+import { gql, useQuery } from "@apollo/client";
+import { useAuthStore } from "@/store/authStore";
 
 
 const StudentHome = () => {

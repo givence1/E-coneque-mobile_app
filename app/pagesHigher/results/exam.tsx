@@ -1,17 +1,18 @@
-import { useAuthStore } from "@/store/authStore";
-import { EdgeResult } from "@/utils/schemas/interfaceGraphql";
-import { gql, useQuery } from "@apollo/client";
-import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
   StyleSheet,
+  Text,
   View
 } from "react-native";
 import Header from "../../../components/Header";
 import COLORS from "../../../constants/colors";
+import { gql, useQuery } from "@apollo/client";
+import { useAuthStore } from "@/store/authStore";
+import { EdgeResult } from "@/utils/schemas/interfaceGraphql";
 import DisplayResults from "./DisplayResults";
+import { Picker } from "@react-native-picker/picker";
 
 // Exam Results screen for Higher Education
 export default function ExamResults() {
@@ -116,6 +117,7 @@ const GET_EXAM_RESULTS = gql`
           course {
             mainCourse { courseName }
             semester
+            courseCode
           }
           infoData
           publishExam

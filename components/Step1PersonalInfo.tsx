@@ -1,21 +1,19 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  KeyboardAvoidingView,
-  TouchableOpacity,
-  Platform,
-  ScrollView,
-  NativeSyntheticEvent,
-  TextInputChangeEventData,
-} from "react-native";
-import { Picker as SelectPicker } from "@react-native-picker/picker";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import { Picker as SelectPicker } from "@react-native-picker/picker";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from "react-native";
 import styles from "../assets/styles/signup.styles";
 import COLORS from "../constants/colors";
-import { useRouter } from "expo-router";
 
 // Define props
 interface Step1Props {
@@ -56,7 +54,6 @@ export default function Step1PersonalInfo({ data, updateField, onNext, onPreviou
               style={{
                 width: 32,
                 height: 32,
-                borderRadius: 16,
                 backgroundColor: isActive ? COLORS.primary : COLORS.border,
                 justifyContent: "center",
                 alignItems: "center",

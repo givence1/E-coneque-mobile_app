@@ -18,7 +18,7 @@ const DisplayResults = (
       <View style={styles.table}>
         {/* HEADER */}
         <View style={styles.rowHeader}>
-          <Text style={[styles.headerCell, { flex: 3 }]}>Course</Text>
+          <Text style={[styles.headerCell, { flex: 2 }]}>Course</Text>
           {result_type === "results" ? (
             <>
               <Text style={[styles.headerCell, { flex: 1 }]}>CA</Text>
@@ -49,7 +49,7 @@ const DisplayResults = (
 
     return (
       <View key={index} style={styles.row}>
-        <Text style={[styles.cellLeft, { flex: 5 }]}>
+        <Text style={[styles.cellLeft, { flex: 3 }]}>
           {item.node.course.mainCourse.courseName}
         </Text>
         <Text style={[styles.cell, { flex: 1 }]}>{ca}</Text>
@@ -68,7 +68,7 @@ const DisplayResults = (
       result_type === "exam" ? exam :
       result_type === "resit" ? resit : 0;
 
-    const passLimit = result_type === "ca" ? (campusInfo?.caLimit || 20) / 2 :
+    const passLimit = result_type === "ca" ? (campusInfo?.caLimit || 30) / 2 :
       result_type === "exam" ? (campusInfo?.examLimit || 40) / 2 :
       result_type === "resit" ? (campusInfo?.resitLimit || 40) / 2 : 0;
 

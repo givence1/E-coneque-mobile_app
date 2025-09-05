@@ -1,15 +1,13 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
+  Platform,
   StyleSheet,
   TextInput,
-  Platform,
+  TouchableOpacity,
+  View
 } from "react-native";
-import { useRouter } from "expo-router";
-import { Ionicons, Feather, MaterialIcons } from "@expo/vector-icons";
 import COLORS from "../constants/colors";
 
 export default function Header(): JSX.Element {
@@ -30,25 +28,26 @@ export default function Header(): JSX.Element {
           <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color="black" />
           </TouchableOpacity>
-          <Image
-            source={require("../assets/images/i.jpg")} // replace with your logo path
+          {/* <Image
+            source={require("../assets/images/i.jpg")} 
             style={styles.logo}
             resizeMode="contain"
-          />
+          /> */}
         </View>
 
         {/* Right Section */}
         <View style={styles.right}>
-          <TouchableOpacity style={styles.icon} onPress={toggleSearch}>
+          {/* <TouchableOpacity style={styles.icon} onPress={toggleSearch}>
             <Feather name="search" size={22} color="black" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity style={styles.icon}>
             <Ionicons name="notifications-outline" size={22} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.icon}>
+          {/* <TouchableOpacity style={styles.icon}>
             <MaterialIcons name="help-outline" size={22} color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.profile}>
+          </TouchableOpacity> */}
+          <TouchableOpacity style={styles.profile}
+          onPress={() => router.push("/(tabstudent)/higher/profile")}>
             <Ionicons name="person-circle-outline" size={26} color="#ccc" />
           </TouchableOpacity>
         </View>

@@ -1,13 +1,12 @@
-import {
-  View,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  TextInput as RNTextInput,
-} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
+import {
+  TextInput as RNTextInput,
+  StyleSheet,
+  TouchableOpacity,
+  View
+} from "react-native";
 import COLORS from "../constants/colors";
 
 type HeaderProps = {
@@ -38,7 +37,7 @@ export default function Header({ placeholder = "Search..." }: HeaderProps) {
       </TouchableOpacity>
 
       {/* Search Bar */}
-      {showSearch ? (
+      {/* {showSearch ? (
         <TextInput
           ref={inputRef}
           style={styles.searchInput}
@@ -49,12 +48,12 @@ export default function Header({ placeholder = "Search..." }: HeaderProps) {
         />
       ) : (
         <View style={styles.spacer} />
-      )}
+      )} */}
 
       {/* Search Icon */}
-      <TouchableOpacity style={styles.iconRight} onPress={handleToggleSearch}>
+      {/* <TouchableOpacity style={styles.iconRight} onPress={handleToggleSearch}>
         <Ionicons name="search-outline" size={24} color={COLORS.primary} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 }

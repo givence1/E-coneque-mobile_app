@@ -1,3 +1,5 @@
+import TabsHeader from "@/components/TabsHeader";
+import COLORS from "@/constants/colors";
 import { useAuthStore } from "@/store/authStore";
 import { gql, useQuery } from "@apollo/client";
 import { Ionicons } from "@expo/vector-icons";
@@ -11,8 +13,6 @@ import {
   TouchableOpacity,
   View
 } from "react-native"; // 👈 import Alert
-import TabsHeader from "../../../components/TabsHeader";
-import COLORS from "../../../constants/colors";
 
 export default function StudentProfileScreen() {
   const { logout, profileId } = useAuthStore();
@@ -24,7 +24,7 @@ export default function StudentProfileScreen() {
     "Are you sure you want to logout?",
     [
       { text: "Cancel", style: "cancel" },
-      { text: "Yes, Logout", style: "destructive", onPress: () => logout() },
+      { text: "Yes", style: "destructive", onPress: () => logout() },
     ]
   );
 };
@@ -101,7 +101,7 @@ export default function StudentProfileScreen() {
 
         {/* Action Buttons (2-column grid) */}
         <View style={styles.actionsGrid}>
-          <ActionButton
+          {/* <ActionButton
             icon="create-outline"
             label="Edit Profile"
             onPress={() => router.push("../../pagesHigher/profile/edit")}
@@ -115,7 +115,7 @@ export default function StudentProfileScreen() {
             icon="chatbox-ellipses-outline"
             label="Complaint"
             onPress={() => router.push("../../pagesHigher/profile/complaint")}
-          />
+          /> */}
           <ActionButton
             icon="document-text-outline"
             label="History"
@@ -162,6 +162,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
     paddingHorizontal: 16,
+    marginTop: 16
   },
   headerCard: {
     alignItems: "center",

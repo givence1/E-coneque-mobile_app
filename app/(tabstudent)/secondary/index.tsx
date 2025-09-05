@@ -12,7 +12,7 @@ import TabsHeader from "../../../components/TabsHeader";
 import { useRouter } from "expo-router";
 import COLORS from "@/constants/colors";
 import styles from "@/assets/styles/home.styles";
-import Header from "../../profileHeader/Header";
+import Header from "../Header";
 import { gql, useQuery } from "@apollo/client";
 import { useAuthStore } from "@/store/authStore";
 

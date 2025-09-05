@@ -1,20 +1,18 @@
+import ProfileHeader from "@/components/ProfileHeader";
+import TabsHeader from "@/components/TabsHeader";
+import COLORS from "@/constants/colors";
+import { useAuthStore } from "@/store/authStore";
+import { gql, useQuery } from "@apollo/client";
+import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
-  View,
-  Text,
   ScrollView,
-  Image,
-  TouchableOpacity,
   StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
-import { Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
-import TabsHeader from "@/components/TabsHeader";
-import { useRouter } from "expo-router";
-import COLORS from "@/constants/colors";
-import styles from "@/assets/styles/home.styles";
-import Header from "../../profileHeader/Header";
-import { gql, useQuery } from "@apollo/client";
-import { useAuthStore } from "@/store/authStore";
 
 
 const StudentHome = () => {
@@ -28,18 +26,18 @@ const StudentHome = () => {
   });
 
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.background, marginBottom: 16, }}>
+    <View style={{ flex: 1, backgroundColor: COLORS.background, marginBottom: 16 }}>
       {/* Fixed Header */}
       <TabsHeader />
 
       {/* Scrollable Content */}
       <ScrollView
         contentContainerStyle={{ paddingBottom: 30 }}
-        style={{ marginTop: 60 }}
+        style={{ marginTop: 80 }}
         showsVerticalScrollIndicator={false}
       >
         {/* Student Info Card */}
-        <Header
+        <ProfileHeader
           fees={
             dataFees?.allSchoolFees?.edges[0] ||
             dataFees?.allSchoolFeesSec?.edges[0] ||
@@ -48,19 +46,19 @@ const StudentHome = () => {
         />
 
         {/* Announcements */}
-        <View style={styles.bookCard}>
+        {/* <View style={[styles.bookCard, { marginHorizontal: 16 }]}>
           <Text style={styles.bookTitle}>📣 Announcements</Text>
           <Text style={styles.caption}>
             📌 Orientation starts Sept 1st. Make sure to check your department schedule.
           </Text>
-        </View>
+        </View> */}
 
         {/* Upcoming */}
-        <View style={styles.bookCard}>
+        {/* <View style={[styles.bookCard, { marginHorizontal: 16 }]}>
           <Text style={styles.bookTitle}>🗓️ Upcoming</Text>
           <Text style={styles.caption}>📘 Data Structures Quiz – Friday, 10AM</Text>
           <Text style={styles.caption}>📗 Software Eng. Class – Thursday, 2PM</Text>
-        </View>
+        </View> */}
 
         {/* Quick Action Boxes */}
         <View style={localStyles.gridContainer}>
@@ -72,7 +70,7 @@ const StudentHome = () => {
             },
             {
               label: "Exam",
-              route: "/pagesHigher/results/results",
+              route: "/pagesHigher/results/exam",
               icon: <MaterialIcons name="edit" size={24} color={COLORS.primary} />,
             },
             {
@@ -82,7 +80,7 @@ const StudentHome = () => {
             },
             {
               label: "Results",
-              route: "results",
+              route: "/pagesHigher/results/results",
               icon: <MaterialIcons name="school" size={24} color={COLORS.primary} />,
             },
             {
@@ -118,7 +116,7 @@ const StudentHome = () => {
         </View>
 
         {/* Quick Links */}
-        <View style={[styles.bookCard, { paddingVertical: 10 }]}>
+        {/* <View style={[styles.bookCard, { paddingVertical: 10, marginHorizontal: 16 }]}>
           <Text style={styles.bookTitle}>🚀 Quick Links</Text>
 
           <TouchableOpacity style={styles.linkItem}>
@@ -135,7 +133,7 @@ const StudentHome = () => {
             <Ionicons name="bar-chart-outline" size={20} color={COLORS.textPrimary} />
             <Text style={[styles.caption, { marginLeft: 10 }]}>View Results</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </ScrollView>
     </View>
   );

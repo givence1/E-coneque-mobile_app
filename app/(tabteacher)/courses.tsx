@@ -1,132 +1,109 @@
-import React from "react";
+import React, { JSX } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  ActivityIndicator,
+  ViewStyle,
+  TextStyle,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import COLORS from "../../constants/colors";
-import TabsHeader from "../../components/TabsHeader";
-import { gql, useQuery } from "@apollo/client";
-import { useAuthStore } from "@/store/authStore";
+import TabsHeader from "../../components/TabsHeader"; // ✅ Import TabsHeader
 
-// GraphQL query
-const GET_LECTURER_COURSES = gql`
-  query GetLecturerCourses($lecturerId: Decimal!) {
-    lecturerCourses(lecturerId: $lecturerId) {
-      edges {
-        node {
-          id
-          courseCode
-          mainCourse {
-            courseName
-          }
-          specialty {
-            academicYear
-          }
-          studentsCount
-        }
-      }
-    }
-  }
-`;
+// Define the type for a course
+interface Course {
+  id: string;
+  title: string;
+  code: string;
+  students: number;
+}
 
-export default function LecturerCoursesScreen() {
-  const { profileId } = useAuthStore(); // 👈 assuming profileId is lecturerId
+// Dummy data typed with the Course interface
+const dummyCourses: Course[] = [
+  {
+    id: "1",
+    title: "Computer Networks",
+    code: "CS301",
+    students: 45,
+  },
+  {
+    id: "2",
+    title: "Operating Systems",
+    code: "CS204",
+    students: 39,
+  },
+];
 
-  const { data, loading, error } = useQuery(GET_LECTURER_COURSES, {
-    variables: { lecturerId: Number(profileId) },
-    skip: !profileId,
-  });
-
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.center}>
-        <Text style={{ color: "red" }}>Failed to load courses</Text>
-      </View>
-    );
-  }
-
-  const courses = data?.lecturerCourses?.edges || [];
-
+export default function LecturerCoursesScreen(): JSX.Element {
   return (
-    <ScrollView style={styles.container}>
-      <TabsHeader />
+    <ScrollView
+      style={styles.container}
+    >
+      <TabsHeader /> 
+
       <Text style={styles.heading}>📚 My Courses</Text>
 
-      {courses.length === 0 ? (
-        <Text style={styles.empty}>No courses assigned.</Text>
-      ) : (
-        courses.map(({ node }: any) => (
-          <View key={node.id} style={styles.courseCard}>
-            <View style={styles.courseInfo}>
-              <Text style={styles.courseTitle}>
-                {node.mainCourse?.courseName || "Untitled"}
-              </Text>
-              <Text style={styles.courseCode}>{node.courseCode}</Text>
-              <Text style={styles.courseStudents}>
-                {node.studentsCount || 0} Students
-              </Text>
-              <Text style={styles.courseYear}>
-                Academic Year {node.specialty?.academicYear}
-              </Text>
-            </View>
-
-            <View style={styles.actions}>
-              <TouchableOpacity style={styles.actionBtn}>
-                <Ionicons
-                  name="document-text-outline"
-                  size={18}
-                  color={COLORS.primary}
-                />
-                <Text style={styles.actionText}>Notes</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.actionBtn}>
-                <Ionicons
-                  name="videocam-outline"
-                  size={18}
-                  color={COLORS.primary}
-                />
-                <Text style={styles.actionText}>Videos</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.actionBtn}>
-                <Ionicons
-                  name="clipboard-outline"
-                  size={18}
-                  color={COLORS.primary}
-                />
-                <Text style={styles.actionText}>Quiz</Text>
-              </TouchableOpacity>
-            </View>
+      {dummyCourses.map((course) => (
+        <View key={course.id} style={styles.courseCard}>
+          <View style={styles.courseInfo}>
+            <Text style={styles.courseTitle}>{course.title}</Text>
+            <Text style={styles.courseCode}>{course.code}</Text>
+            <Text style={styles.courseStudents}>
+              {course.students} Students
+            </Text>
           </View>
-        ))
-      )}
+
+          <View style={styles.actions}>
+            <TouchableOpacity style={styles.actionBtn}>
+              <Ionicons
+                name="document-text-outline"
+                size={18}
+                color={COLORS.primary}
+              />
+              <Text style={styles.actionText}>Notes</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.actionBtn}>
+              <Ionicons
+                name="videocam-outline"
+                size={18}
+                color={COLORS.primary}
+              />
+              <Text style={styles.actionText}>Videos</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.actionBtn}>
+              <Ionicons
+                name="clipboard-outline"
+                size={18}
+                color={COLORS.primary}
+              />
+              <Text style={styles.actionText}>Quiz</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ))}
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+// Define styles with explicit typing for TypeScript
+const styles = StyleSheet.create<{
+  container: ViewStyle;
+  heading: TextStyle;
+  courseCard: ViewStyle;
+  courseInfo: ViewStyle;
+  courseTitle: TextStyle;
+  courseCode: TextStyle;
+  courseStudents: TextStyle;
+  actions: ViewStyle;
+  actionBtn: ViewStyle;
+  actionText: TextStyle;
+}>({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    paddingHorizontal: 16,
-  },
-  center: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: COLORS.background,
+    
   },
   heading: {
     fontSize: 22,
@@ -134,12 +111,6 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     marginTop: 30,
     marginBottom: 20,
-  },
-  empty: {
-    fontSize: 16,
-    color: COLORS.textSecondary,
-    textAlign: "center",
-    marginTop: 20,
   },
   courseCard: {
     backgroundColor: COLORS.cardBackground,
@@ -166,12 +137,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textSecondary,
     marginTop: 4,
-  },
-  courseYear: {
-    fontSize: 12,
-    fontStyle: "italic",
-    color: COLORS.textSecondary,
-    marginTop: 2,
   },
   actions: {
     flexDirection: "row",

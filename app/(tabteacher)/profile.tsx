@@ -1,4 +1,4 @@
-import React from "react";
+import React, { JSX } from "react";
 import {
   View,
   Text,
@@ -7,88 +7,35 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
-  ActivityIndicator,
+  ViewStyle,
+  TextStyle,
+  ImageStyle,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { gql, useQuery } from "@apollo/client";
 import COLORS from "../../constants/colors";
-import TabHeader from "../../components/TabsHeader";
-import { useAuthStore } from "@/store/authStore"; // ✅ get profileId from auth store
+import TabHeader from "../../components/TabsHeader"; // adjust path if needed
 
-// GraphQL Query
-const GET_PROFILE = gql`
-  query GetProfile($id: ID!) {
-    allUserProfiles(id: $id) {
-      edges {
-        node {
-          id
-          program { name }
-          specialty {
-            academicYear
-            level { level }
-            mainSpecialty { specialtyName }
-          }
-          customuser {
-            fullName
-            email
-            telephone
-            photo
-          }
-        }
-      }
-    }
-  }
-`;
-
-export default function LecturerProfileScreen() {
-  const { profileId } = useAuthStore();
-
-  const { data, loading, error } = useQuery(GET_PROFILE, {
-    variables: { id: profileId },
-    skip: !profileId,
-  });
-
-  const handleLogout = () => {
+export default function LecturerProfileScreen(): JSX.Element {
+  const handleLogout = (): void => {
     Alert.alert("Logout", "Are you sure you want to logout?", [
       { text: "Cancel", style: "cancel" },
       { text: "Logout", onPress: () => console.log("Logged out") },
     ]);
   };
 
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.center}>
-        <Text style={{ color: "red" }}>Failed to load profile</Text>
-      </View>
-    );
-  }
-
-  const profile = data?.allUserProfiles?.edges?.[0]?.node;
-  const user = profile?.customuser;
-
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 30 }}>
+      {/* Tab Header */}
       <TabHeader />
 
       {/* Profile Header */}
       <View style={styles.header}>
-        {user?.photo ? (
-          <Image source={{ uri: user.photo }} style={styles.avatar} />
-        ) : (
-          <Ionicons name="person-circle-outline" size={120} color={COLORS.border} />
-        )}
-        <Text style={styles.name}>{user?.fullName || "Lecturer"}</Text>
-        <Text style={styles.subtext}>{profile?.program?.name}</Text>
-        <Text style={styles.subtext}>{user?.email}</Text>
-        <Text style={styles.subtext}>{user?.telephone}</Text>
+        <Image
+          source={{ uri: "https://via.placeholder.com/120" }}
+          style={styles.avatar}
+        />
+        <Text style={styles.name}>Dr. Patrisco Givence</Text>
+        <Text style={styles.subtext}>Department: Computer Science</Text>
       </View>
 
       {/* Profile Actions */}
@@ -113,10 +60,28 @@ export default function LecturerProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
-  header: { alignItems: "center", marginTop: 80, marginBottom: 20 },
+// Style types
+const styles = StyleSheet.create<{
+  container: ViewStyle;
+  header: ViewStyle;
+  avatar: ImageStyle;
+  name: TextStyle;
+  subtext: TextStyle;
+  section: ViewStyle;
+  actionBtn: ViewStyle;
+  actionText: TextStyle;
+  logoutBtn: ViewStyle;
+  logoutText: TextStyle;
+}>({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  header: {
+    alignItems: "center",
+    marginTop: 80,
+    marginBottom: 20,
+  },
   avatar: {
     width: 120,
     height: 120,
@@ -124,9 +89,19 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.border,
     marginBottom: 10,
   },
-  name: { fontSize: 22, fontWeight: "700", color: COLORS.textPrimary },
-  subtext: { fontSize: 14, color: COLORS.textSecondary },
-  section: { marginTop: 20, paddingHorizontal: 20 },
+  name: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: COLORS.textPrimary,
+  },
+  subtext: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+  section: {
+    marginTop: 20,
+    paddingHorizontal: 20,
+  },
   actionBtn: {
     backgroundColor: COLORS.cardBackground,
     padding: 15,
@@ -138,7 +113,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
   },
-  actionText: { fontSize: 16, color: COLORS.textDark },
+  actionText: {
+    fontSize: 16,
+    color: COLORS.textDark,
+  },
   logoutBtn: {
     flexDirection: "row",
     justifyContent: "center",
@@ -149,5 +127,10 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 30,
   },
-  logoutText: { marginLeft: 8, color: COLORS.white, fontSize: 16, fontWeight: "600" },
+  logoutText: {
+    marginLeft: 8,
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: "600",
+  },
 });
