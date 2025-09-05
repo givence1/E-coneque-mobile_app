@@ -1,43 +1,52 @@
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import {
+  Alert,
   FlatList,
   Image,
   ImageStyle,
+  KeyboardAvoidingView,
   ListRenderItem,
+  Modal,
+  Platform,
   StyleSheet,
   Text,
+  TextInput,
   TextStyle,
   TouchableOpacity,
   View,
   ViewStyle,
 } from "react-native";
+import DropDownPicker from "react-native-dropdown-picker";
 import Header from "../../../components/Header";
 import COLORS from "../../../constants/colors";
 
-// Define the type for each complaint
+// ---------- Types ----------
 type ComplaintItem = {
   id: string;
   type: string;
   date: string;
   status: "Pending" | "Resolved" | "In Review";
   attachment: string | null;
+  message?: string;
 };
 
 const complaintHistory: ComplaintItem[] = [
   {
     id: "1",
-    type: "Result Issue",
+    type: "Result Problem",
     date: "2025-07-22",
     status: "Pending",
     attachment: null,
+    message: "I believe my exam result was not recorded correctly.",
   },
   {
     id: "2",
-    type: "Fee Dispute",
+    type: "Fee Issue",
     date: "2025-07-15",
     status: "Resolved",
     attachment: "https://res.cloudinary.com/demo/image/upload/sample.jpg",
+    message: "I was charged an incorrect fee.",
   },
   {
     id: "3",
@@ -45,50 +54,93 @@ const complaintHistory: ComplaintItem[] = [
     date: "2025-06-30",
     status: "In Review",
     attachment: null,
+    message: "General complaint.",
   },
 ];
 
 const ComplaintHistory: React.FC = () => {
-  const renderComplaint: ListRenderItem<ComplaintItem> = ({ item }) => (
-    <View style={styles.card}>
-      <View style={styles.row}>
-        <Text style={styles.label}>Type:</Text>
-        <Text style={styles.value}>{item.type}</Text>
-      </View>
+  const [selectedComplaint, setSelectedComplaint] = useState<ComplaintItem | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
-      <View style={styles.row}>
-        <Text style={styles.label}>Date:</Text>
-        <Text style={styles.value}>{item.date}</Text>
-      </View>
+  // Dropdown state
+  const [open, setOpen] = useState(false);
+  const [type, setType] = useState<string | null>(null);
+  const [items, setItems] = useState([
+    { label: "Fee Issue", value: "Fee Issue" },
+    { label: "Result Problem", value: "Result Problem" },
+    { label: "Lecturer Misconduct", value: "Lecturer Misconduct" },
+    { label: "Attendance", value: "Attendance" },
+    { label: "Other", value: "Other" },
+  ]);
+  const [message, setMessage] = useState("");
 
-      <View style={styles.row}>
-        <Text style={styles.label}>Status:</Text>
-        <Text
-          style={[
-            styles.status,
-            item.status === "Pending"
-              ? styles.pending
-              : item.status === "Resolved"
-              ? styles.resolved
-              : styles.inReview,
-          ]}
-        >
-          {item.status}
-        </Text>
-      </View>
+  const handleEdit = (complaint: ComplaintItem) => {
+    setSelectedComplaint(complaint);
+    setType(complaint.type);
+    setMessage(complaint.message || "");
+    setModalVisible(true);
+  };
 
-      {item.attachment && (
-        <TouchableOpacity style={styles.attachment}>
-          <Image
-            source={{ uri: item.attachment }}
-            style={styles.imagePreview}
-          />
-          <Text style={styles.attachmentText}>View Attachment</Text>
-          <Ionicons name="open-outline" size={16} color={COLORS.primary} />
-        </TouchableOpacity>
-      )}
-    </View>
-  );
+  const handleSave = () => {
+    if (!type || !message.trim()) {
+      Alert.alert("Error", "Please select a type and enter your message.");
+      return;
+    }
+
+    Alert.alert("Updated", "Your complaint has been updated.");
+    setModalVisible(false);
+    setSelectedComplaint(null);
+  };
+
+  const renderComplaint: ListRenderItem<ComplaintItem> = ({ item }) => {
+    const isEditable = item.status === "Pending";
+
+    return (
+      <TouchableOpacity
+        activeOpacity={isEditable ? 0.7 : 1}
+        onPress={() => isEditable && handleEdit(item)}
+        style={[styles.card, !isEditable && { opacity: 0.7 }]}
+        disabled={!isEditable}
+      >
+        <View style={styles.row}>
+          <Text style={styles.label}>Type:</Text>
+          <Text style={styles.value}>{item.type}</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Date:</Text>
+          <Text style={styles.value}>{item.date}</Text>
+        </View>
+
+        <View style={styles.row}>
+          <Text style={styles.label}>Status:</Text>
+          <Text
+            style={[
+              styles.status,
+              item.status === "Pending"
+                ? styles.pending
+                : item.status === "Resolved"
+                ? styles.resolved
+                : styles.inReview,
+            ]}
+          >
+            {item.status}
+          </Text>
+        </View>
+
+        {item.attachment && (
+          <TouchableOpacity
+            style={styles.attachment}
+            onPress={() => console.log("Open attachment", item.attachment)}
+          >
+            <Image source={{ uri: item.attachment }} style={styles.imagePreview} />
+            <Text style={styles.attachmentText}>View Attachment</Text>
+            <Ionicons name="open-outline" size={16} color={COLORS.primary} />
+          </TouchableOpacity>
+        )}
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -100,13 +152,63 @@ const ComplaintHistory: React.FC = () => {
         renderItem={renderComplaint}
         contentContainerStyle={{ paddingBottom: 20 }}
       />
+
+      {/* Edit Modal */}
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <KeyboardAvoidingView
+            style={styles.modalContent}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+          >
+            <Text style={styles.modalTitle}>Edit Complaint</Text>
+
+            <Text style={styles.label}>Complaint Type</Text>
+            <DropDownPicker
+              open={open}
+              value={type}
+              items={items}
+              setOpen={setOpen}
+              setValue={setType}
+              setItems={setItems}
+              placeholder="Select type"
+              style={styles.dropdown}
+              dropDownContainerStyle={{ borderColor: "#ccc" }}
+            />
+
+            <Text style={styles.label}>Message</Text>
+            <TextInput
+              placeholder="Describe your issue..."
+              value={message}
+              onChangeText={setMessage}
+              style={[styles.input, { height: 120 }]}
+              multiline
+            />
+
+            <TouchableOpacity style={styles.button} onPress={handleSave}>
+              <Text style={styles.buttonText}>Save Changes</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: "#ccc", marginTop: 10 }]}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={[styles.buttonText, { color: "#333" }]}>Cancel</Text>
+            </TouchableOpacity>
+          </KeyboardAvoidingView>
+        </View>
+      </Modal>
     </View>
   );
 };
 
 export default ComplaintHistory;
 
-// ---------- Styles Types ----------
+// ---------- Styles ----------
 type Styles = {
   container: ViewStyle;
   title: TextStyle;
@@ -121,6 +223,13 @@ type Styles = {
   attachment: ViewStyle;
   imagePreview: ImageStyle;
   attachmentText: TextStyle;
+  modalOverlay: ViewStyle;
+  modalContent: ViewStyle;
+  modalTitle: TextStyle;
+  dropdown: ViewStyle;
+  input: TextStyle;
+  button: ViewStyle;
+  buttonText: TextStyle;
 };
 
 const styles = StyleSheet.create<Styles>({
@@ -192,5 +301,46 @@ const styles = StyleSheet.create<Styles>({
   attachmentText: {
     color: COLORS.primary,
     fontWeight: "500",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    padding: 16,
+  },
+  modalContent: {
+    backgroundColor: COLORS.cardBackground,
+    borderRadius: 12,
+    padding: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 12,
+    color: COLORS.primary,
+  },
+  dropdown: {
+    borderColor: "#ccc",
+    marginBottom: 10,
+    zIndex: 1000,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 6,
+    padding: 10,
+    marginTop: 5,
+    marginBottom: 20,
+    textAlignVertical: "top",
+  },
+  button: {
+    backgroundColor: COLORS.primary,
+    padding: 14,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "600",
   },
 });
