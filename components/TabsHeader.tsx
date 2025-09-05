@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import React, { JSX, useState } from "react";
 import {
   Platform,
   StyleSheet,
@@ -76,12 +76,14 @@ const styles = StyleSheet.create({
     width: "100%",
     zIndex: 99,
     backgroundColor: COLORS.background,
-    paddingTop: Platform.OS === "android" ? 40 : 50,
-    paddingBottom: 10,
+
+    // Reduce size
+    paddingTop: Platform.OS === "android" ? 25 : 35, // was 40/50
+    paddingBottom: 6, // was 10
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
 
-    height: Platform.OS === "android" ? 70 : 80,
+    height: Platform.OS === "android" ? 55 : 65, // was 70/80
 
     elevation: 4,
     shadowColor: "#000",
@@ -90,41 +92,45 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   container: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 12, // tighter padding
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "center", // vertically centers icons
   },
   left: {
     flexDirection: "row",
     alignItems: "center",
   },
   logo: {
-    width: 50,
-    height: 24,
-    marginLeft: 12,
+    width: 40,
+    height: 20,
+    marginLeft: 8,
   },
   right: {
     flexDirection: "row",
     alignItems: "center",
   },
   icon: {
-    marginHorizontal: 6,
+    marginHorizontal: 4,
+    justifyContent: "center",
+    alignItems: "center", // ensures icons are vertically centered
   },
   profile: {
     marginLeft: 6,
+    justifyContent: "center",
+    alignItems: "center",
   },
   searchBar: {
     marginTop: 6,
-    paddingHorizontal: 16,
-    paddingBottom: 10,
+    paddingHorizontal: 12,
+    paddingBottom: 8,
   },
   searchInput: {
     backgroundColor: "#f0f0f0",
     borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    fontSize: 16,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    fontSize: 14,
     color: "#000",
   },
 });
