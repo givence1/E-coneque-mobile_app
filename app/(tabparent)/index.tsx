@@ -1,17 +1,17 @@
+import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
-  View,
-  Text,
-  ScrollView,
   Image,
-  TouchableOpacity,
+  ScrollView,
   StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { Ionicons, MaterialIcons, Feather } from "@expo/vector-icons";
 import styles from "../../assets/styles/home.styles";
-import COLORS from "../../constants/colors";
 import TabsHeader from "../../components/TabsHeader";
-import { useRouter } from "expo-router";
+import COLORS from "../../constants/colors";
 
 
 const ParentHome = () => {
@@ -44,7 +44,7 @@ const ParentHome = () => {
             </View>
           </View>
           <Image
-            source={require("../../assets/images/icon.png")}
+            source={require("../../assets/images/icon.jpg")}
             style={localStyles.avatar}
           />
         </View>

@@ -1,6 +1,6 @@
 import COLORS from '@/constants/colors';
 import { EdgeSchoolFees } from '@/utils/schemas/interfaceGraphql';
-import { EdgePreInscriptionPrim, EdgeSchoolFeesPrim } from '@/utils/schemas/interfaceGraphqlPrimary';
+import { EdgeSchoolFeesPrim } from '@/utils/schemas/interfaceGraphqlPrimary';
 import { EdgeSchoolFeesSec } from '@/utils/schemas/interfaceGraphqlSecondary';
 import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
@@ -58,7 +58,7 @@ const Header = (
                 </View>
             </View>
             <Image
-                source={require("../../assets/images/icon.png")}
+                source={require("../../assets/images/icon.jpg")}
                 style={localStyles.avatar}
             />
         </View>
