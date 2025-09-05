@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: COLORS.border,
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
   },
   inputIcon: { marginRight: 10 },
   input: {
@@ -62,6 +62,12 @@ const styles = StyleSheet.create({
     height: 48,
     color: COLORS.textDark,
   },
+  picker: {
+  flex: 1,
+  height: 48, // ensures full height
+  color: COLORS.textPrimary,
+},
+
   eyeIcon: { padding: 8 },
   button: {
     backgroundColor: COLORS.primary,

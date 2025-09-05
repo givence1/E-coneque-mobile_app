@@ -11,7 +11,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import styles from "../../assets/styles/login.styles";
 import COLORS from "../../constants/colors";
@@ -22,12 +22,20 @@ export default function Login() {
   const [parent, setParent] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  const { isLoading, login, role, isCheckingAuth, schoolIdentification, checkAuth } =
+  const { isLoading, login, isCheckingAuth, schoolIdentification, checkAuth } =
     useAuthStore();
 
   const handleLogin = async () => {
-    if (matricle.trim().length < 4) {
-      Alert.alert("Invalid Input", "Matricle/Username must be at least 4 characters long.");
+    if (!parent && matricle.trim().length < 4) {
+      Alert.alert(
+        "Invalid Input",
+        "Matricle/Username must be at least 4 characters long."
+      );
+      return;
+    }
+
+    if (parent && matricle.trim().length < 7) {
+      Alert.alert("Invalid Input", "Phone number must be at least 7 digits.");
       return;
     }
 
@@ -50,7 +58,9 @@ export default function Login() {
 
   if (!schoolIdentification) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
+      <View
+        style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20 }}
+      >
         <Text style={{ fontSize: 18, color: "red", marginBottom: 12 }}>
           {schoolIdentification || "Check Your Internet Connection."}
         </Text>
@@ -65,14 +75,14 @@ export default function Login() {
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: "#fff" }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0} // ensures proper push on iOS
+      keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
     >
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
       >
         {/* Header with Logo + School Name */}
-        {/* <View
+        <View
           style={{
             alignItems: "center",
             gap: 40,
@@ -80,13 +90,8 @@ export default function Login() {
             paddingBottom: 30,
             backgroundColor: COLORS.background,
           }}
-        > */}
-          {/* <Image
-            source={{ uri: `${protocol}${tenant}${RootApi}/media/${schoolIdentification?.logo}` }}
-            style={{ width: 120, height: 120, borderRadius: 10 }}
-            resizeMode="contain"
-          /> */}
-          {/* <Text
+        >
+          <Text
             style={{
               color: COLORS.primary,
               fontSize: 28,
@@ -96,40 +101,74 @@ export default function Login() {
             }}
           >
             {schoolIdentification?.name || "Welcome"}
-          </Text> */}
-        {/* </View> */}  
+          </Text>
+        </View>
 
         {/* Form Card */}
         <View style={styles.container}>
           <View style={styles.card}>
             <View style={styles.formContainer}>
-              {/* Role Toggle */}
+              {/* Header with Toggle Button */}
               <View
                 style={{
                   flexDirection: "row",
-                  justifyContent: "center",
+                  justifyContent: "space-between",
                   alignItems: "center",
-                  marginBottom: 16,
+                  marginBottom: 24,
                 }}
               >
-                <Text style={{ color: COLORS.primary, marginRight: 10 }}> Login </Text>
+                {/* Left Title */}
+                <Text
+                  style={{
+                    fontSize: 22,
+                    fontWeight: "700",
+                    color: COLORS.primary,
+                  }}
+                >
+                  {parent ? "PARENT LOGIN" : "LOGIN"}
+                </Text>
+
+                {/* Toggle pill */}
+                <TouchableOpacity
+                  onPress={() => setParent(!parent)}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    backgroundColor: COLORS.primary,
+                    paddingVertical: 8,
+                    paddingHorizontal: 16,
+                    borderRadius: 30,
+                  }}
+                >
+                  <Text style={{ color: "#fff", fontWeight: "600", marginRight: 6 }}>
+                    {parent ? "Retour" : "As Parent"}
+                  </Text>
+                  <Ionicons
+                    name={parent ? "arrow-back" : "arrow-forward"}
+                    size={18}
+                    color="#fff"
+                  />
+                </TouchableOpacity>
               </View>
 
-              {/* Username */}
+              {/* Username / Phone */}
               <View style={styles.inputGroup}>
                 <View style={styles.inputContainer}>
                   <Ionicons
-                    name="person-outline"
+                    name={parent ? "call-outline" : "person-outline"}
                     size={20}
                     color={COLORS.primary}
                     style={styles.inputIcon}
                   />
                   <TextInput
                     style={styles.input}
-                    placeholder="Enter Matricule or Username"
+                    placeholder={
+                      parent ? "Parent Telephone Number" : "Enter Matricule or Username"
+                    }
                     placeholderTextColor={COLORS.placeholderText}
                     value={matricle}
                     onChangeText={setMatricle}
+                    keyboardType={parent ? "phone-pad" : "default"}
                     returnKeyType="next"
                   />
                 </View>
@@ -176,12 +215,18 @@ export default function Login() {
                 </TouchableOpacity>
               </View>
 
-              {/* Login */}
-              <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={isLoading}>
+              {/* Login Button */}
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleLogin}
+                disabled={isLoading}
+              >
                 {isLoading ? (
                   <ActivityIndicator color="#fff" />
                 ) : (
-                  <Text style={styles.buttonText}>Login</Text>
+                  <Text style={styles.buttonText}>
+                    {parent ? "Login As Parent" : "Login"}
+                  </Text>
                 )}
               </TouchableOpacity>
 
@@ -197,7 +242,6 @@ export default function Login() {
 
               {/* Footer */}
               <View style={styles.footer}>
-                {/* <Text style={styles.footerText}>Pre Enrollment</Text> */}
                 <Link href="/signup" asChild>
                   <TouchableOpacity>
                     <Text style={styles.link}>Register</Text>

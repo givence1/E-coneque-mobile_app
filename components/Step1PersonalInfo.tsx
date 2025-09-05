@@ -138,13 +138,18 @@ export default function Step1PersonalInfo({ data, updateField, onNext, onPreviou
                   </View>
                 </View>
 
-                {/* Gender */}
+              {/* Gender */}
                 <View style={styles.inputGroup}>
                   <Text style={styles.label}>Gender</Text>
                   <View style={styles.inputContainer}>
-                    <Ionicons name="person-outline" size={20} color={COLORS.primary} style={styles.inputIcon} />
+                    <Ionicons
+                      name="person-outline"
+                      size={20}
+                      color={COLORS.primary}
+                      style={styles.inputIcon}
+                    />
                     <SelectPicker
-                      style={styles.input}
+                      style={styles.picker }   // 👈 use dedicated style
                       selectedValue={data.gender || ""}
                       onValueChange={(itemValue) => updateField("gender", itemValue)}
                     >
@@ -154,6 +159,7 @@ export default function Step1PersonalInfo({ data, updateField, onNext, onPreviou
                     </SelectPicker>
                   </View>
                 </View>
+
 
                 {/* Address */}
                 <View style={styles.inputGroup}>
@@ -261,7 +267,7 @@ export default function Step1PersonalInfo({ data, updateField, onNext, onPreviou
 
               {/* FOOTER */}
               <View style={styles.footer}>
-                <Text style={styles.footerText}>Already have an account?</Text>
+                <Text style={styles.footerText}>Already have an account back to</Text>
                 <TouchableOpacity onPress={() => router.back()}>
                   <Text style={styles.link}>Login</Text>
                 </TouchableOpacity>
