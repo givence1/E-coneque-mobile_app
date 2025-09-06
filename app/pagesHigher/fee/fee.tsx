@@ -1,3 +1,5 @@
+import Header from "@/components/Header";
+import COLORS from "@/constants/colors";
 import { useAuthStore } from "@/store/authStore";
 import { NodeSchoolFees } from "@/utils/schemas/interfaceGraphql";
 import { gql, useQuery } from "@apollo/client";
@@ -11,8 +13,6 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import Header from "../../../components/Header";
-import COLORS from "../../../constants/colors";
 import ModalMoratorium from "../../pagesHigher/fee/ModalMoratorium";
 
 
@@ -38,7 +38,7 @@ const Fees = () => {
     }
   }, [dataFees]);
 
-
+  
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       <Header />
@@ -100,13 +100,18 @@ const Fees = () => {
             </View>
 
             {/* Moratorium Button */}
-            <TouchableOpacity
+            {!fees?.moratoires?.length ? <TouchableOpacity
               onPress={() => setModalVisible(true)}
               style={styles.moratoriumButton}
             >
               <Text style={styles.buttonText}>Request Moratorium</Text>
               <Ionicons name="arrow-forward" size={16} color="white" />
             </TouchableOpacity>
+            :
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <Text style={{ color: "black" }}>Moratoire:</Text>
+              <Text style={[styles.buttonText, { color: "green" }]}>{fees?.moratoires[0]?.status}</Text>
+            </View>}
 
             {/* ID Card & Status */}
             <View style={styles.statusSection}>
@@ -259,6 +264,11 @@ const GET_DATA = gql`
           }
           platformPaid idPaid
           transactions { id amount reason ref createdAt }
+          moratoires { 
+            id reason status
+            requestedSchedule { amount dueDate }
+            approvedSchedule { amount dueDate }
+          }
         }
       }
     }

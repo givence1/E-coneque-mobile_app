@@ -1,17 +1,16 @@
 import COLORS from '@/constants/colors';
+import { protocol, RootApi, tenant } from '@/utils/config';
 import { EdgeSchoolFees } from '@/utils/schemas/interfaceGraphql';
 import { EdgeSchoolFeesPrim } from '@/utils/schemas/interfaceGraphqlPrimary';
 import { EdgeSchoolFeesSec } from '@/utils/schemas/interfaceGraphqlSecondary';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 
 
 const ProfileHeader = (
     { fees }:
-    { fees: EdgeSchoolFees | EdgeSchoolFeesSec | EdgeSchoolFeesPrim }
+        { fees: EdgeSchoolFees | EdgeSchoolFeesSec | EdgeSchoolFeesPrim }
 ) => {
-
-    console.log(fees);
 
     if (!fees) {
         return <View>
@@ -43,10 +42,9 @@ const ProfileHeader = (
                         profile?.classroomsec?.academicYear ||
                         profile?.classroomprim?.academicYear
                     } | {
-                        profile?.specialty?.level?.level
-                        // profile?.specialty?.level?.level ||
-                        // profile?.classroomsec?.level ||
-                        // profile?.classroomprim?.level
+                        profile?.specialty?.level?.level ||
+                        profile?.classroomsec?.level ||
+                        profile?.classroomprim?.level
                     }
                 </Text>
                 <Text style={localStyles.matricule}>
@@ -58,10 +56,11 @@ const ProfileHeader = (
                     <View style={[localStyles.progress, { width: "70%" }]} />
                 </View>
             </View>
-            {/* <Image
-                source={require("../assets/images/icon.png")}
+            <Image
+                // source={`${profile?.customuser?.photo?.length > 1 ? protocol+tenant+RootApi+"/media/"+profile?.customuser?.photo : require("../assets/images/icon.png")}`}
+                source={`${profile?.customuser?.photo?.length > 1 ? protocol + tenant + RootApi + "/media/" + profile?.customuser?.photo : ""}` || require("../assets/images/icon.jpg")}
                 style={localStyles.avatar}
-            /> */}
+            />
         </View>
     );
 }

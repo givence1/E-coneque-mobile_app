@@ -420,6 +420,7 @@ export interface NodeSchoolFees {
   idPaid: boolean;
   balance: number;
   transactions: SetTransactions[];
+  moratoires: NodeMoratoire[];
   updatedAt: string;
   updatedBy: NodeCustomUser;
 }
