@@ -1,16 +1,16 @@
+import TabsHeader from "@/components/studentHeader/TabsHeader";
+import { useAuthStore } from "@/store/authStore";
+import { EdgeCourse } from "@/utils/schemas/interfaceGraphql";
+import { gql, useQuery } from "@apollo/client";
 import React from "react";
 import {
+  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
   View,
-  ActivityIndicator,
 } from "react-native";
-import TabsHeader from "@/components/TabsHeader";
 import COLORS from "../../../constants/colors";
-import { gql, useQuery } from "@apollo/client";
-import { useAuthStore } from "@/store/authStore";
-import { EdgeCourse } from "@/utils/schemas/interfaceGraphql";
 
 
 type CourseNode = {

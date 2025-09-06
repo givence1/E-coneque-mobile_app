@@ -1,7 +1,10 @@
 import COLORS from "@/constants/colors";
+import { useAuthStore } from "@/store/authStore";
+import { capitalizeFirstLetter, validateDate } from "@/utils/functions";
+import { ApiFactory } from "@/utils/graphql/ApiFactory";
 import { NodeSchoolFees } from "@/utils/schemas/interfaceGraphql";
+import { gql } from "@apollo/client";
 import { Ionicons } from "@expo/vector-icons";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import React, { useState } from "react";
 import {
   FlatList,
@@ -13,40 +16,124 @@ import {
   View,
 } from "react-native";
 
+
+
+
 const ModalMoratorium = (
-  { fees, modalVisible, setModalVisible, setMoratoriumStatus }:
-  { fees: NodeSchoolFees, modalVisible: boolean, setModalVisible: any, setMoratoriumStatus: any }
+  { fees, modalVisible, setModalVisible }:
+    { fees: NodeSchoolFees, modalVisible: boolean, setModalVisible: any, setMoratoriumStatus: any }
 ) => {
   const [reason, setReason] = useState("");
-  const [schedules, setSchedules] = useState<{ id: number; amount: string; date: Date }[]>([]);
-  const [showPickerId, setShowPickerId] = useState<number | null>(null);
+  const { profileId } = useAuthStore();
+  const [schedules, setSchedules] = useState<{ id: number; amount: string; due_date: string; error?: string }[]>([]);
 
-  // add a new schedule field
   const addSchedule = () => {
     if (schedules.length < 4) {
-      setSchedules([...schedules, { id: Date.now(), amount: "", date: new Date() }]);
+      setSchedules([...schedules, { id: Date.now(), amount: "", due_date: "", error: "" }]);
     }
   };
 
-  // remove schedule field
   const removeSchedule = (id: number) => {
     setSchedules(schedules.filter(s => s.id !== id));
   };
 
-  // update schedule
-  const updateSchedule = (id: number, field: "amount" | "date", value: any) => {
+  const updateSchedule = (id: number, field: "amount" | "due_date" | "error", value: any) => {
     setSchedules(schedules.map(s => s.id === id ? { ...s, [field]: value } : s));
   };
 
-  // handle submit
-  const handleApply = () => {
-    if (schedules.length === 0 || reason.trim() === "") {
-      alert("Please add at least one schedule and a reason.");
+  const handleDateChange = (id: number, val: string) => {
+    const formattedDate = formatDateInput(val);
+    const validation = validateDate(formattedDate);
+
+    setSchedules(schedules.map(s => {
+      if (s.id === id) {
+        return {
+          ...s,
+          due_date: formattedDate,
+          error: formattedDate.length === 10 && !validation?.isValid
+            ? validation?.error || "Invalid date"
+            : ""
+        };
+      }
+      return s;
+    }));
+  };
+
+  const formatDateInput = (text: string) => {
+    let cleaned = text.replace(/\D/g, '');
+    if (cleaned.length > 8) {
+      cleaned = cleaned.substring(0, 8);
+    }
+    if (cleaned.length < 4) {
+      return cleaned;
+    } else if (cleaned.length == 4) {
+      return `${cleaned.substring(0, 4)}-`;
+    } else if (cleaned.length < 6) {
+      return `${cleaned.substring(0, 4)}-${cleaned.substring(4)}`;
+    } else {
+      return `${cleaned.substring(0, 4)}-${cleaned.substring(4, 6)}-${cleaned.substring(6, 8)}`;
+    }
+  };
+
+
+  const handleApply = async () => {
+    const validation = validateMoratoriumApplication(schedules, reason, fees?.balance);
+
+    if (!validation.isValid) {
+      alert(validation.message);
       return;
     }
-    setModalVisible(false);
-    setMoratoriumStatus("pending"); // update parent state
+
+    const sortedSchedules = [...schedules]
+      .sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime())
+      .map(({ due_date, amount }) => ({
+        due_date,
+        amount: parseFloat(amount)
+      }));
+
+    const requestedSchedule = JSON.stringify(sortedSchedules.map((s: any) => {
+      return { amount: s.amount, due_date: s.due_date }
+    })
+    );
+ 
+
+
+    const dataForMutation = {
+      userprofileId: profileId,
+      reason: capitalizeFirstLetter(reason),
+      status: "Pending",
+      requestedSchedule,
+      comment: "",
+      delete: false,
+    }
+
+       console.log(dataForMutation);
+    // return
+
+    const successData = await ApiFactory({
+      newData: dataForMutation,
+      editData: dataForMutation,
+      mutationName: "createUpdateDeleteMoratoire",
+      modelName: "moratoire",
+      successField: "id",
+      query,
+      router: null,
+      params: null,
+      redirect: false,
+      reload: false,
+      returnResponseField: true,
+      redirectPath: ``,
+      actionLabel: "creating",
+    });
+
+    console.log(successData);
+    if (successData) {
+      alert("Submitted Successfully");
+      setModalVisible(false)
+    }
+
   };
+
 
   return (
     <Modal
@@ -79,47 +166,44 @@ const ModalMoratorium = (
           <Text style={styles.modalSubtitle}>Requested Schedule</Text>
 
           <FlatList
-  data={schedules}
-  keyExtractor={(item) => item.id.toString()}
-  renderItem={({ item }) => (
-    <View style={styles.scheduleRow}>
-      <TextInput
-        style={styles.amountInput}
-        placeholder="Amount"
-        keyboardType="numeric"
-        value={item.amount}
-        onChangeText={(val) => updateSchedule(item.id, "amount", val)}
-      />
+            data={schedules}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.scheduleRow}>
 
-      {/* Date Field with border */}
-      <TouchableOpacity
-        style={styles.dateInput}
-        onPress={() => setShowPickerId(item.id)}
-      >
-        <Text>{item.date.toLocaleDateString()}</Text>
-        <Ionicons name="calendar" size={20} color={COLORS.primary} />
-      </TouchableOpacity>
+                <TextInput
+                  style={styles.amountInput}
+                  placeholder="Amount"
+                  keyboardType="numeric"
+                  value={item.amount}
+                  onChangeText={(val) => updateSchedule(item.id, "amount", val)}
+                />
 
-      {/* Remove schedule */}
-      <TouchableOpacity onPress={() => removeSchedule(item.id)}>
-        <Ionicons name="close-circle" size={22} color="red" />
-      </TouchableOpacity>
+                <View style={styles.dateInputContainer}>
+                  <TextInput
+                    style={[
+                      styles.dateInput,
+                      item.error && styles.dateInputError
+                    ]}
+                    placeholder="YYYY-MM-DD"
+                    value={item.due_date}
+                    onChangeText={(val) => handleDateChange(item.id, val)}
+                    keyboardType="numbers-and-punctuation"
+                    maxLength={10}
+                  />
+                  {item.error ? (
+                    <Text style={styles.errorText}>{item.error}</Text>
+                  ) : null}
+                </View>
 
-      {/* Date Picker (hidden until calendar pressed) */}
-      {showPickerId === item.id && (
-        <DateTimePicker
-          value={item.date}
-          mode="date"
-          display="default"
-          onChange={(_, selectedDate) => {
-            setShowPickerId(null);
-            if (selectedDate) updateSchedule(item.id, "date", selectedDate);
-          }}
-        />
-      )}
-    </View>
-  )}
-/>
+
+
+                <TouchableOpacity onPress={() => removeSchedule(item.id)}>
+                  <Ionicons name="close-circle" size={22} color="red" />
+                </TouchableOpacity>
+              </View>
+            )}
+          />
 
           {schedules.length < 4 && (
             <TouchableOpacity style={styles.addButton} onPress={addSchedule}>
@@ -199,6 +283,18 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     padding: 8,
   },
+  dateInputContainer: {
+    flex: 1,
+  },
+  dateInput: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 5,
+    padding: 10,
+  },
+  dateInputError: {
+    borderColor: "#fff",
+  },
   addButton: {
     alignItems: "center",
     marginBottom: 12,
@@ -222,16 +318,97 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "600",
   },
-  dateInput: {
-  flex: 1,
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "space-between",
-  borderWidth: 1,
-  borderColor: "#ccc",
-  borderRadius: 6,
-  padding: 8,
-  backgroundColor: "#fff",
-},
-
+  errorText: {
+    color: "#c73131ff",
+    fontSize: 12,
+    marginTop: 2,
+  },
 });
+
+
+const validateMoratoriumApplication = (schedules: { id: number; amount: string; due_date: string; error?: string }[], reason: string, balance: number): { isValid: boolean; message?: string } => {
+  // Check if at least one schedule exists
+  if (schedules.length === 0) {
+    return { isValid: false, message: "Please add at least one schedule." };
+  }
+
+  // Check if reason is provided and has minimum length
+  if (reason.trim() === "") {
+    return { isValid: false, message: "Please provide a reason for the moratorium." };
+  }
+
+  if (reason.trim().length < 10) {
+    return { isValid: false, message: "Reason must be at least 10 characters long." };
+  }
+
+  // Check if all amounts are valid numbers and positive
+  const invalidAmounts = schedules.some(schedule => {
+    const amount = parseFloat(schedule.amount);
+    return isNaN(amount) || amount <= 0;
+  });
+
+  if (invalidAmounts) {
+    return { isValid: false, message: "All amounts must be valid positive numbers." };
+  }
+
+  // Calculate total amount from all schedules
+  const totalAmount = schedules.reduce((sum: number, schedule: any) => {
+    return sum + parseFloat(schedule.amount);
+  }, 0);
+
+  // Check if total amount matches the balance
+  if (totalAmount !== balance) {
+    return {
+      isValid: false,
+      message: `Total amount (${totalAmount.toLocaleString()} F) must equal the balance (${balance.toLocaleString()} F).`
+    };
+  }
+
+  // Check if any schedule has validation errors
+  const hasErrors = schedules.some(schedule => schedule.error);
+  if (hasErrors) {
+    return { isValid: false, message: "Please fix all date validation errors before applying." };
+  }
+
+  // Additional validation: Re-validate all dates to ensure they're completely valid
+  const invalidDates = schedules.some(schedule => {
+    const validation = validateDate(schedule.due_date);
+    return !validation.isValid;
+  });
+
+  if (invalidDates) {
+    return { isValid: false, message: "Please ensure all dates are valid (YYYY-MM-DD format and exist in calendar)." };
+  }
+
+  // If all validations pass
+  return { isValid: true };
+};
+
+
+
+const query = gql`
+  mutation CreateUpdateDeleteMoratoire(
+    $comment: String
+    $reason: String!
+    $requestedSchedule: JSONString!
+    $status: String!
+    $userprofileId: ID!
+    $delete: Boolean!
+  ) {
+    createUpdateDeleteMoratoire(
+      comment: $comment
+      reason: $reason
+      requestedSchedule: $requestedSchedule
+      status: $status
+      userprofileId: $userprofileId
+      delete: $delete
+    ) {
+      moratoire {
+        id
+        status
+        reason
+        createdAt
+      }
+    }
+  }
+`;

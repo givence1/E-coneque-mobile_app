@@ -1,5 +1,5 @@
 import ProfileHeader from "@/components/ProfileHeader";
-import TabsHeader from "@/components/TabsHeader";
+import TabsHeader from "@/components/studentHeader/TabsHeader";
 import COLORS from "@/constants/colors";
 import { useAuthStore } from "@/store/authStore";
 import { gql, useQuery } from "@apollo/client";

@@ -1,16 +1,16 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { JSX } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   ScrollView,
-  TouchableOpacity,
-  ViewStyle,
+  StyleSheet,
+  Text,
   TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import TabsHeader from "../../components/lecturerHeader/TabsHeader"; // ✅ Import TabsHeader
 import COLORS from "../../constants/colors";
-import TabsHeader from "../../components/TabsHeader"; // ✅ Import TabsHeader
 
 // Define the type for a course
 interface Course {

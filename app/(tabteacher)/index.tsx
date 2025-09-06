@@ -1,15 +1,15 @@
+import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import React, { JSX } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   ScrollView,
-  ViewStyle,
+  StyleSheet,
+  Text,
   TextStyle,
+  View,
+  ViewStyle,
 } from "react-native";
-import { Ionicons, MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
+import TabsHeader from "../../components/lecturerHeader/TabsHeader";
 import COLORS from "../../constants/colors";
-import TabsHeader from "../../components/TabsHeader";
 
 export default function LecturerHomeScreen(): JSX.Element {
   return (

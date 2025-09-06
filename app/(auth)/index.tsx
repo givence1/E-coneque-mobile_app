@@ -1,11 +1,12 @@
 import { useAuthStore } from "@/store/authStore";
 import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   ScrollView,
   Text,
@@ -24,6 +25,8 @@ export default function Login() {
 
   const { isLoading, login, isCheckingAuth, schoolIdentification, checkAuth } =
     useAuthStore();
+
+  const router = useRouter();
 
   const handleLogin = async () => {
     if (!parent && matricle.trim().length < 4) {
@@ -52,6 +55,14 @@ export default function Login() {
     } catch (error) {
       Alert.alert("Error", "Something went wrong. Please try again.");
     }
+  };
+
+  const handleSupport = () => {
+    // 👉 Replace with your WhatsApp number
+    const phoneNumber = "237673351854";
+    const message = "Hello, I need help with my login.";
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    Linking.openURL(url);
   };
 
   if (isCheckingAuth) return null;
@@ -207,10 +218,10 @@ export default function Login() {
 
               {/* Links */}
               <View style={styles.linkRow}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push("/(auth)/forgot-password")}>
                   <Text style={styles.linkText}>Forgot Password?</Text>
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push("/(auth)/enter-token")}>
                   <Text style={styles.linkText}>Enter Token</Text>
                 </TouchableOpacity>
               </View>
@@ -232,10 +243,10 @@ export default function Login() {
 
               {/* Support Links */}
               <View style={styles.linkRow}>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={handleSupport}>
                   <Text style={styles.linkText}>Contact Support</Text>
                 </TouchableOpacity>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => router.push("/(auth)/check-user")}>
                   <Text style={styles.linkText}>Check User</Text>
                 </TouchableOpacity>
               </View>

@@ -1,15 +1,15 @@
+import { Ionicons } from "@expo/vector-icons";
 import React, { JSX } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
   ScrollView,
-  ViewStyle,
+  StyleSheet,
+  Text,
   TextStyle,
+  View,
+  ViewStyle,
 } from "react-native";
+import TabsHeader from "../../components/lecturerHeader/TabsHeader"; // ✅ Import TabsHeader
 import COLORS from "../../constants/colors";
-import { Ionicons } from "@expo/vector-icons";
-import TabsHeader from "../../components/TabsHeader"; // ✅ Import TabsHeader
 
 // Define types for the timetable data
 type Session = {

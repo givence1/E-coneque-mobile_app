@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import Header from "../../components/Header";
-import COLORS from "../../constants/colors";
+import Header from "../../../components/Header";
+import COLORS from "../../../constants/colors";
 
 export default function TranscriptScreen() {
   // Mock values (replace with actual API data)

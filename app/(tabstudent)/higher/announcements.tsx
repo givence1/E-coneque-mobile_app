@@ -1,4 +1,4 @@
-import TabsHeader from "@/components/TabsHeader";
+import TabsHeader from "@/components/studentHeader/TabsHeader";
 import COLORS from "@/constants/colors";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React from "react";

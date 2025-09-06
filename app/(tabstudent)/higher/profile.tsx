@@ -1,4 +1,4 @@
-import TabsHeader from "@/components/TabsHeader";
+import TabsHeader from "@/components/studentHeader/TabsHeader";
 import COLORS from "@/constants/colors";
 import { useAuthStore } from "@/store/authStore";
 import { gql, useQuery } from "@apollo/client";
@@ -79,6 +79,8 @@ export default function StudentProfileScreen() {
           <Text style={styles.sectionTitle}>📞 Contact Info</Text>
           <InfoRow label="Email" value={profile?.customuser?.email} />
           <InfoRow label="Phone" value={profile?.customuser?.telephone} />
+          <InfoRow label="Date Of Birth" value={profile?.customuser?.DOB} />
+          <InfoRow label="place Of Birth" value={profile?.customuser?.POB} />
         </View>
 
         {/* Parent Info */}
@@ -282,10 +284,8 @@ const GET_PROFILE = gql`
             email
             telephone
             photo
-            fatherName
-            fatherTelephone
-            motherName
-            motherTelephone
+            dob
+            pob
           }
         }
       }

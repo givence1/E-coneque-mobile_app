@@ -149,7 +149,7 @@ export default function Step1PersonalInfo({ data, updateField, onNext, onPreviou
                       style={styles.inputIcon}
                     />
                     <SelectPicker
-                      style={styles.picker }   // 👈 use dedicated style
+                      style={styles.picker } 
                       selectedValue={data.gender || ""}
                       onValueChange={(itemValue) => updateField("gender", itemValue)}
                     >
