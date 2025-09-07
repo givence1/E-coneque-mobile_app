@@ -4,6 +4,8 @@ import { gql, useQuery } from "@apollo/client";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -20,59 +22,87 @@ export default function Signup() {
 
   const { data } = useQuery(GET_DATA, { variables: { language: "en" } });
 
+  const renderSection = () => {
+    if (section === "H")
+      return <PreinscriptionHigher section={section} data={data} />;
+    if (section === "S")
+      return <PreinscriptionSecondary section={section} data={data} />;
+    if (section === "P")
+      return <PreinscriptionPrimary section={section} data={data} />;
+    return null;
+  };
+
   return (
     <View style={styles.wrapper}>
-      <ScrollView contentContainerStyle={styles.content}>
-        {section ? (
-          <View style={{ gap: 16, marginVertical: 5 }}>
-            {section === "H" ? (
-              <PreinscriptionHigher section={section} data={data} />
-            ) : null}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
+      >
+        <ScrollView
+          contentContainerStyle={[
+            styles.content,
+            !section && { justifyContent: "center" }, // 👈 only center when no section
+          ]}
+          keyboardShouldPersistTaps="handled"
+        >
+          {section ? (
+            <View style={{ gap: 16, marginVertical: 5 }}>{renderSection()}</View>
+          ) : (
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Select a Section</Text>
 
-            {section === "S" ? (
-              <PreinscriptionSecondary section={section} data={data} />
-            ) : null}
+              {schoolIdentification?.hasHigher && (
+                <TouchableOpacity
+                  onPress={() => setSection("H")}
+                  style={styles.option}
+                >
+                  <Text style={styles.optionText}>
+                    University Pre-Inscription
+                  </Text>
+                  <Ionicons
+                    name="arrow-forward"
+                    size={18}
+                    color={COLORS.primary}
+                  />
+                </TouchableOpacity>
+              )}
 
-            {section === "P" ? (
-              <PreinscriptionPrimary section={section} data={data} />
-            ) : null}
-          </View>
-        ) : (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Select a Section</Text>
+              {schoolIdentification?.hasSecondary && (
+                <TouchableOpacity
+                  onPress={() => setSection("S")}
+                  style={styles.option}
+                >
+                  <Text style={styles.optionText}>
+                    Secondary Pre-Inscription
+                  </Text>
+                  <Ionicons
+                    name="arrow-forward"
+                    size={18}
+                    color={COLORS.primary}
+                  />
+                </TouchableOpacity>
+              )}
 
-            {schoolIdentification?.hasHigher ? (
-              <TouchableOpacity
-                onPress={() => setSection("H")}
-                style={styles.option}
-              >
-                <Text style={styles.optionText}>University Pre-Inscription</Text>
-                <Ionicons name="arrow-forward" size={18} color={COLORS.primary} />
-              </TouchableOpacity>
-            ) : null}
-
-            {schoolIdentification?.hasSecondary ? (
-              <TouchableOpacity
-                onPress={() => setSection("S")}
-                style={styles.option}
-              >
-                <Text style={styles.optionText}>Secondary Pre-Inscription</Text>
-                <Ionicons name="arrow-forward" size={18} color={COLORS.primary} />
-              </TouchableOpacity>
-            ) : null}
-
-            {schoolIdentification?.hasPrimary ? (
-              <TouchableOpacity
-                onPress={() => setSection("P")}
-                style={styles.option}
-              >
-                <Text style={styles.optionText}>Primary Pre-Inscription</Text>
-                <Ionicons name="arrow-forward" size={18} color={COLORS.primary} />
-              </TouchableOpacity>
-            ) : null}
-          </View>
-        )}
-      </ScrollView>
+              {schoolIdentification?.hasPrimary && (
+                <TouchableOpacity
+                  onPress={() => setSection("P")}
+                  style={styles.option}
+                >
+                  <Text style={styles.optionText}>
+                    Primary Pre-Inscription
+                  </Text>
+                  <Ionicons
+                    name="arrow-forward"
+                    size={18}
+                    color={COLORS.primary}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
@@ -85,7 +115,6 @@ const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
     padding: 20,
-    justifyContent: "center", // 👈 centers content vertically
   },
   card: {
     backgroundColor: COLORS.cardBackground,
