@@ -8,8 +8,8 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import TabsHeader from "../../components/lecturerHeader/TabsHeader"; // ✅ Import TabsHeader
-import COLORS from "../../constants/colors";
+import TabsHeader from "../../../components/lecturerHeader/TabsHeader"; // ✅ Import TabsHeader
+import COLORS from "../../../constants/colors";
 
 // Define types for the timetable data
 type Session = {

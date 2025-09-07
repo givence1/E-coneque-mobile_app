@@ -71,7 +71,7 @@ export default function StudentProfileScreen() {
             style={styles.avatar}
           />
           <Text style={styles.name}>{profile?.customuser?.fullName || "Not Available"}</Text>
-          <Text style={styles.matric}>Origin: {profile?.customuser?.regionOfOrigin}</Text>
+          <Text style={styles.matric}>Department: {profile?.customuser?.regionOfOrigin}</Text>
         </View>
 
         {/* Contact Info */}

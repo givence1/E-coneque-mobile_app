@@ -9,8 +9,8 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import TabsHeader from "../../components/lecturerHeader/TabsHeader"; // ✅ Import TabsHeader
-import COLORS from "../../constants/colors";
+import TabsHeader from "../../../components/lecturerHeader/TabsHeader";
+import COLORS from "../../../constants/colors";
 
 // Define the type for a course
 interface Course {

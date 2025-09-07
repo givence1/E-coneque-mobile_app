@@ -1,81 +1,104 @@
+import COLORS from "@/constants/colors";
+import { useAuthStore } from "@/store/authStore";
+import { gql, useQuery } from "@apollo/client";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import Step1PersonalInfo from "../../components/Step1PersonalInfo";
-import Step2RoleDept from "../../components/Step2RoleDept";
-import Step3Specialty from "../../components/Step3Specialty";
-import Step4Confirmation from "../../components/Step4Confirmation";
-import COLORS from "../../constants/colors";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import PreinscriptionHigher from "./PreinscriptionComponents/PreinscriptionHigher";
+import PreinscriptionSecondary from "./PreinscriptionComponents/PreinscriptionSecondary";
+import PreinscriptionPrimary from "./PreinscriptionComponents/PreinscriptionPrimary";
 
-export default function Signup() {
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    firstName: "", lastName: "", gender: "", address: "", dob: "", placeOfBirth: "",
-    telephone: "", email: "", campus: "", nationality: "", region: "",
-    highestCertificate: "", yearObtained: "", subjectsGrade: "", fatherName: "",
-    motherName: "", fatherPhone: "", motherPhone: "", parentAddress: "",
-    specialty1: "", specialty2: "", academicYear: "", program: "", level: "", session: "",
+
+export default function signup() {
+
+  const { schoolIdentification } = useAuthStore();
+  const [section, setSection] = useState<"H" | "S" | "P" | "V">()
+
+  const { data, loading, error } = useQuery(GET_DATA, {
+    variables: { language: "en" }
   });
 
-  const updateField = (key: any, value: any) =>
-    setFormData((prev) => ({ ...prev, [key]: value }));
-
-  const handleNext = () => setStep((prev) => prev + 1);
-  const handleBack = () => setStep((prev) => prev - 1);
-
+  console.log(section);
+  console.log(data);
+  
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 70} // adjust if header overlaps
-    >
-      <View style={styles.wrapper}>
-        {/* Fixed Header */}
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>Step {step} of 4</Text>
-        </View>
+    <View style={styles.wrapper}>
+      <ScrollView contentContainerStyle={styles.content}>
 
-        {/* Step Content */}
-        <View style={{ flex: 1 }}>
-          {step === 1 && (
-            <Step1PersonalInfo
-              data={formData}
-              updateField={updateField}
-              onNext={handleNext}
-              onPrevious={() => {}}
-            />
-          )}
-          {step === 2 && (
-            <Step2RoleDept
-              data={formData}
-              updateField={updateField}
-              onNext={handleNext}
-              onPrevious={handleBack}
-            />
-          )}
-          {step === 3 && (
-            <Step3Specialty
-              data={formData}
-              updateField={updateField}
-              onNext={handleNext}
-              onPrevious={handleBack}
-            />
-          )}
-          {step === 4 && (
-            <Step4Confirmation
-              data={formData}
-              onPrevious={handleBack}
-              onSubmit={() => console.log("SUBMIT:", formData)}
-            />
-          )}
-        </View>
-      </View>
-    </KeyboardAvoidingView>
+        {
+          section ?
+            <View
+              style={{ gap: 16, marginVertical: 5 }}
+            >
+
+              {section === "H" ?
+                <PreinscriptionHigher
+                  section={section}
+                  data={data}
+                /> : null}
+
+              {section === "S" ?
+                <PreinscriptionSecondary
+                  section={section}
+                  data={data}
+                /> : null}
+
+              {section === "P" ?
+                <PreinscriptionPrimary
+                  section={section}
+                  data={data}
+                /> : null}
+
+            </View>
+            :
+            <View
+              style={{ gap: 16, marginVertical: 20 }}
+            >
+              <Text>Select A Section</Text>
+            </View>
+        }
+
+        {
+          !section ? schoolIdentification ?
+            <View
+              style={{ gap: 16 }}
+            >
+
+              {schoolIdentification?.hasHigher ?
+                <TouchableOpacity
+                  onPress={() => setSection("H")}
+                  style={{ flexDirection: "row", gap: 4 }}
+                >
+                  <Text>University Pre-Inscription</Text>
+                  <Ionicons name="arrow-forward" size={16} color="green" />
+                </TouchableOpacity> : null}
+
+              {schoolIdentification?.hasSecondary ?
+                <TouchableOpacity
+                  onPress={() => setSection("S")}
+                  style={{ flexDirection: "row", gap: 4 }}
+                >
+                  <Text>Secondary Pre-Inscription</Text>
+                  <Ionicons name="arrow-forward" size={16} color="green" />
+                </TouchableOpacity> : null}
+
+              {schoolIdentification?.hasPrimary ?
+                <TouchableOpacity
+                  onPress={() => setSection("P")}
+                  style={{ flexDirection: "row", gap: 4 }}
+                >
+                  <Text>Primary Pre-Inscription</Text>
+                  <Ionicons name="arrow-forward" size={16} color="green" />
+                </TouchableOpacity> : null}
+
+            </View>
+            :
+            <View>Check School Info</View>
+            : null
+        }
+
+      </ScrollView>
+    </View>
   );
 }
 
@@ -105,4 +128,50 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontFamily: "JetBrainsMono-Medium",
   },
+  content: {
+    padding: 20,
+    paddingBottom: 20,
+  },
 });
+
+
+
+const GET_DATA = gql`
+  query GetData {
+    allSchoolInfos {
+      edges {
+        node {
+          id campus address schoolType
+        }
+      }
+    }
+    allLevels {
+      edges {
+        node {
+          id level
+        }
+      }
+    }
+    allMainSpecialties {
+      edges {
+        node {
+          id specialtyName
+        }
+      }
+    }
+    allPrograms {
+      edges {
+        node {
+          id name
+        }
+      }
+    }
+    getProgramsSec
+    getProgramsPrim
+    getLevelsSec
+    getLevelsPrim
+    allAcademicYears
+    allAcademicYearsSec
+    allAcademicYearsPrim
+  }
+`;
