@@ -11,9 +11,9 @@ interface Step1Props {
   data: {
     firstName?: string;
     lastName?: string;
-    gender?: string;
+    sex?: string;
     address?: string;
-    placeOfBirth?: string;
+    pob?: string;
     dob?: string;
     telephone?: string;
     email?: string;
@@ -142,8 +142,8 @@ export default function Step1PersonalInfo({
                 style={[styles.inputIcon, { left: 10 }]}
               />
               <SelectPicker
-                selectedValue={data.gender || ""}
-                onValueChange={(v) => updateField("gender", v)}
+                selectedValue={data.sex || ""}
+                onValueChange={(v) => updateField("sex", v)}
                 mode={Platform.OS === "android" ? "dropdown" : undefined}
                 style={{ flex: 1, color: COLORS.textPrimary }}
                 dropdownIconColor={COLORS.textSecondary}
@@ -179,8 +179,8 @@ export default function Step1PersonalInfo({
               <TextInput
                 placeholder="Place of Birth"
                 placeholderTextColor={COLORS.placeholderText}
-                value={data.placeOfBirth || ""}
-                onChangeText={(text) => updateField("placeOfBirth", text)}
+                value={data.pob || ""}
+                onChangeText={(text) => updateField("pob", text)}
                 style={styles.input}
                 returnKeyType="next"
               />

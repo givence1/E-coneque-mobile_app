@@ -1,5 +1,6 @@
 import { removeEmptyFields } from "../functions";
 import { uploadGraphQLMutation } from "./UploadGraphql";
+import { useAuthStore } from "@/store/authStore";
 
 type SubmitOptions = {
   newData: any;
@@ -40,17 +41,17 @@ export const ApiFactory = async ({
   const successMessages: string[] = [];
   const errorMessages: string[] = [];
   let responseFieldData: any = null;
-
+  // Get token from authStore
+  const { token } = useAuthStore.getState();
   for (let index = 0; index < items.length; index++) {
     let res: any = items[index];
-
     try {
       const response = await uploadGraphQLMutation({
         query: query.loc?.source.body || "",
         variables: removeEmptyFields(res),
         fileMap: getFileMap ? getFileMap(res) : {},
         params,
-        token: localStorage.getItem("token") || "",
+        token: token || "",
       });
       (response);
       const result = response?.data?.[mutationName]?.[modelName];

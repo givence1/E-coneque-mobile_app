@@ -55,7 +55,7 @@ export default function Step2RoleDept({
       "Gabon",
       "International",
     ],
-    regionOfOrigin: ["South West", "North West", "Center", "Other"],
+    regionOfOrigin: ["South West", "North West", "Center", "Littoral", "Other"],
     highestCertificate: ["GCE O/L", "GCE A/L", "Bachelor's"],
     yearObtained: Array.from({ length: 15 }, (_, i) => `${new Date().getFullYear() - i}`),
   };
@@ -66,7 +66,7 @@ export default function Step2RoleDept({
     <Modal transparent animationType="fade" visible={!!popupField}>
       <View style={local.popupOverlay}>
         <View style={local.popupContainer}>
-          <Text style={local.popupTitle}>Select {field}</Text>
+          <Text style={local.popupTitle}>Select Campus</Text>
           <FlatList
             data={optionsMap[field]}
             keyExtractor={(item) => item}
@@ -128,7 +128,7 @@ export default function Step2RoleDept({
                       style={styles.inputIcon}
                     />
                     <Text style={[styles.input, { paddingVertical: 12 }]}>
-                      {data[field] || `Select ${field}`}
+                      {data[field] || `Select Campus`}
                     </Text>
                   </TouchableOpacity>
                   {errors[field] && touched[field] && (
