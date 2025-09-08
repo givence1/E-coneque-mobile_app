@@ -1,4 +1,4 @@
-import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
@@ -96,7 +96,7 @@ export default function LecturerHomeScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>📚 Lecturer Overview</Text>
           <View style={styles.statsRow}>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={styles.statBox}
               onPress={() => router.push("/pagesHigher/lecturersComponents/courses")}
             >
@@ -107,7 +107,7 @@ export default function LecturerHomeScreen() {
               />
               <Text style={styles.statValue}>4</Text>
               <Text style={styles.statLabel}>Courses</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <TouchableOpacity
               style={styles.statBox}
