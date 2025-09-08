@@ -1,4 +1,7 @@
+import styles from "@/assets/styles/signup.styles";
+import COLORS from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
+import { Formik } from "formik";
 import React, { useState } from "react";
 import {
   FlatList,
@@ -12,8 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import styles from "../../../assets/styles/signup.styles";
-import COLORS from "@/constants/colors";
+import * as Yup from "yup";
 import StepIndicator from "./StepIndicator";
 
 type Step3Props = {
@@ -22,18 +24,26 @@ type Step3Props = {
   onNext: () => void;
   onPrevious: () => void;
   apiMainSpecialties: string[];
-  apiLevels: string[] | [];
-  apiLevelsSec: string[] | [];
-  apiLevelsPrim: string[] | [];
-  apiYears: string[] | [];
-  apiYearsSec: string[] | [];
-  apiYearsPrim: string[] | [];
-  apiPrograms: string[] | [];
-  apiProgramsSec: string[] | [];
-  apiProgramsPrim: string[] | [];
+  apiLevels: string[];
+  apiLevelsSec: string[];
+  apiLevelsPrim: string[];
+  apiYears: string[];
+  apiYearsSec: string[];
+  apiYearsPrim: string[];
+  apiPrograms: string[];
+  apiProgramsSec: string[];
+  apiProgramsPrim: string[];
   section: "H" | "S" | "P";
 };
 
+const validationSchema = Yup.object().shape({
+  specialtyoneId: Yup.string().required("First Specialty is required"),
+  specialtytwoId: Yup.string().required("Second Specialty is required"),
+  academicYear: Yup.string().required("Academic Year is required"),
+  programId: Yup.string().required("Program is required"),
+  level: Yup.string().required("Level is required"),
+  session: Yup.string().required("Session is required"),
+});
 
 export default function Step3Specialty({
   data,
@@ -45,22 +55,33 @@ export default function Step3Specialty({
   apiLevelsPrim,
   apiMainSpecialties,
   apiYears,
+  apiYearsSec,
+  apiYearsPrim,
   apiPrograms,
   apiProgramsSec,
   apiProgramsPrim,
+  section,
 }: Step3Props) {
+  // Pick correct API lists based on section
+  const levelOptions =
+    section === "H" ? apiLevels : section === "S" ? apiLevelsSec : apiLevelsPrim;
+
+  const yearOptions =
+    section === "H" ? apiYears : section === "S" ? apiYearsSec : apiYearsPrim;
+
+  const programOptions =
+    section === "H" ? apiPrograms : section === "S" ? apiProgramsSec : apiProgramsPrim;
 
   const optionsMap: Record<string, string[]> = {
     specialtyoneId: apiMainSpecialties,
     specialtytwoId: apiMainSpecialties,
-    academicYear: apiYears,
-    programId: apiPrograms,
-    level: apiLevels,
+    academicYear: yearOptions,
+    programId: programOptions,
+    level: levelOptions,
     session: ["Morning", "Evening"],
   };
 
   const [popupField, setPopupField] = useState<string | null>(null);
-
 
   const renderPopup = (field: string) => (
     <Modal transparent animationType="fade" visible={!!popupField}>
@@ -94,55 +115,83 @@ export default function Step3Specialty({
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 70}
     >
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={[styles.container, { paddingBottom: 40 }]}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <StepIndicator idx={2} />
 
-        <StepIndicator idx={3} />
+        <Formik
+          initialValues={data}
+          validationSchema={validationSchema}
+          onSubmit={onNext}
+        >
+          {({ errors, touched }) => (
+            <View style={styles.card}>
+              <View style={styles.header}>
+                <Text style={styles.title}>Specialty Details</Text>
+              </View>
 
-        <View style={styles.card}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Specialty Details</Text>
-          </View>
+              <View style={styles.formContainer}>
+                {Object.keys(optionsMap).map((field) => (
+                  <View key={field} style={styles.inputGroup}>
+                    <Text style={styles.label}>
+                      {field.replace(/([A-Z])/g, " $1")}
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => setPopupField(field)}
+                      style={[styles.inputContainer, { justifyContent: "flex-start" }]}
+                    >
+                      <Ionicons
+                        name="chevron-down-outline"
+                        size={20}
+                        color={COLORS.primary}
+                        style={styles.inputIcon}
+                      />
+                      <Text style={[styles.input, { paddingVertical: 12 }]}>
+                        {data[field] || `Select ${field}`}
+                      </Text>
+                    </TouchableOpacity>
+                    {errors[field] && touched[field] && (
+                      <Text style={{ color: "red", fontSize: 12 }}>{errors[field]}</Text>
+                    )}
+                  </View>
+                ))}
 
-          <View style={styles.formContainer}>
-            {Object.keys(optionsMap).map((field) => (
-              <View key={field} style={styles.inputGroup}>
-                <Text style={styles.label}>{field.replace(/([A-Z])/g, " $1")}</Text>
+                {popupField && renderPopup(popupField)}
+              </View>
+
+              {/* Navigation Buttons */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  gap: 12,
+                  marginTop: 24,
+                }}
+              >
                 <TouchableOpacity
-                  onPress={() => setPopupField(field)}
-                  style={[styles.inputContainer, { justifyContent: "flex-start" }]}
+                  style={[styles.button, { backgroundColor: COLORS.border, flex: 1 }]}
+                  onPress={onPrevious}
                 >
-                  <Ionicons name="chevron-down-outline" size={20} color={COLORS.primary} style={styles.inputIcon} />
-                  <Text style={[styles.input, { paddingVertical: 12 }]}>
-                    {data[field] || `Select ${field}`}
+                  <Text style={[styles.buttonText, { color: COLORS.textPrimary }]}>
+                    Back
                   </Text>
                 </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.button, { flex: 1 }]}
+                  onPress={onNext}
+                >
+                  <Text style={styles.buttonText}>Next</Text>
+                </TouchableOpacity>
               </View>
-            ))}
-
-            {popupField && renderPopup(popupField)}
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              gap: 12,
-              marginTop: 24,
-            }}
-          >
-            <TouchableOpacity
-              style={[styles.button, { backgroundColor: COLORS.border, flex: 1 }]}
-              onPress={onPrevious}
-            >
-              <Text style={[styles.buttonText, { color: COLORS.textPrimary }]}>Back</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={[styles.button, { flex: 1 }]} onPress={onNext}>
-              <Text style={styles.buttonText}>Next</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+            </View>
+          )}
+        </Formik>
       </ScrollView>
     </KeyboardAvoidingView>
   );
