@@ -1,3 +1,4 @@
+import AppHeader from "@/components/AppHeader";
 import React, { useState } from "react";
 import {
   Alert,
@@ -6,13 +7,11 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
-  ViewStyle,
   TextStyle,
-  TextInputProps,
+  TouchableOpacity,
+  ViewStyle
 } from "react-native";
-import DropDownPicker, { ItemType } from "react-native-dropdown-picker";
-import Header from "../../../components/Header";
+import DropDownPicker from "react-native-dropdown-picker";
 import COLORS from "../../../constants/colors";
 
 type ComplaintType = string | null;
@@ -51,7 +50,7 @@ const Complaint: React.FC = () => {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <Header placeholder="search topic" />
+      <AppHeader showBack  showTitle  />
       <Text style={styles.label}>Complaint Type</Text>
       <DropDownPicker
         open={open}

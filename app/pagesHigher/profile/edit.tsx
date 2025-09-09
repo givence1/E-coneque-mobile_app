@@ -1,3 +1,5 @@
+import AppHeader from "@/components/AppHeader";
+import COLORS from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
@@ -11,8 +13,6 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import Header from "../../../components/Header";
-import COLORS from "../../../constants/colors";
 
 const EditProfileScreen: React.FC = () => {
   const [name, setName] = useState<string>("Patrisco Givence");
@@ -31,7 +31,7 @@ const EditProfileScreen: React.FC = () => {
       contentContainerStyle={{ paddingBottom: 40 }}
       keyboardShouldPersistTaps="handled"
     >
-      <Header placeholder="Search profile..." />
+      <AppHeader showBack showTabs  showTitle  />
       <Text style={styles.title}>Edit Profile</Text>
 
       <View style={styles.inputGroup}>

@@ -1,3 +1,5 @@
+import AppHeader from "@/components/AppHeader";
+import COLORS from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
@@ -9,8 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Header from "../../../components/Header";
-import COLORS from "../../../constants/colors";
 
 const transactions = [
   { no: 1, reason: "TUITION", amount: "100,000 F" },
@@ -24,7 +24,7 @@ const Fees = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-      <Header />
+      <AppHeader showBack showTabs  showTitle  />
 
       <ScrollView contentContainerStyle={{ padding: 16, paddingTop: 80 }}>
         <Text style={styles.title}>TAMBE - BU23-NUS-0023</Text>

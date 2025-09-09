@@ -1,7 +1,7 @@
+import AppHeader from '@/components/AppHeader';
+import COLORS from '@/constants/colors';
 import React from 'react';
 import { FlatList, StyleSheet, Text, TextStyle, View, ViewStyle } from 'react-native';
-import Header from '../../../components/Header';
-import COLORS from '../../../constants/colors';
 
 type AttendanceItem = {
   course: string;
@@ -18,7 +18,7 @@ const attendanceData: AttendanceItem[] = [
 const Attendance: React.FC = () => {
   return (
     <View style={styles.container}>
-      <Header placeholder="Search attendance..." />
+      <AppHeader showBack  showTitle  />
       <Text style={styles.header}>Attendance Report</Text>
       <FlatList
         data={attendanceData}

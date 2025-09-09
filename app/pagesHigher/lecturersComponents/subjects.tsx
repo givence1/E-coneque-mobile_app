@@ -1,6 +1,6 @@
 import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import TabsHeader from "../../../components/lecturerHeader/TabsHeader";
+import AppHeader from "../../../components/AppHeader";
 import COLORS from "../../../constants/colors";
 
 export default function SubjectsScreen() {
@@ -11,7 +11,7 @@ export default function SubjectsScreen() {
 
   return (
     <View style={styles.container}>
-      <TabsHeader title="Subjects" />
+     <AppHeader showBack  showTitle  />
       <ScrollView
         contentContainerStyle={{ paddingTop: 80, paddingBottom: 30, paddingHorizontal: 16 }}
       >

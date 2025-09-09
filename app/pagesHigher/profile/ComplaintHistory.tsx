@@ -1,3 +1,4 @@
+import AppHeader from "@/components/AppHeader";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import {
@@ -18,7 +19,6 @@ import {
   ViewStyle,
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
-import Header from "../../../components/Header";
 import COLORS from "../../../constants/colors";
 
 // ---------- Types ----------
@@ -144,7 +144,7 @@ const ComplaintHistory: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Header placeholder="search complain history" />
+     <AppHeader showBack  showTitle  />
       <Text style={styles.title}>Complaint History</Text>
       <FlatList
         data={complaintHistory}

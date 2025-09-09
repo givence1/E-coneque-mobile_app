@@ -57,7 +57,6 @@ export default function LecturerHomeScreen() {
           <View style={styles.statsRow}>
             <TouchableOpacity
               style={styles.statBox}
-              onPress={() => router.push("/pagesHigher/lecturersComponents/studentList")}
             >
               <Ionicons name="people-outline" size={24} color={COLORS.primary} />
               <Text style={styles.statValue}>120</Text>
@@ -66,7 +65,6 @@ export default function LecturerHomeScreen() {
 
             <TouchableOpacity
               style={styles.statBox}
-              onPress={() => router.push("/pagesHigher/lecturersComponents/studentAttendance")}
             >
               <Ionicons
                 name="checkmark-circle-outline"
@@ -79,7 +77,6 @@ export default function LecturerHomeScreen() {
 
             <TouchableOpacity
               style={styles.statBox}
-              onPress={() => router.push("/pagesHigher/lecturersComponents/grades")}
             >
               <Ionicons
                 name="trending-up-outline"
@@ -96,22 +93,10 @@ export default function LecturerHomeScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>📚 Lecturer Overview</Text>
           <View style={styles.statsRow}>
-            {/* <TouchableOpacity
-              style={styles.statBox}
-              onPress={() => router.push("/pagesHigher/lecturersComponents/courses")}
-            >
-              <FontAwesome5
-                name="chalkboard-teacher"
-                size={24}
-                color={COLORS.info}
-              />
-              <Text style={styles.statValue}>4</Text>
-              <Text style={styles.statLabel}>Courses</Text>
-            </TouchableOpacity> */}
+          
 
             <TouchableOpacity
               style={styles.statBox}
-              onPress={() => router.push("/pagesHigher/lecturersComponents/classes")}
             >
               <MaterialIcons name="class" size={24} color={COLORS.warning} />
               <Text style={styles.statValue}>6</Text>
@@ -128,38 +113,6 @@ export default function LecturerHomeScreen() {
             </TouchableOpacity>
           </View>
         </View>
-
-        {/* ✅ Resits */}
-        {/* <View style={styles.section}>
-          <Text style={styles.sectionTitle}>🎓 Resits</Text>
-          <View style={styles.statsRow}>
-            <TouchableOpacity
-              style={styles.statBox}
-              onPress={() => router.push("/pagesHigher/lecturersComponents/resit")}
-            >
-              <Ionicons
-                name="document-text-outline"
-                size={24}
-                color={COLORS.error}
-              />
-              <Text style={styles.statValue}>12</Text>
-              <Text style={styles.statLabel}>Resits (Sem 1)</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.statBox}
-              onPress={() => router.push("/pagesHigher/lecturersComponents/timetable")}
-            >
-              <Ionicons
-                name="document-text-outline"
-                size={24}
-                color={COLORS.error}
-              />
-              <Text style={styles.statValue}>8</Text>
-              <Text style={styles.statLabel}>Resits</Text>
-            </TouchableOpacity>
-          </View>
-        </View> */}
 
         {/* ✅ Upload Marks */}
         <View style={styles.section}>
