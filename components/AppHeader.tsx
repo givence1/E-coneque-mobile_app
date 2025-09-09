@@ -6,16 +6,36 @@ import React from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type AppHeaderProps = {
-  showBack?: boolean;   // arrow back
-  showTitle?: boolean;  // centered title
-  title?: string;       // optional override
-  showTabs?: boolean;   // lecturer/student tabs header
+  showBack?: boolean;
+  showTitle?: boolean;
+  title?: string;
+  showTabs?: boolean;
 };
 
 export default function AppHeader({ showBack, showTitle, title, showTabs }: AppHeaderProps) {
   const router = useRouter();
-  const { user, schoolIdentification } = useAuthStore(); // 👈 now also grab schoolIdentification
-  const role = user?.role; // "lecturer" | "student" | "guest"
+  const { user, schoolIdentification } = useAuthStore();
+  const role = user?.role?.toLowerCase();
+
+  const handleProfilePress = () => {
+    switch (role) {
+      case "teacher":
+        router.push("/(auth)/select-campus");
+        break;
+      case "student":
+        router.push("/(auth)/select-profile");
+        break;
+      // case "parent":
+      //   router.push("/(auth)/p");
+      //   break;
+      // case "admin":
+      //   router.push("/(auth)/admin-dashboard");
+      //   break;
+      // default:
+      //   router.push("/(auth)/"); // fallback for unknown or unauthenticated users
+      //   break;
+    }
+  };
 
   return (
     <View style={styles.wrapper}>
@@ -43,14 +63,7 @@ export default function AppHeader({ showBack, showTitle, title, showTabs }: AppH
           <TouchableOpacity style={styles.icon}>
             <Ionicons name="notifications-outline" size={22} color="white" />
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.icon}
-            onPress={() =>
-              role === "lecturer"
-                ? router.push("/(tabteacher)/profile")
-                : router.push("/(tabstudent)/higher/profile")
-            }
-          >
+          <TouchableOpacity style={styles.icon} onPress={handleProfilePress}>
             <Ionicons name="person-circle-outline" size={26} color="#fff" />
           </TouchableOpacity>
         </View>
@@ -95,7 +108,7 @@ const styles = StyleSheet.create({
   },
   left: { flexDirection: "row", alignItems: "center" },
   center: { flex: 1, alignItems: "center" },
-  title: { color: "#fff", fontSize: 13, fontWeight: "700", textAlign: "center", },
+  title: { color: "#fff", fontSize: 13, fontWeight: "700", textAlign: "center" },
   right: { flexDirection: "row", alignItems: "center" },
   icon: { marginHorizontal: 4 },
   tabs: {
