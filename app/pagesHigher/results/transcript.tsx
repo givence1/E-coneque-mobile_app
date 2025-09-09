@@ -23,8 +23,11 @@ export default function TranscriptScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <AppHeader showBack  showTitle  />
+    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+
+      {/* ✅ Fixed header outside the ScrollView */}
+    <AppHeader showBack showTitle />
+    <View style={[styles.container, { paddingTop: 70 }]}>
 
       {/* Transcript Application Card */}
       <View style={styles.card}>
@@ -88,6 +91,7 @@ export default function TranscriptScreen() {
           </Text>
         </TouchableOpacity>
       </View>
+    </View>
     </View>
   );
 }

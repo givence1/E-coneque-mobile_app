@@ -75,7 +75,7 @@ const StudentHome = () => {
             },
             {
               label: "Transcript",
-              route: "/pagesHigher/transcript",
+              route: "/pagesHigher/results/transcript",
               icon: <MaterialIcons name="description" size={24} color={COLORS.primary} />,
             },
             {

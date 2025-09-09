@@ -34,8 +34,11 @@ export default function ExamResults() {
   }, [semester, dataResults]);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-      <AppHeader showBack  showTitle  />
+    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+
+      {/* ✅ Fixed header outside the ScrollView */}
+    <AppHeader showBack showTitle />
+    <ScrollView style={styles.container} contentContainerStyle={[styles.scrollContent, { paddingTop: 50 }]} showsVerticalScrollIndicator={false}>
       <View style={styles.dropdownWrapper}>
       <Picker
     selectedValue={semester}
@@ -60,6 +63,7 @@ export default function ExamResults() {
         <ActivityIndicator size="large" />
       }
     </ScrollView>
+    </View>
   );
 }
 
