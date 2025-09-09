@@ -1,6 +1,6 @@
 import React from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
-import TabsHeader from "../../../components/TabsHeader";
+import TabsHeader from "../../../components/AppHeader";
 import COLORS from "../../../constants/colors";
 
 const coursesByYear = [

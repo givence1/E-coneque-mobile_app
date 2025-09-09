@@ -1,3 +1,4 @@
+import AppHeader from "@/components/AppHeader";
 import { Ionicons } from "@expo/vector-icons";
 import React, { JSX } from "react";
 import {
@@ -8,7 +9,6 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import TabsHeader from "../../../components/lecturerHeader/TabsHeader"; // ✅ Import TabsHeader
 import COLORS from "../../../constants/colors";
 
 // Define types for the timetable data
@@ -39,7 +39,7 @@ export default function LecturerTimetableScreen(): JSX.Element {
   return (
     <View style={styles.container}>
       {/* ✅ Fixed Tabs Header */}
-      <TabsHeader />
+      <AppHeader showBack  showTitle  />
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>📅 Weekly Timetable</Text>

@@ -1,4 +1,5 @@
-import TabsHeader from "@/components/studentHeader/TabsHeader";
+import AppHeader from "@/components/AppHeader";
+import COLORS from "@/constants/colors";
 import { useAuthStore } from "@/store/authStore";
 import { EdgeCourse } from "@/utils/schemas/interfaceGraphql";
 import { gql, useQuery } from "@apollo/client";
@@ -10,7 +11,6 @@ import {
   Text,
   View,
 } from "react-native";
-import COLORS from "../../../constants/colors";
 
 
 type CourseNode = {
@@ -53,7 +53,7 @@ export default function CoursesScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-      <TabsHeader />
+     <AppHeader showBack showTabs  showTitle  />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}

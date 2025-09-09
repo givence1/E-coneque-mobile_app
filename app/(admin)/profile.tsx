@@ -1,18 +1,17 @@
-import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from "react-native";
-import COLORS from "../../constants/colors";
+import { useAuthStore } from "@/store/authStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import TabsHeader from "../../components/TabsHeader";
-import { useAuthStore } from "@/store/authStore";
+import React from "react";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native";
+import TabsHeader from "../../components/AppHeader";
+import COLORS from "../../constants/colors";
 
 
 export default function StudentProfileScreen() {

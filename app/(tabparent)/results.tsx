@@ -1,15 +1,14 @@
+import { useRouter } from "expo-router";
 import React from "react";
 import {
-  View,
-  Text,
   SectionList,
   StyleSheet,
+  Text,
   TouchableOpacity,
-  SafeAreaView,
+  View
 } from "react-native";
-import { useRouter } from "expo-router";
+import TabsHeader from "../../components/AppHeader";
 import COLORS from "../../constants/colors";
-import TabsHeader from "../../components/TabsHeader";
 
 const resultsData = [
   {

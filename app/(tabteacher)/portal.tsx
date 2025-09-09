@@ -1,3 +1,5 @@
+import AppHeader from "@/components/AppHeader";
+import COLORS from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -9,8 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import TabsHeader from "../../components/lecturerHeader/TabsHeader";
-import COLORS from "../../constants/colors";
 
 type PortalStatus = {
   ca: boolean;
@@ -94,7 +94,7 @@ export default function LecturerPortalScreen() {
   return (
     <View style={styles.container}>
       {/* Fixed Header */}
-      <TabsHeader />
+      <AppHeader showBack showTabs  showTitle  />
 
       {/* Scrollable Content */}
       <ScrollView

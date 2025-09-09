@@ -1,5 +1,5 @@
+import AppHeader from "@/components/AppHeader";
 import ProfileHeader from "@/components/ProfileHeader";
-import TabsHeader from "@/components/studentHeader/TabsHeader";
 import COLORS from "@/constants/colors";
 import { useAuthStore } from "@/store/authStore";
 import { gql, useQuery } from "@apollo/client";
@@ -26,7 +26,7 @@ const StudentHome = () => {
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       {/* Fixed Header */}
-      <TabsHeader />
+      <AppHeader  showTabs  showTitle  />
 
       {/* Scrollable Content */}
       <ScrollView
@@ -85,7 +85,7 @@ const StudentHome = () => {
             },
             {
               label: "More",
-              route: "/pagesHigher/more",
+              route: "/pagesHigher/results/more",
               icon: <Ionicons name="ellipsis-horizontal" size={24} color={COLORS.primary} />,
             },
           ].map((item, index) => (

@@ -1,8 +1,8 @@
 // app/student/timetable/index.jsx
 import React from "react";
-import { View, Text, FlatList, StyleSheet, ScrollView } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import TabsHeader from "../../components/AppHeader";
 import COLORS from "../../constants/colors";
-import TabsHeader from "../../components/TabsHeader";
 
 const timetableData = {
   Monday: [

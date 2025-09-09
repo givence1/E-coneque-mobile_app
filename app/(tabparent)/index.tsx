@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import styles from "../../assets/styles/home.styles";
-import TabsHeader from "../../components/TabsHeader";
+import TabsHeader from "../../components/AppHeader";
 import COLORS from "../../constants/colors";
 
 

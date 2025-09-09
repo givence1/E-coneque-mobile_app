@@ -1,3 +1,5 @@
+import AppHeader from "@/components/AppHeader";
+import COLORS from "@/constants/colors";
 import { useAuthStore } from "@/store/authStore";
 import { EdgeResult } from "@/utils/schemas/interfaceGraphql";
 import { gql, useQuery } from "@apollo/client";
@@ -9,8 +11,6 @@ import {
   StyleSheet,
   View
 } from "react-native";
-import Header from "../../../components/Header";
-import COLORS from "../../../constants/colors";
 import DisplayResults from "./DisplayResults";
 
 
@@ -37,7 +37,7 @@ export default function CAResults() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-      <Header placeholder="" />
+      <AppHeader showBack  showTitle  />
 
       <View style={styles.dropdownWrapper}>
   <Picker

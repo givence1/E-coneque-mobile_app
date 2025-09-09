@@ -1,3 +1,5 @@
+import AppHeader from "@/components/AppHeader";
+import COLORS from "@/constants/colors";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
@@ -8,8 +10,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import TabsHeader from "../../components/lecturerHeader/TabsHeader";
-import COLORS from "../../constants/colors";
 
 const LecturerProfileHeader = () => {
   return (
@@ -28,7 +28,7 @@ export default function LecturerHomeScreen() {
 
   return (
     <View style={styles.container}>
-      <TabsHeader />
+      <AppHeader showTabs  showTitle  />
 
       <ScrollView
         contentContainerStyle={{ paddingTop: 80, paddingBottom: 30 }}
@@ -130,7 +130,7 @@ export default function LecturerHomeScreen() {
         </View>
 
         {/* ✅ Resits */}
-        <View style={styles.section}>
+        {/* <View style={styles.section}>
           <Text style={styles.sectionTitle}>🎓 Resits</Text>
           <View style={styles.statsRow}>
             <TouchableOpacity
@@ -159,7 +159,7 @@ export default function LecturerHomeScreen() {
               <Text style={styles.statLabel}>Resits</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </View> */}
 
         {/* ✅ Upload Marks */}
         <View style={styles.section}>

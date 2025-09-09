@@ -1,15 +1,15 @@
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import TabsHeader from "../../components/TabsHeader";
+import TabsHeader from "../../components/AppHeader";
 import COLORS from "../../constants/colors";
 
 //  Mock student data (replace with API later)

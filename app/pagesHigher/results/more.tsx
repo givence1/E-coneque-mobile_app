@@ -1,16 +1,16 @@
+import AppHeader from "@/components/AppHeader";
+import COLORS from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import TabsHeader from "../../../components/TabsHeader";
-import COLORS from "../../../constants/colors";
 
 export default function TranscriptScreen() {
   const router = useRouter();
 
   return (
     <View style={styles.container}>
-      <TabsHeader  />
+      <AppHeader showBack showTitle  />
 
       <ScrollView
         contentContainerStyle={{

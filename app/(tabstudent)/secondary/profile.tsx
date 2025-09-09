@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native";
-import TabsHeader from "../../../components/TabsHeader";
+import TabsHeader from "../../../components/AppHeader";
 import COLORS from "../../../constants/colors";
 
 export default function StudentProfileScreen() {

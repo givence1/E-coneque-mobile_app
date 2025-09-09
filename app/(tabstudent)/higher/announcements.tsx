@@ -1,4 +1,4 @@
-import TabsHeader from "@/components/studentHeader/TabsHeader";
+import AppHeader from "@/components/AppHeader";
 import COLORS from "@/constants/colors";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import React from "react";
@@ -8,7 +8,7 @@ const AnnouncementsScreen = () => {
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       {/* Fixed Header */}
-      <TabsHeader />
+      <AppHeader showBack showTabs  showTitle  />
 
       <ScrollView
         style={{ marginTop: 80 }} // 👈 pushes below header

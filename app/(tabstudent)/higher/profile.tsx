@@ -1,4 +1,4 @@
-import TabsHeader from "@/components/studentHeader/TabsHeader";
+import AppHeader from "@/components/AppHeader";
 import COLORS from "@/constants/colors";
 import { useAuthStore } from "@/store/authStore";
 import { gql, useQuery } from "@apollo/client";
@@ -12,7 +12,7 @@ import {
   Text,
   TouchableOpacity,
   View
-} from "react-native"; // 👈 import Alert
+} from "react-native";
 
 export default function StudentProfileScreen() {
   const { logout, profileId } = useAuthStore();
@@ -56,7 +56,7 @@ export default function StudentProfileScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       {/* Fixed Header */}
-      <TabsHeader />
+      <AppHeader showBack showTabs  showTitle  />
 
       {/* Scrollable Content */}
       <ScrollView

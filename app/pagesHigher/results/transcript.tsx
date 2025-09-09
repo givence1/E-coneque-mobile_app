@@ -1,8 +1,8 @@
+import AppHeader from "@/components/AppHeader";
+import COLORS from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import Header from "../../../components/Header";
-import COLORS from "../../../constants/colors";
 
 export default function TranscriptScreen() {
   // Mock values (replace with actual API data)
@@ -24,7 +24,7 @@ export default function TranscriptScreen() {
 
   return (
     <View style={styles.container}>
-      <Header  />
+      <AppHeader showBack  showTitle  />
 
       {/* Transcript Application Card */}
       <View style={styles.card}>

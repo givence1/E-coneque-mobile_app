@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+import AppHeader from "@/components/AppHeader";
 import COLORS from "@/constants/colors";
 import { useAuthStore } from "@/store/authStore";
 import { NodeSchoolFees } from "@/utils/schemas/interfaceGraphql";
@@ -41,7 +41,7 @@ const Fees = () => {
   
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-      <Header />
+      <AppHeader showBack   showTitle  />
 
       {!loading ?
         fees?.id ?

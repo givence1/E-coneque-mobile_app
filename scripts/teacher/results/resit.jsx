@@ -1,8 +1,8 @@
-import React from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import React from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import TabsHeader from "../../../components/AppHeader";
 import COLORS from "../../../constants/colors";
-import TabsHeader from "../../../components/TabsHeader";
 
 const resitResults = [
   { course: "Mathematics", code: "MATH101", score: 65, grade: "C" },

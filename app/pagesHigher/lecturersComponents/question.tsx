@@ -1,17 +1,17 @@
-import Header from "@/components/Header";
+import AppHeader from "@/components/AppHeader";
 import COLORS from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
 import * as DocumentPicker from "expo-document-picker";
 import React, { useState } from "react";
 import {
-    FlatList,
-    Modal,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  FlatList,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-
 type Question = {
   id: string;
   course: string;
@@ -39,8 +39,9 @@ export default function LecturerQuestionsScreen() {
   ]);
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedType, setSelectedType] = useState<"CA" | "Exam" | "Resit">("CA");
 
-  const handleUpload = async (type: "CA" | "Exam" | "Resit") => {
+  const handleUpload = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
         type: "application/pdf",
@@ -50,15 +51,18 @@ export default function LecturerQuestionsScreen() {
         const file = result.assets[0];
         const newQuestion: Question = {
           id: Date.now().toString(),
-          course: "Computer Networks", // 👉 replace with selected course context
-          type,
+          course: "Computer Networks", // 👉 later bind with actual course
+          type: selectedType,
           status: "Pending",
           fileName: file.name || "Uploaded File",
         };
         setQuestions((prev) => [newQuestion, ...prev]);
+
+       
       }
     } catch (err) {
       console.error("File upload error:", err);
+     
     } finally {
       setModalVisible(false);
     }
@@ -85,9 +89,9 @@ export default function LecturerQuestionsScreen() {
   );
 
   return (
+    
     <View style={styles.container}>
-        < Header/>
-      {/* List of questions */}
+      <AppHeader showBack showTabs  showTitle  />
       <FlatList
         data={questions}
         renderItem={renderQuestion}
@@ -109,16 +113,25 @@ export default function LecturerQuestionsScreen() {
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>Upload Question</Text>
 
-            {["CA", "Exam", "Resit"].map((type) => (
-              <TouchableOpacity
-                key={type}
-                style={styles.modalBtn}
-                onPress={() => handleUpload(type as "CA" | "Exam" | "Resit")}
+            {/* Dropdown Picker */}
+            <View style={styles.pickerWrapper}>
+              <Picker
+                selectedValue={selectedType}
+                onValueChange={(val) => setSelectedType(val)}
+                style={styles.picker}
               >
-                <Text style={styles.modalBtnText}>{type}</Text>
-              </TouchableOpacity>
-            ))}
+                <Picker.Item label="CA" value="CA" />
+                <Picker.Item label="Exam" value="Exam" />
+                <Picker.Item label="Resit" value="Resit" />
+              </Picker>
+            </View>
 
+            {/* Upload Button */}
+            <TouchableOpacity style={styles.modalBtn} onPress={handleUpload}>
+              <Text style={styles.modalBtnText}>Upload Question</Text>
+            </TouchableOpacity>
+
+            {/* Cancel Button */}
             <TouchableOpacity
               style={[styles.modalBtn, { backgroundColor: COLORS.border }]}
               onPress={() => setModalVisible(false)}
@@ -202,6 +215,18 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 20,
     color: COLORS.textPrimary,
+  },
+  pickerWrapper: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: 8,
+    marginBottom: 16,
+    overflow: "hidden",
+  },
+  picker: {
+    width: "100%",
+    height: 50,
   },
   modalBtn: {
     width: "100%",
