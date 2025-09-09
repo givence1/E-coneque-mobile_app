@@ -9,6 +9,7 @@ import {
   TextInput,
   TextStyle,
   TouchableOpacity,
+  View,
   ViewStyle
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -46,11 +47,15 @@ const Complaint: React.FC = () => {
   };
 
   return (
+     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+
+      {/* ✅ Fixed header outside the ScrollView */}
+            <AppHeader showBack showTitle />
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { paddingTop: 50 }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
+
     >
-      <AppHeader showBack  showTitle  />
       <Text style={styles.label}>Complaint Type</Text>
       <DropDownPicker
         open={open}
@@ -80,6 +85,7 @@ const Complaint: React.FC = () => {
         <Text style={styles.buttonText}>Submit Complain</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
+    </View>
   );
 };
 

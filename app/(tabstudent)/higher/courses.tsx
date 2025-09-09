@@ -56,7 +56,7 @@ export default function CoursesScreen() {
      <AppHeader showBack showTabs  showTitle  />
 
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: 50 }, { paddingBottom: 2 }]}
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.title}>My Courses</Text>
@@ -149,6 +149,9 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
     fontWeight: "700",
     color: COLORS.primary,
     marginBottom: 16,
@@ -158,6 +161,7 @@ const styles = StyleSheet.create({
   },
   yearTitle: {
     fontSize: 18,
+    textAlign: "center",
     fontWeight: "700",
     color: COLORS.textPrimary,
     marginBottom: 8,
@@ -167,6 +171,7 @@ const styles = StyleSheet.create({
   },
   semesterTitle: {
     fontSize: 16,
+    textAlign: "center",
     fontWeight: "600",
     color: COLORS.textDark,
     marginBottom: 8,

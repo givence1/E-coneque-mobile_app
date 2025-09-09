@@ -1,3 +1,5 @@
+import AppHeader from "@/components/AppHeader";
+import COLORS from "@/constants/colors";
 import { useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -9,8 +11,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import TabsHeader from "../../components/AppHeader";
-import COLORS from "../../constants/colors";
 
 //  Mock student data (replace with API later)
 type Student = {
@@ -49,7 +49,7 @@ export default function UploadMarksDetailScreen() {
 
   return (
     <View style={styles.container}>
-      <TabsHeader title={course as string} />
+      <AppHeader showBack showTitle />
 
       <ScrollView
         style={styles.scroll}

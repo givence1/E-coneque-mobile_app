@@ -61,7 +61,7 @@ export default function StudentProfileScreen() {
       {/* Scrollable Content */}
       <ScrollView
         style={styles.container}
-        contentContainerStyle={{ paddingTop: 80, paddingBottom: 50 }}
+        contentContainerStyle={{ paddingTop: 50, paddingBottom: 50 }}
         showsVerticalScrollIndicator={false}
       >
         {/* Profile Header */}
@@ -253,7 +253,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: COLORS.primary,
     marginTop: 20,
-    marginHorizontal: 40,
     padding: 14,
     borderRadius: 30,
   },

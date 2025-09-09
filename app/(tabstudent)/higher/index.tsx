@@ -31,8 +31,8 @@ const StudentHome = () => {
       {/* Scrollable Content */}
       <ScrollView
         contentContainerStyle={{
-          paddingTop: 80, // 👈 space for header
-          paddingBottom: 30,
+          paddingTop: 50,
+          paddingBottom: 2,
         }}
         showsVerticalScrollIndicator={false}
       >

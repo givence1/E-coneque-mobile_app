@@ -40,12 +40,15 @@ const Fees = () => {
 
   
   return (
+     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+
+      {/* ✅ Fixed header outside the ScrollView */}
+            <AppHeader showBack showTitle />
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-      <AppHeader showBack   showTitle  />
 
       {!loading ?
         fees?.id ?
-          <ScrollView contentContainerStyle={{ padding: 10, }}>
+          <ScrollView contentContainerStyle={{ padding: 10, paddingTop: 60, paddingBottom: 50 }} showsVerticalScrollIndicator={false}>
             <Text style={styles.title}>{fees?.userprofile?.customuser?.fullName}</Text>
             <Text style={styles.title}>Matricle: {fees?.userprofile?.customuser?.matricle}</Text>
             <Text style={styles.subtitle}>Specialty: {fees.userprofile?.specialty?.mainSpecialty?.specialtyName}</Text>
@@ -150,6 +153,7 @@ const Fees = () => {
 
       /> : null}
 
+    </View>
     </View>
   );
 };

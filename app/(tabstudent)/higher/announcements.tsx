@@ -11,10 +11,11 @@ const AnnouncementsScreen = () => {
       <AppHeader showBack showTabs  showTitle  />
 
       <ScrollView
-        style={{ marginTop: 80 }} // 👈 pushes below header
-        contentContainerStyle={{ padding: 16, paddingBottom: 50 }}
+        style={{ marginTop: 50 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 2 }}
         showsVerticalScrollIndicator={false}
       >
+         <Text style={styles.title}>My Courses</Text>
         {/* Announcements */}
         <View style={styles.card}>
           <View style={styles.cardHeader}>
@@ -85,5 +86,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     color: COLORS.textDark,
     lineHeight: 20,
+  },
+    title: {
+    fontSize: 24,
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center",
+    fontWeight: "700",
+    color: COLORS.primary,
+    marginBottom: 16,
   },
 });
