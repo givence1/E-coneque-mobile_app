@@ -6,31 +6,29 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-  ActivityIndicator, Alert, Image,
+  ActivityIndicator,
+  Alert,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 
-export default function StudentProfileScreen() {
+export default function LecturerProfileScreen() {
   const { logout, profileId } = useAuthStore();
   const router = useRouter();
 
   const handleLogout = () => {
-  Alert.alert(
-    "Logout",
-    "Are you sure you want to logout?",
-    [
+    Alert.alert("Logout", "Are you sure you want to logout?", [
       { text: "Cancel", style: "cancel" },
       { text: "Yes", style: "destructive", onPress: () => logout() },
-    ]
-  );
-};
+    ]);
+  };
 
-  // Fetch student profile from backend
-  const { data, loading, error } = useQuery(GET_PROFILE, {
+  // Fetch lecturer profile
+  const { data, loading, error } = useQuery(GET_LECTURER_PROFILE, {
     variables: { id: profileId },
     skip: !profileId,
   });
@@ -51,17 +49,16 @@ export default function StudentProfileScreen() {
     );
   }
 
-  const profile = data?.allUserProfiles?.edges?.[0]?.node || {};
+  const profile = data?.allLecturerProfiles?.edges?.[0]?.node || {};
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-      {/* Fixed Header */}
-      <AppHeader showBack showTabs  showTitle  />
+      {/* Header */}
+      <AppHeader showBack showTabs showTitle />
 
-      {/* Scrollable Content */}
       <ScrollView
         style={styles.container}
-        contentContainerStyle={{ paddingTop: 80, paddingBottom: 50 }}
+        contentContainerStyle={{ paddingTop: 50, paddingBottom: 50 }}
         showsVerticalScrollIndicator={false}
       >
         {/* Profile Header */}
@@ -71,7 +68,7 @@ export default function StudentProfileScreen() {
             style={styles.avatar}
           />
           <Text style={styles.name}>{profile?.customuser?.fullName || "Not Available"}</Text>
-          <Text style={styles.matric}>Department: {profile?.customuser?.regionOfOrigin}</Text>
+          <Text style={styles.matric}>ID: {profile?.customuser?.matricle || "N/A"}</Text>
         </View>
 
         {/* Contact Info */}
@@ -79,48 +76,18 @@ export default function StudentProfileScreen() {
           <Text style={styles.sectionTitle}>📞 Contact Info</Text>
           <InfoRow label="Email" value={profile?.customuser?.email} />
           <InfoRow label="Phone" value={profile?.customuser?.telephone} />
-          <InfoRow label="Address" value={profile?.customuser?.telephone} />
+          <InfoRow label="Date of Birth" value={profile?.customuser?.dob} />
+          <InfoRow label="Place of Birth" value={profile?.customuser?.pob} />
         </View>
-
-        {/* Parent Info
-        <View style={styles.infoCard}>
-          <Text style={styles.sectionTitle}>👨‍👩‍👧 Parent / Guardian Info</Text>
-          <InfoRow label="Father" value={profile?.customuser?.fatherName} />
-          <InfoRow label="Father Tel" value={profile?.customuser?.fatherTelephone} />
-          <InfoRow label="Mother" value={profile?.customuser?.motherName} />
-          <InfoRow label="Mother Tel" value={profile?.customuser?.motherTelephone} />
-        </View> */}
 
         {/* Academic Info */}
         <View style={styles.infoCard}>
-          <Text style={styles.sectionTitle}>🎓 Level Of Education</Text>
-          <InfoRow label="Highest Certificate" value={profile?.program?.highestCertificate} />
-          <InfoRow label="Year Obtain" value={profile?.specialty?.level?.yearObtained} />
+          <Text style={styles.sectionTitle}>🎓 Academic Info</Text>
+          <InfoRow label="Department" value={profile?.department?.domainName} />
+          <InfoRow label="Specialty" value={profile?.specialty?.specialtyName} />
+          <InfoRow label="Highest Certificate" value={profile?.customuser?.highestCertificate} />
+          <InfoRow label="Year Obtained" value={profile?.customuser?.yearObtained} />
         </View>
-
-        {/* Action Buttons (2-column grid) */}
-        {/* <View style={styles.actionsGrid}> */}
-          {/* <ActionButton
-            icon="create-outline"
-            label="Edit Profile"
-            onPress={() => router.push("../../pagesHigher/profile/edit")}
-          />
-          <ActionButton
-            icon="clipboard-outline"
-            label="Attendance"
-            onPress={() => router.push("../../pagesHigher/profile/attendance")}
-          />
-          <ActionButton
-            icon="chatbox-ellipses-outline"
-            label="Complaint"
-            onPress={() => router.push("../../pagesHigher/profile/complaint")}
-          /> */}
-          {/* <ActionButton
-            icon="document-text-outline"
-            label="History"
-            onPress={() => router.push("../../pagesHigher/profile/ComplaintHistory")}
-          /> */}
-        {/* </View> */}
 
         {/* Logout Button */}
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
@@ -132,7 +99,7 @@ export default function StudentProfileScreen() {
   );
 }
 
-/* ✅ Reusable Row Component */
+/* 🔹 Reusable Row */
 const InfoRow = ({ label, value }: { label: string; value?: string }) => (
   <View style={styles.infoRow}>
     <Text style={styles.infoLabel}>{label}:</Text>
@@ -140,28 +107,12 @@ const InfoRow = ({ label, value }: { label: string; value?: string }) => (
   </View>
 );
 
-/* ✅ Reusable Action Button */
-const ActionButton = ({
-  icon,
-  label,
-  onPress,
-}: {
-  icon: any;
-  label: string;
-  onPress: () => void;
-}) => (
-  <TouchableOpacity style={styles.actionBtn} onPress={onPress}>
-    <Ionicons name={icon} size={22} color={COLORS.primary} />
-    <Text style={styles.actionText}>{label}</Text>
-  </TouchableOpacity>
-);
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
     paddingHorizontal: 16,
-    marginTop: 16
+    marginTop: 16,
   },
   headerCard: {
     alignItems: "center",
@@ -182,15 +133,8 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: COLORS.primary,
   },
-  name: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: COLORS.textPrimary,
-  },
-  matric: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
+  name: { fontSize: 20, fontWeight: "700", color: COLORS.textPrimary },
+  matric: { fontSize: 14, color: COLORS.textSecondary },
   infoCard: {
     backgroundColor: COLORS.cardBackground,
     borderRadius: 12,
@@ -210,71 +154,29 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 6,
   },
-  infoLabel: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  infoValue: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: COLORS.textPrimary,
-  },
-  actionsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  actionBtn: {
-    width: "48%",
-    backgroundColor: COLORS.cardBackground,
-    paddingVertical: 18,
-    borderRadius: 12,
-    marginBottom: 12,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  actionText: {
-    marginTop: 6,
-    fontSize: 14,
-    fontWeight: "500",
-    color: COLORS.textDark,
-  },
+  infoLabel: { fontSize: 14, color: COLORS.textSecondary },
+  infoValue: { fontSize: 14, fontWeight: "500", color: COLORS.textPrimary },
   logoutBtn: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: COLORS.primary,
     marginTop: 20,
-    marginHorizontal: 40,
     padding: 14,
     borderRadius: 30,
   },
-  logoutText: {
-    marginLeft: 8,
-    color: COLORS.white,
-    fontSize: 16,
-    fontWeight: "600",
-  },
+  logoutText: { marginLeft: 8, color: COLORS.white, fontSize: 16, fontWeight: "600" },
 });
 
-// GraphQL query
-const GET_PROFILE = gql`
-  query GetProfile($id: ID!) {
-    allUserProfiles(id: $id) {
+/* ✅ Correct Lecturer Query */
+const GET_LECTURER_PROFILE = gql`
+  query GetLecturerProfile($id: ID!) {
+    allLecturerProfiles(id: $id) {
       edges {
         node {
           id
-          program { name }
-          specialty {
-            academicYear
-            level { level }
-            mainSpecialty { specialtyName }
-          }
+          department { domainName }
+          specialty { specialtyName }
           customuser {
             fullName
             matricle
@@ -282,8 +184,7 @@ const GET_PROFILE = gql`
             telephone
             photo
             dob
-            pob 
-            regionOfOrigin
+            pob
             highestCertificate
             yearObtained
           }

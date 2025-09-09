@@ -1,4 +1,3 @@
-// components/AppHeader.tsx
 import COLORS from "@/constants/colors";
 import { useAuthStore } from "@/store/authStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -7,15 +6,15 @@ import React from "react";
 import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type AppHeaderProps = {
-  showBack?: boolean;        // arrow back
-  showTitle?: boolean;       // centered title
-  title?: string;            // optional title text
-  showTabs?: boolean;        // lecturer/student tabs header
+  showBack?: boolean;   // arrow back
+  showTitle?: boolean;  // centered title
+  title?: string;       // optional override
+  showTabs?: boolean;   // lecturer/student tabs header
 };
 
 export default function AppHeader({ showBack, showTitle, title, showTabs }: AppHeaderProps) {
   const router = useRouter();
-  const { user } = useAuthStore(); // 👈 get role from authStore
+  const { user, schoolIdentification } = useAuthStore(); // 👈 now also grab schoolIdentification
   const role = user?.role; // "lecturer" | "student" | "guest"
 
   return (
@@ -34,7 +33,7 @@ export default function AppHeader({ showBack, showTitle, title, showTabs }: AppH
         {showTitle && (
           <View style={styles.center}>
             <Text style={styles.title}>
-              {title || "THE BRAINS UNIVERSITY INSTITUTE"}
+              {title || schoolIdentification?.name || "Welcome"}
             </Text>
           </View>
         )}
@@ -46,11 +45,11 @@ export default function AppHeader({ showBack, showTitle, title, showTabs }: AppH
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.icon}
-            // onPress={() =>
-            //   role === "lecturer"
-            //     ? router.push("/(tabteacher)/profile")
-            //     : router.push("/(tabstudent)/higher/profile")
-            // }
+            onPress={() =>
+              role === "lecturer"
+                ? router.push("/(tabteacher)/profile")
+                : router.push("/(tabstudent)/higher/profile")
+            }
           >
             <Ionicons name="person-circle-outline" size={26} color="#fff" />
           </TouchableOpacity>
@@ -96,7 +95,7 @@ const styles = StyleSheet.create({
   },
   left: { flexDirection: "row", alignItems: "center" },
   center: { flex: 1, alignItems: "center" },
-  title: { color: "#fff", fontSize: 14, fontWeight: "700", textAlign: "center" },
+  title: { color: "#fff", fontSize: 13, fontWeight: "700", textAlign: "center", },
   right: { flexDirection: "row", alignItems: "center" },
   icon: { marginHorizontal: 4 },
   tabs: {
