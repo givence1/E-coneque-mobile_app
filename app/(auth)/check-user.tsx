@@ -1,3 +1,4 @@
+import COLORS from "@/constants/colors";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -9,7 +10,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import COLORS from "../../constants/colors";
+
 
 export default function CheckUserScreen() {
   const router = useRouter();

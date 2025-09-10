@@ -1,3 +1,8 @@
+
+import { Alert, Linking } from "react-native";
+import { protocol, RootApi, tenant } from "./config";
+
+
 export const decodeUrlID = (urlID: string) => {
     try {
         const base64DecodedString = decodeURIComponent(urlID); // Decodes %3D%3D to ==
@@ -68,3 +73,119 @@ export const validateDate = (dateString: string): { isValid: boolean; error?: st
   
   return { isValid: true };
 };
+
+
+
+
+export const handleSupport = () => {
+  const phoneNumber = "237673351854";
+  const message = "Hello, I need help resetting my password.";
+  const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+  Linking.openURL(url);
+};
+
+
+
+
+
+export const errorLog = (err: any, show?: boolean) => {
+  let mes = "An unknown error occurred";
+
+  if (typeof err === "string") {
+    mes = err;
+  }
+
+  // GraphQL Errors
+  else if (err?.graphQLErrors?.length > 0) {
+    console.error("GraphQL Errors:", err.graphQLErrors);
+    mes = err.graphQLErrors.map((e: any) => e.message).join('\n');
+  }
+
+  // Network Errors (Apollo network error with result.errors[])
+  else if (err?.networkError) {
+    if ("result" in err.networkError) {
+      if (err?.networkError?.result?.errors?.length > 0) {
+        console.log("Network Error -> GraphQL errors:", err?.networkError?.result?.errors);
+        mes = err.networkError.result.errors.map((e: any) => e.message).join('\n');
+      }
+      else if (err?.networkError?.message) {
+        console.log("Network Error:", err.networkError.message);
+        mes = err.networkError.message;
+      }
+      else {
+        console.error("Apollo Network Error:", err.networkError);
+      }
+    }
+  }
+
+  // Extra Info fallback
+  else if (err?.extraInfo) {
+    console.error("Extra Info:", err.extraInfo);
+    mes = String(err.extraInfo);
+  }
+
+  // Plain error message
+  else if (err?.message) {
+    mes = err.message;
+  }
+
+  // Unknown error fallback
+  else {
+    console.error("Unhandled error:", err);
+  }
+
+  // SweetAlert show option
+  if (show) {
+    // Swal.fire({
+    //   title: mes,
+    //   icon: 'error',
+    //   timer: 3000,
+    //   timerProgressBar: true,
+    //   showConfirmButton: false,
+    // });
+  }
+
+  return mes;
+};
+
+
+export const actionSubmit = async (data: any, url: string) => {
+  console.log(data);
+  console.log(url);
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+    console.log(result);
+
+    if (result?.errors) {
+      Alert.alert("Error", JSON.stringify(result.errors));
+      return;
+    }
+
+    if (result?.email?.length) {
+      Alert.alert("Error", result.email[0]);
+      return;
+    }
+
+    if (result?.error) {
+      if (JSON.stringify(result.error).includes("(535, b'Incorrect authentication data')")) {
+        return "An Error Occurred";
+      }
+      return JSON.stringify(result?.error);
+    }
+    return result
+
+  } catch (err: any) {
+    return err;
+  }
+};
+
+
+

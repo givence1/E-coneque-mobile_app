@@ -1,6 +1,11 @@
 import AppHeader from "@/components/AppHeader";
+import DashHigher from "@/components/CompLecturer/DashHigher";
+import DashPrimary from "@/components/CompLecturer/DashPrimary";
+import DashSecondary from "@/components/CompLecturer/DashSecondary";
 import COLORS from "@/constants/colors";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useAuthStore } from "@/store/authStore";
+import { Ionicons } from "@expo/vector-icons";
+import { useRoute } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
@@ -11,31 +16,32 @@ import {
   View,
 } from "react-native";
 
-const LecturerProfileHeader = () => {
-  return (
-    <View style={styles.profileCard}>
-      <Ionicons name="person-circle-outline" size={60} color={COLORS.primary} />
-      <View>
-        <Text style={styles.profileName}>Mr. Patrisco</Text>
-        <Text style={styles.profileSub}>Department of Electronics</Text>
-      </View>
-    </View>
-  );
-};
+
 
 export default function LecturerHomeScreen() {
   const router = useRouter();
+  const { user } = useAuthStore();
+  const sp = useRoute()
+  const { schoolId, schoolType } = sp?.params
+
+  console.log(schoolType);
 
   return (
     <View style={styles.container}>
-      <AppHeader showTabs  showTitle  />
+      <AppHeader showTabs showTitle />
 
       <ScrollView
         contentContainerStyle={{ paddingTop: 80, paddingBottom: 30 }}
         showsVerticalScrollIndicator={false}
       >
         {/* ✅ Lecturer Info */}
-        <LecturerProfileHeader />
+        <View style={styles.profileCard}>
+          <Ionicons name="person-circle-outline" size={60} color={COLORS.primary} />
+          <View>
+            <Text style={styles.profileName}>{user?.matricle}</Text>
+            <Text style={styles.profileSub}>{user?.full_name}</Text>
+          </View>
+        </View>
 
         {/* ✅ Announcements */}
         <View style={styles.section}>
@@ -51,81 +57,10 @@ export default function LecturerHomeScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* ✅ Student Overview */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📊 Student Overview</Text>
-          <View style={styles.statsRow}>
-            <TouchableOpacity
-              style={styles.statBox}
-            >
-              <Ionicons name="people-outline" size={24} color={COLORS.primary} />
-              <Text style={styles.statValue}>120</Text>
-              <Text style={styles.statLabel}>Students</Text>
-            </TouchableOpacity>
+        {schoolType === "Section-H" ? <DashHigher /> : null}
+        {schoolType === "Section-S" ? <DashSecondary /> : null}
+        {schoolType === "Section-P" ? <DashPrimary /> : null}
 
-            <TouchableOpacity
-              style={styles.statBox}
-            >
-              <Ionicons
-                name="checkmark-circle-outline"
-                size={24}
-                color={COLORS.success}
-              />
-              <Text style={styles.statValue}>85%</Text>
-              <Text style={styles.statLabel}>Attendance</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.statBox}
-            >
-              <Ionicons
-                name="trending-up-outline"
-                size={24}
-                color={COLORS.warning}
-              />
-              <Text style={styles.statValue}>72%</Text>
-              <Text style={styles.statLabel}>Avg. Grade</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* ✅ Lecturer Overview */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📚 Lecturer Overview</Text>
-          <View style={styles.statsRow}>
-          
-
-            <TouchableOpacity
-              style={styles.statBox}
-            >
-              <MaterialIcons name="class" size={24} color={COLORS.warning} />
-              <Text style={styles.statValue}>6</Text>
-              <Text style={styles.statLabel}>Classes</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.statBox}
-              onPress={() => router.push("/pagesHigher/lecturersComponents/subjects")}
-            >
-              <Ionicons name="book-outline" size={24} color={COLORS.primary} />
-              <Text style={styles.statValue}>3</Text>
-              <Text style={styles.statLabel}>Subjects</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* ✅ Upload Marks */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📈 Upload Marks</Text>
-          <TouchableOpacity
-            style={styles.announcementCard}
-            onPress={() => router.push("/(tabteacher)/portal")}
-          >
-            <Text style={styles.announcementText}>
-              Access your courses and upload marks here.
-            </Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
     </View>
   );
@@ -179,11 +114,4 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
   },
-  statValue: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginTop: 8,
-    color: COLORS.textPrimary,
-  },
-  statLabel: { fontSize: 13, color: COLORS.textSecondary, textAlign: "center" },
 });

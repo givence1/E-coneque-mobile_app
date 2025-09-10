@@ -1,30 +1,63 @@
 import { useAuthStore } from "@/store/authStore";
+import { protocol, RootApi, tenant } from "@/utils/config";
+import { actionSubmit } from "@/utils/functions";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Linking,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Linking,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import COLORS from "../../constants/colors";
 
 export default function ForgotPasswordScreen() {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { schoolIdentification } = useAuthStore(); // ✅ get school name from store
   const [email, setEmail] = useState("");
-
-  const handleSubmit = () => {
-    console.log("Forgot password for:", email);
-  };
 
   const handleSupport = () => {
     const phoneNumber = "237673351854";
     const message = "Hello, I need help resetting my password.";
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     Linking.openURL(url);
+  };
+
+  const validateEmail = (): boolean => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email.trim());
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    if (!validateEmail()) return;
+    const url = `${protocol}${tenant}${RootApi}/password_reset/`;
+
+    const res = await actionSubmit({ email: email?.toString().toLowerCase() }, url);
+
+    if (res?.status.toString() === "OK") {
+      // ✅ Show success alert and redirect
+      Alert.alert(
+        "Success",
+        "A reset token has been sent to your email. Please check your inbox.",
+        [
+          {
+            text: "OK",
+            onPress: () => {
+              // 👉 Navigate to token entry page
+              router.push("/(auth)/enter-token");
+            },
+          },
+        ]
+      );
+    } else {
+      Alert.alert("Error", "Failed to send reset token. Please try again.");
+    }
+    setLoading(false);
   };
 
   return (
@@ -48,9 +81,13 @@ export default function ForgotPasswordScreen() {
           <Text style={styles.link}>Back to Login</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Send Reset Link</Text>
-        </TouchableOpacity>
+        {validateEmail() ? (
+          <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
+            <Text style={styles.buttonText}>
+              {loading ? "Sending..." : "Send Reset Token"}
+            </Text>
+          </TouchableOpacity>
+        ) : null}
 
         <View style={styles.divider} />
 
@@ -62,7 +99,6 @@ export default function ForgotPasswordScreen() {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {

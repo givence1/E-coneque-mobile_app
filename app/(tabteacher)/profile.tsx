@@ -17,7 +17,7 @@ import {
 } from "react-native";
 
 export default function LecturerProfileScreen() {
-  const { logout, profileId } = useAuthStore();
+  const { logout, profileId, user } = useAuthStore();
   const router = useRouter();
 
   const handleLogout = () => {
@@ -29,9 +29,10 @@ export default function LecturerProfileScreen() {
 
   // Fetch lecturer profile
   const { data, loading, error } = useQuery(GET_LECTURER_PROFILE, {
-    variables: { id: profileId },
-    skip: !profileId,
+    variables: { customuserId: user?.user_id },
+    skip: !user,
   });
+  console.log(data);
 
   if (loading) {
     return (
@@ -168,10 +169,15 @@ const styles = StyleSheet.create({
   logoutText: { marginLeft: 8, color: COLORS.white, fontSize: 16, fontWeight: "600" },
 });
 
+
 /* ✅ Correct Lecturer Query */
 const GET_LECTURER_PROFILE = gql`
-  query GetLecturerProfile($id: ID!) {
-    allLecturerProfiles(id: $id) {
+  query GetLecturerProfile(
+    $customuserId: Decimal!
+  ) {
+    allLecturerProfiles(
+      customuserId: $customuserId
+    ) {
       edges {
         node {
           id

@@ -1,97 +1,138 @@
 import { useAuthStore } from "@/store/authStore";
+import { protocol, RootApi, tenant } from "@/utils/config";
+import { actionSubmit } from "@/utils/functions";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Linking,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Linking,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import COLORS from "../../constants/colors";
 
-
 export default function EnterTokenScreen() {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const {schoolIdentification} = useAuthStore();
+  const { schoolIdentification } = useAuthStore();
+
   const [token, setToken] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSubmit = () => {
-    if (!token || !newPassword || !confirmPassword) {
-      alert("All fields are required");
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
-    // TODO: call API for password reset
-    console.log("Reset with:", { token, newPassword });
-  };
-
   const handleSupport = () => {
     const phoneNumber = "237673351854";
     const message = "Hello, I need help resetting my password.";
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+      message
+    )}`;
     Linking.openURL(url);
+  };
+
+  // ✅ Validate password rules
+  const validatePassword = (password: string): boolean => {
+    const hasUpper = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasMinLength = password.length >= 8;
+    return hasUpper && hasNumber && hasMinLength;
+  };
+
+  const handleSubmit = async () => {
+    if (!token || !newPassword || !confirmPassword) {
+      Alert.alert("Error", "All fields are required.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match.");
+      return;
+    }
+    if (!validatePassword(newPassword)) {
+      Alert.alert(
+        "Invalid Password",
+        "Password must contain at least 1 uppercase letter, 1 number, and be at least 8 characters long."
+      );
+      return;
+    }
+
+    setLoading(true);
+    const url = `${protocol}${tenant}${RootApi}/password_reset/confirm/`;
+
+    const res = await actionSubmit({ token, password: newPassword }, url);
+
+    if (res?.status?.toString() === "OK") {
+      Alert.alert("Success", "Password reset successfully!", [
+        { text: "OK", onPress: () => router.push("/(auth)") },
+      ]);
+    } else {
+      Alert.alert("Error", "Failed to reset password. Please try again.");
+    }
+    setLoading(false);
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        {/* School Name */}
-        <Text style={styles.schoolName}>{ schoolIdentification?.name || "my school"}</Text>
-
-        {/* Title */}
-        <Text style={styles.title}>Password Reset</Text>
-
-        {/* Subtitle */}
-        <Text style={styles.subtitle}>
-          Enter token sent to your email, then set your new password.
+        <Text style={styles.schoolName}>
+          {schoolIdentification?.name || "My School"}
         </Text>
 
-        {/* Inputs */}
+        <Text style={styles.title}>Enter Reset Token</Text>
+        <Text style={styles.subtitle}>Check your email for the reset token</Text>
+
+        {/* Token Input */}
         <TextInput
           style={styles.input}
-          placeholder="Enter Token"
+          placeholder="Enter token"
           placeholderTextColor={COLORS.placeholderText}
           value={token}
           onChangeText={setToken}
         />
+
+        {/* Password Inputs */}
         <TextInput
           style={styles.input}
-          placeholder="Enter New Password"
+          placeholder="New Password"
           placeholderTextColor={COLORS.placeholderText}
+          secureTextEntry
           value={newPassword}
           onChangeText={setNewPassword}
-          secureTextEntry
         />
         <TextInput
           style={styles.input}
           placeholder="Confirm Password"
           placeholderTextColor={COLORS.placeholderText}
+          secureTextEntry
           value={confirmPassword}
           onChangeText={setConfirmPassword}
-          secureTextEntry
         />
 
-        {/* Back to Login */}
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.link}>Back to Login</Text>
+        {/* ✅ Password rules */}
+        <Text style={styles.passwordHint}>
+          Password must contain:
+          {"\n"}• At least 1 uppercase letter
+          {"\n"}• At least 1 number
+          {"\n"}• Minimum 8 characters
+        </Text>
+
+        {/* Submit Button - Always visible */}
+        <TouchableOpacity
+          style={[
+            styles.button,
+            !validatePassword(newPassword) && { backgroundColor: COLORS.border },
+          ]}
+          onPress={handleSubmit}
+          disabled={loading || !validatePassword(newPassword)}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? "Submitting..." : "Submit"}
+          </Text>
         </TouchableOpacity>
 
-        {/* Submit Button */}
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Reset Password</Text>
-        </TouchableOpacity>
-
-        {/* Divider */}
         <View style={styles.divider} />
 
-        {/* Footer */}
         <TouchableOpacity onPress={handleSupport}>
           <Text style={styles.link}>Contact Support</Text>
         </TouchableOpacity>
@@ -149,6 +190,13 @@ const styles = StyleSheet.create({
     padding: 12,
     width: "100%",
     marginBottom: 12,
+  },
+  passwordHint: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginBottom: 12,
+    textAlign: "left",
+    width: "100%",
   },
   link: {
     color: COLORS.primary,
