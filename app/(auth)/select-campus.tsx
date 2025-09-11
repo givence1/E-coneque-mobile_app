@@ -1,36 +1,35 @@
+import COLORS from "@/constants/colors";
+import { useAuthStore } from "@/store/authStore";
+import { decodeUrlID } from "@/utils/functions";
+import { EdgeSchoolHigherInfo } from "@/utils/schemas/interfaceGraphql";
+import { gql, useQuery } from "@apollo/client";
+import { useRouter } from "expo-router";
 import React, { JSX } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
+  ActivityIndicator,
   FlatList,
-  ViewStyle,
+  StyleSheet,
+  Text,
   TextStyle,
+  TouchableOpacity,
+  View,
+  ViewStyle,
 } from "react-native";
-import { useRouter } from "expo-router";
-import COLORS from "../../constants/colors";
 
-type AcademicYear = {
-  id: string;
-  school: string;
-  city: String;
-  campus: string;
-};
-
-const academicYears: AcademicYear[] = [
-    { id: "1",school:"BEST CHOISE UNIVERSITY INSTITUDE", city:"BAMENDA, BP CITE",  campus: "A" },
-    { id: "2", school: "BEST CHOISE UNIVERSITY INSTITUDE", city:"DOUALA, BUNABERI",   campus: "B" },
-    { id: "3", school: "BEST CHOISE UNIVERSITY INSTITUDE", city:"DOUALA, AKWA",  campus: "C" },
-];
 
 export default function SelectCampusScreen(): JSX.Element {
   const router = useRouter();
+  const { user } = useAuthStore();
 
-  const handleSelect = (item: AcademicYear): void => {
+  const { data: dataSchools, loading, error } = useQuery(GET_DATA);
+
+  const mySchools = dataSchools?.allSchoolInfos?.edges?.filter((sch: EdgeSchoolHigherInfo) => user?.school?.includes(parseInt(decodeUrlID(sch.node.id) || "")));
+  const schoolTypes = mySchools?.map((sch: EdgeSchoolHigherInfo) => sch?.node?.schoolType?.slice(-1));
+
+  const handleSelect = (item: EdgeSchoolHigherInfo): void => {
     router.replace({
       pathname: "/(tabteacher)",
-      params: { campus: item.campus },
+      params: { schoolId: item.node.id, schoolType: item.node.schoolType },
     });
   };
 
@@ -38,27 +37,50 @@ export default function SelectCampusScreen(): JSX.Element {
     <View style={styles.container}>
       <Text style={styles.header}>Select Campus</Text>
 
-      <FlatList
-        data={academicYears}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.card} onPress={() => handleSelect(item)}>
-            <Text style={styles.title} >
-               {item.school}
-            </Text>
-            <Text style={styles.text}>
-             {item.city}
-            </Text>
-            <Text style={styles.text}>
-             {item.campus}
-            </Text>
-          </TouchableOpacity>
-        )}
-        contentContainerStyle={{ paddingVertical: 20 }}
-      />
+      {loading ? <ActivityIndicator />
+
+        :
+
+        <FlatList
+          data={mySchools}
+          keyExtractor={(item) => item.node.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.card} onPress={() => handleSelect(item)}>
+              <Text style={styles.title} >
+                {item.node.schoolName}
+              </Text>
+              <Text style={styles.text}>
+                {item.node.town} - {item.node.address}
+              </Text>
+              <Text style={styles.text}>
+                {item.node.campus.replace("_", "-")}
+              </Text>
+            </TouchableOpacity>
+          )}
+          contentContainerStyle={{ paddingVertical: 20 }}
+        />
+      }
+
     </View>
   );
 }
+
+
+
+const GET_DATA = gql`
+  query GetData {
+    allSchoolInfos {
+      edges {
+        node {
+          id schoolName address town telephone
+          schoolType campus
+        }
+      }
+    }
+  }
+`;
+
+
 
 const styles = StyleSheet.create<{
   container: ViewStyle;

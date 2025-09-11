@@ -18,7 +18,7 @@ const DisplayResults = (
       <View style={styles.table}>
         {/* HEADER */}
         <View style={styles.rowHeader}>
-          <Text style={[styles.headerCell, { flex: 2 }]}>Course</Text>
+          <Text style={[styles.headerCell, { flex: 2 }]}>Course Name</Text>
           {result_type === "results" ? (
             <>
               <Text style={[styles.headerCell, { flex: 1 }]}>CA</Text>
@@ -35,59 +35,88 @@ const DisplayResults = (
         </View>
 
         {/* DATA ROWS */}
-    {results?.sort((a: EdgeResult, b: EdgeResult) =>
-  a.node.course.mainCourse.courseName.localeCompare(b.node.course.mainCourse.courseName)
-)?.map((item, index) => {
-  const parsedResults = JSON.parse(item.node.infoData);
-  const { ca, exam, resit } = parsedResults;
+        {results?.sort((a: EdgeResult, b: EdgeResult) =>
+          a.node.course.mainCourse.courseName.localeCompare(b.node.course.mainCourse.courseName)
+        )?.map((item, index) => {
+          const parsedResults = JSON.parse(item.node.infoData || "{}");
+          const { ca, exam, resit } = parsedResults;
 
-  if (result_type === "results") {
-    const caPassLimit = (campusInfo?.caLimit || 20) / 2;
-    const examPassLimit = (campusInfo?.examLimit || 40) / 2;
-    const resitPassLimit = (campusInfo?.resitLimit || 40) / 2;
-    const overallPassed = ca >= caPassLimit || exam >= examPassLimit || resit >= resitPassLimit;
+          if (result_type === "results") {
+            const caPassLimit = (campusInfo?.caLimit || 30) / 2;
+            const examPassLimit = (campusInfo?.examLimit || 40) / 2;
+            const resitPassLimit = (campusInfo?.resitLimit || 40) / 2;
+            const overallPassed = ca >= caPassLimit || exam >= examPassLimit || resit >= resitPassLimit;
 
-    return (
-      <View key={index} style={styles.row}>
-        <Text style={[styles.cellLeft, { flex: 3 }]}>
-          {item.node.course.mainCourse.courseName}
-        </Text>
-        <Text style={[styles.cell, { flex: 1 }]}>{ca}</Text>
-        <Text style={[styles.cell, { flex: 1 }]}>{exam}</Text>
-        <Text style={[styles.cell, { flex: 1 }]}>{resit || "-"}</Text>
-        <Text style={[
-          styles.cell,
-          { flex: 1, color: overallPassed ? COLORS.success : COLORS.error }
-        ]}>
-          {overallPassed ? "Pass" : "Fail"}
-        </Text>
-      </View>
-    );
-  } else {
-    const mark = result_type === "ca" ? ca :
-      result_type === "exam" ? exam :
-      result_type === "resit" ? resit : 0;
+            return (
+              <View key={index} style={styles.row}>
+                <Text style={[styles.cellLeft, { flex: 3 }]}>
+                  {item.node.course.mainCourse.courseName}
+                </Text>
+                <Text style={[styles.cell, { flex: 1 }]}>{ca}</Text>
+                <Text style={[styles.cell, { flex: 1 }]}>{exam}</Text>
+                <Text style={[styles.cell, { flex: 1 }]}>{resit || "-"}</Text>
+                <Text style={[
+                  styles.cell,
+                  { flex: 1, color: overallPassed ? COLORS.success : COLORS.error }
+                ]}>
+                  {overallPassed ? "Pass" : "Fail"}
+                </Text>
+              </View>
+            );
+          } 
+          
+          if (result_type === "resit") {
+            const passLimit = (campusInfo?.resitLimit || 40) / 2;
+            const published = item.node.publishResit;
+            let displayMark = "-";
+            let status = "No Resit";
+            let statusColor = COLORS.textSecondary;
 
-    const passLimit = result_type === "ca" ? (campusInfo?.caLimit || 30) / 2 :
-      result_type === "exam" ? (campusInfo?.examLimit || 40) / 2 :
-      result_type === "resit" ? (campusInfo?.resitLimit || 40) / 2 : 0;
+            if (!published && resit) {
+              status = "Pending";
+              statusColor = COLORS.warning;
+            } else if (published && resit) {
+              displayMark = resit;
+              const passed = resit >= passLimit;
+              status = passed ? "Pass" : "Fail";
+              statusColor = passed ? COLORS.success : COLORS.error;
+            }
 
-    return (
-      <View key={index} style={styles.row}>
-        <Text style={[styles.cellLeft, { flex: 5 }]}>
-          {item.node.course.mainCourse.courseName}
-        </Text>
-        <Text style={[styles.cell, { flex: 1 }]}>{mark}</Text>
-        <Text style={[
-          styles.cell,
-          { flex: 1, color: mark >= passLimit ? COLORS.success : COLORS.error }
-        ]}>
-          {mark >= passLimit ? "Pass" : "Fail"}
-        </Text>
-      </View>
-    );
-  }
-})}
+            return (
+              <View key={index} style={styles.row}>
+                <Text style={[styles.cellLeft, { flex: 5 }]}>
+                  {item.node.course.mainCourse.courseName}
+                </Text>
+                <Text style={[styles.cell, { flex: 2 }]}>{displayMark}</Text>
+                <Text style={[
+                  styles.cell,
+                  { flex: 1, color: statusColor }
+                ]}>
+                  {status}
+                </Text>
+              </View>
+            );
+          }
+
+          // CA / EXAM (default)
+          const mark = result_type === "ca" ? ca : exam;
+          const passLimit = result_type === "ca" ? (campusInfo?.caLimit || 30) / 2 : (campusInfo?.examLimit || 40) / 2;
+
+          return (
+            <View key={index} style={styles.row}>
+              <Text style={[styles.cellLeft, { flex: 5 }]}>
+                {item.node.course.mainCourse.courseName}
+              </Text>
+              <Text style={[styles.cell, { flex: 2 }]}>{mark}</Text>
+              <Text style={[
+                styles.cell,
+                { flex: 1, color: mark >= passLimit ? COLORS.success : COLORS.error }
+              ]}>
+                {mark >= passLimit ? "Pass" : "Fail"}
+              </Text>
+            </View>
+          );
+        })}
       </View>
     </View>
   );
@@ -141,9 +170,8 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   cellLeft: {
-  fontSize: 14,
-  color: COLORS.textDark,
-  textAlign: "left",
-},
-
+    fontSize: 14,
+    color: COLORS.textDark,
+    textAlign: "left",
+  },
 });

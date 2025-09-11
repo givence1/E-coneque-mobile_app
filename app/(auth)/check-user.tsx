@@ -1,35 +1,60 @@
 import COLORS from "@/constants/colors";
 import { useAuthStore } from "@/store/authStore";
+import { protocol, RootApi, tenant } from "@/utils/config";
+import { actionSubmit } from "@/utils/functions";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Linking,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Linking,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-
 
 export default function CheckUserScreen() {
   const router = useRouter();
-  const {schoolIdentification} = useAuthStore();
+  const { schoolIdentification } = useAuthStore();
   const [username, setUsername] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!username.trim()) {
-      alert("Please enter your matricule or username");
+      Alert.alert("Error", "Please enter your matricule or username");
       return;
     }
-    // TODO: call API
-    console.log("Check user:", username);
+
+    try {
+      setLoading(true);
+      const url = `${protocol}${tenant}${RootApi}/check_user/`;
+
+      // 👉 Call backend
+      const res = await actionSubmit({ username: username.trim() }, url);
+
+      if (res?.exists) {
+        // ✅ User found → go to create password page
+        Alert.alert("Success", "User found! Please create your new password.", [
+          { text: "OK", onPress: () => router.push("/(auth)/create-password") },
+        ]);
+      } else {
+        // ❌ User not found → show error
+        Alert.alert("Error", "User does not exist. Please check your input.");
+      }
+    } catch (err) {
+      Alert.alert("Error", "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSupport = () => {
-    const phoneNumber = "237673351854"; 
+    const phoneNumber = "237673351854";
     const message = "Hello, I need help checking my account.";
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+      message
+    )}`;
     Linking.openURL(url);
   };
 
@@ -37,7 +62,9 @@ export default function CheckUserScreen() {
     <View style={styles.container}>
       <View style={styles.card}>
         {/* School Name */}
-        <Text style={styles.schoolName}> {schoolIdentification?.name || "my school"} </Text>
+        <Text style={styles.schoolName}>
+          {schoolIdentification?.name || "My School"}
+        </Text>
 
         {/* Title */}
         <Text style={styles.title}>Check User</Text>
@@ -60,8 +87,14 @@ export default function CheckUserScreen() {
         </TouchableOpacity>
 
         {/* Submit Button */}
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Check Now</Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSubmit}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? "Checking..." : "Check Now"}
+          </Text>
         </TouchableOpacity>
 
         {/* Divider */}
