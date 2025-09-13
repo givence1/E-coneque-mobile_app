@@ -37,10 +37,10 @@ type Step3Props = {
 };
 
 const validationSchema = Yup.object().shape({
-  specialtyoneId: Yup.string().required("First Specialty is required"),
-  specialtytwoId: Yup.string().required("Second Specialty is required"),
+  specialtyone: Yup.string().required("First Specialty is required"),
+  specialtytwo: Yup.string().required("Second Specialty is required"),
   academicYear: Yup.string().required("Academic Year is required"),
-  programId: Yup.string().required("Program is required"),
+  program: Yup.string().required("Program is required"),
   level: Yup.string().required("Level is required"),
   session: Yup.string().required("Session is required"),
 });
@@ -73,10 +73,10 @@ export default function Step3Specialty({
     section === "H" ? apiPrograms : section === "S" ? apiProgramsSec : apiProgramsPrim;
 
   const optionsMap: Record<string, string[]> = {
-    specialtyoneId: apiMainSpecialties,
-    specialtytwoId: apiMainSpecialties,
+    specialtyoneName: apiMainSpecialties,
+    specialtytwo: apiMainSpecialties,
     academicYear: yearOptions,
-    programId: programOptions,
+    program: programOptions,
     level: levelOptions,
     session: ["Morning", "Evening"],
   };
@@ -124,74 +124,75 @@ export default function Step3Specialty({
       >
         <StepIndicator idx={2} />
 
-        <Formik
-          initialValues={data}
-          validationSchema={validationSchema}
-          onSubmit={onNext}
+      <Formik
+  initialValues={data}
+  validationSchema={validationSchema}
+  onSubmit={onNext}
+>
+  {({ errors, touched, handleSubmit }) => (
+    <View style={styles.card}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Specialty Details</Text>
+      </View>
+
+      <View style={styles.formContainer}>
+        {Object.keys(optionsMap).map((field) => (
+          <View key={field} style={styles.inputGroup}>
+            <Text style={styles.label}>
+              {field.replace(/([A-Z])/g, " $1")}
+            </Text>
+            <TouchableOpacity
+              onPress={() => setPopupField(field)}
+              style={[styles.inputContainer, { justifyContent: "flex-start" }]}
+            >
+              <Ionicons
+                name="chevron-down-outline"
+                size={20}
+                color={COLORS.primary}
+                style={styles.inputIcon}
+              />
+              <Text style={[styles.input, { paddingVertical: 12 }]}>
+                {data[field] || `Select ${field}`}
+              </Text>
+            </TouchableOpacity>
+            {errors[field] && touched[field] && (
+              <Text style={{ color: "red", fontSize: 12 }}>{errors[field]}</Text>
+            )}
+          </View>
+        ))}
+
+        {popupField && renderPopup(popupField)}
+      </View>
+
+      {/* Navigation Buttons */}
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          gap: 12,
+          marginTop: 24,
+        }}
+      >
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: COLORS.border, flex: 1 }]}
+          onPress={onPrevious}
         >
-          {({ errors, touched }) => (
-            <View style={styles.card}>
-              <View style={styles.header}>
-                <Text style={styles.title}>Specialty Details</Text>
-              </View>
+          <Text style={[styles.buttonText, { color: COLORS.textPrimary }]}>
+            Back
+          </Text>
+        </TouchableOpacity>
 
-              <View style={styles.formContainer}>
-                {Object.keys(optionsMap).map((field) => (
-                  <View key={field} style={styles.inputGroup}>
-                    <Text style={styles.label}>
-                      {field.replace(/([A-Z])/g, " $1")}
-                    </Text>
-                    <TouchableOpacity
-                      onPress={() => setPopupField(field)}
-                      style={[styles.inputContainer, { justifyContent: "flex-start" }]}
-                    >
-                      <Ionicons
-                        name="chevron-down-outline"
-                        size={20}
-                        color={COLORS.primary}
-                        style={styles.inputIcon}
-                      />
-                      <Text style={[styles.input, { paddingVertical: 12 }]}>
-                        {data[field] || `Select ${field}`}
-                      </Text>
-                    </TouchableOpacity>
-                    {errors[field] && touched[field] && (
-                      <Text style={{ color: "red", fontSize: 12 }}>{errors[field]}</Text>
-                    )}
-                  </View>
-                ))}
-
-                {popupField && renderPopup(popupField)}
-              </View>
-
-              {/* Navigation Buttons */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  gap: 12,
-                  marginTop: 24,
-                }}
-              >
-                <TouchableOpacity
-                  style={[styles.button, { backgroundColor: COLORS.border, flex: 1 }]}
-                  onPress={onPrevious}
-                >
-                  <Text style={[styles.buttonText, { color: COLORS.textPrimary }]}>
-                    Back
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.button, { flex: 1 }]}
-                  onPress={onNext}
-                >
-                  <Text style={styles.buttonText}>Next</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
-        </Formik>
+        {/* ✅ Use handleSubmit instead of onNext */}
+        <TouchableOpacity
+          style={[styles.button, { flex: 1 }]}
+          onPress={handleSubmit}
+        >
+          <Text style={styles.buttonText}>Next</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  )}
+</Formik>
       </ScrollView>
     </KeyboardAvoidingView>
   );

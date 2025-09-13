@@ -65,11 +65,11 @@ const router = useRouter();
 
             <TouchableOpacity
               style={styles.statBox}
-              onPress={() => router.push("/pagesHigher/lecturersComponents/subjects")}
+              onPress={() => router.push("/pagesHigher/courses/index")}
             >
               <Ionicons name="book-outline" size={24} color={COLORS.primary} />
               <Text style={styles.statValue}>3</Text>
-              <Text style={styles.statLabel}>Subjects</Text>
+              <Text style={styles.statLabel}>Courses</Text>
             </TouchableOpacity>
           </View>
         </View>

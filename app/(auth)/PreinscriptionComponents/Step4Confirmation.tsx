@@ -1,5 +1,6 @@
 import COLORS from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
   ScrollView,
@@ -10,11 +11,10 @@ import {
 } from "react-native";
 import globalStyles from "../../../assets/styles/signup.styles";
 
-
 type Step4ConfirmationProps = {
   data: FormData;
   onPrevious: () => void;
-  onSubmit: () => void;
+  onSubmit: () => Promise<void>;  
   section: "H" | "S" | "P";
 };
 
@@ -23,7 +23,16 @@ export default function Step4Confirmation({
   onPrevious,
   onSubmit
 }: Step4ConfirmationProps) {
+  const router = useRouter();
 
+  const handleFinalSubmit = async () => {
+    try {
+      await onSubmit(); 
+      router.replace("/(auth)/signup");
+    } catch (error) {
+      console.error("Submit failed:", error);
+    }
+  };
 
   return (
     <View style={{ flex: 1 }}>
@@ -115,7 +124,7 @@ export default function Step4Confirmation({
 
           <TouchableOpacity
             style={[globalStyles.button, { flex: 1 }]}
-            onPress={onSubmit}
+            onPress={handleFinalSubmit}
           >
             <Text style={globalStyles.buttonText}>Submit</Text>
           </TouchableOpacity>
@@ -195,8 +204,6 @@ const styles = StyleSheet.create({
   },
 });
 
-
-// Define type for the data prop
 export type FormData = {
   firstName?: string;
   lastName?: string;

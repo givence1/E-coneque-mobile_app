@@ -56,6 +56,12 @@ export interface JwtPayload {
     iat?: number;
     jti?: string;
     user_id?: number;
+    registration_lec_id?: number;
+    registration_hig_id?: number;
+    registration_sec_id?: number;
+    registration_prim_id?: number;
+    matricle?: string;
+    full_name?: string;
     username?: string;
     is_superuser?: boolean;
     is_staff?: boolean;

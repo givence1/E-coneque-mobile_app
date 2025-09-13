@@ -48,15 +48,15 @@ export default function Step2RoleDept({
     campusId: apiSchools,
     nationality: [
       "Cameroon",
-      "Nigeria",
-      "Tchad",
-      "Congo",
-      "Guinea",
-      "Gabon",
+      // "Nigeria",
+      // "Tchad",
+      // "Congo",
+      // "Guinea",
+      // "Gabon",
       "International",
     ],
-    regionOfOrigin: ["South West", "North West", "Center", "Littoral", "Other"],
-    highestCertificate: ["GCE O/L", "GCE A/L", "Bachelor's"],
+    regionOfOrigin: ["South West", "North West", "West", "South", "Center", "Littoral", "East", "Adamawa", "Nord", "Far Nord"],
+    highestCertificate: ["GCE O/L", "GCE A/L", "HND", "Bachelor's", "Master" ],
     yearObtained: Array.from({ length: 15 }, (_, i) => `${new Date().getFullYear() - i}`),
   };
 
@@ -66,7 +66,7 @@ export default function Step2RoleDept({
     <Modal transparent animationType="fade" visible={!!popupField}>
       <View style={local.popupOverlay}>
         <View style={local.popupContainer}>
-          <Text style={local.popupTitle}>Select Campus</Text>
+          <Text style={local.popupTitle}>Select {field}</Text>
           <FlatList
             data={optionsMap[field]}
             keyExtractor={(item) => item}
@@ -105,98 +105,114 @@ export default function Step2RoleDept({
         <StepIndicator idx={1} />
 
         <Formik
-          initialValues={data}
-          validationSchema={validationSchema}
-          onSubmit={onNext}
-        >
-          {({ errors, touched }) => (
-            <View style={styles.formContainer}>
-              {/* Dropdown Fields */}
-              {Object.keys(optionsMap).map((field) => (
-                <View key={field} style={styles.inputGroup}>
-                  <Text style={styles.label}>
-                    {field.replace(/([A-Z])/g, " $1")}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => setPopupField(field)}
-                    style={[styles.inputContainer, { justifyContent: "flex-start" }]}
-                  >
-                    <Ionicons
-                      name="chevron-down-outline"
-                      size={20}
-                      color={COLORS.primary}
-                      style={styles.inputIcon}
-                    />
-                    <Text style={[styles.input, { paddingVertical: 12 }]}>
-                      {data[field] || `Select Campus`}
-                    </Text>
-                  </TouchableOpacity>
-                  {errors[field] && touched[field] && (
-                    <Text style={{ color: "red", fontSize: 12 }}>{errors[field]}</Text>
-                  )}
-                </View>
-              ))}
-
-              {popupField && renderPopup(popupField)}
-
-              {/* Manual Inputs */}
-              {[
-                { key: "grade", label: "Grade" },
-                { key: "fatherName", label: "Father's Name" },
-                { key: "fatherTelephone", label: "Father's Telephone" },
-                { key: "motherName", label: "Mother's Name" },
-                { key: "motherTelephone", label: "Mother's Telephone" },
-                { key: "parentAddress", label: "Parent's Address" },
-              ].map(({ key, label }) => (
-                <View key={key} style={styles.inputGroup}>
-                  <Text style={styles.label}>{label}</Text>
-                  <View style={styles.inputContainer}>
-                    <Ionicons
-                      name="person-outline"
-                      size={20}
-                      color={COLORS.primary}
-                      style={styles.inputIcon}
-                    />
-                    <TextInput
-                      style={styles.input}
-                      placeholder={label}
-                      placeholderTextColor={COLORS.placeholderText}
-                      value={data[key] || ""}
-                      onChangeText={(text) => updateField(key, text)}
-                      autoCapitalize="words"
-                    />
-                  </View>
-                </View>
-              ))}
-
-              {/* Navigation Buttons */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  gap: 12,
-                  marginTop: 24,
-                }}
-              >
-                <TouchableOpacity
-                  style={[styles.button, { backgroundColor: COLORS.border, flex: 1 }]}
-                  onPress={onPrevious}
-                >
-                  <Text style={[styles.buttonText, { color: COLORS.textPrimary }]}>
-                    Back
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.button, { flex: 1 }]}
-                  onPress={onNext}
-                >
-                  <Text style={styles.buttonText}>Next</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+  initialValues={data}
+  validationSchema={Yup.object().shape({
+    campusId: Yup.string().required("Campus is required"),
+    nationality: Yup.string().required("Nationality is required"),
+    regionOfOrigin: Yup.string().required("Region is required"),
+    highestCertificate: Yup.string().required("Certificate is required"),
+    yearObtained: Yup.string().required("Year obtained is required"),
+    grade: Yup.string().required("Grade is required"),
+    fatherName: Yup.string().required("Father's name is required"),
+    fatherTelephone: Yup.string().required("Father's telephone is required"),
+    motherName: Yup.string().required("Mother's name is required"),
+    motherTelephone: Yup.string().required("Mother's telephone is required"),
+    parentAddress: Yup.string().required("Parent's address is required"),
+  })}
+  onSubmit={onNext} // ✅ Only proceed if validation passes
+>
+  {({ errors, touched, handleSubmit }) => (
+    <View style={styles.formContainer}>
+      {/* Dropdown Fields */}
+      {Object.keys(optionsMap).map((field) => (
+        <View key={field} style={styles.inputGroup}>
+          <Text style={styles.label}>
+            {field.replace(/([A-Z])/g, " $1")}
+          </Text>
+          <TouchableOpacity
+            onPress={() => setPopupField(field)}
+            style={[styles.inputContainer, { justifyContent: "flex-start" }]}
+          >
+            <Ionicons
+              name="chevron-down-outline"
+              size={20}
+              color={COLORS.primary}
+              style={styles.inputIcon}
+            />
+            <Text style={[styles.input, { paddingVertical: 12 }]}>
+              {data[field] || `Select ${field}`}
+            </Text>
+          </TouchableOpacity>
+          {errors[field] && touched[field] && (
+            <Text style={{ color: "red", fontSize: 12 }}>{errors[field]}</Text>
           )}
-        </Formik>
+        </View>
+      ))}
+
+      {popupField && renderPopup(popupField)}
+
+      {/* Manual Inputs */}
+      {[
+        { key: "grade", label: "Grade" },
+        { key: "fatherName", label: "Father's Name" },
+        { key: "fatherTelephone", label: "Father's Telephone" },
+        { key: "motherName", label: "Mother's Name" },
+        { key: "motherTelephone", label: "Mother's Telephone" },
+        { key: "parentAddress", label: "Parent's Address" },
+      ].map(({ key, label }) => (
+        <View key={key} style={styles.inputGroup}>
+          <Text style={styles.label}>{label}</Text>
+          <View style={styles.inputContainer}>
+            <Ionicons
+              name="person-outline"
+              size={20}
+              color={COLORS.primary}
+              style={styles.inputIcon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder={label}
+              placeholderTextColor={COLORS.placeholderText}
+              value={data[key] || ""}
+              onChangeText={(text) => updateField(key, text)}
+            />
+          </View>
+          {errors[key] && touched[key] && (
+            <Text style={{ color: "red", fontSize: 12 }}>{errors[key]}</Text>
+          )}
+        </View>
+      ))}
+
+      {/* Navigation Buttons */}
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          gap: 12,
+          marginTop: 24,
+        }}
+      >
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: COLORS.border, flex: 1 }]}
+          onPress={onPrevious}
+        >
+          <Text style={[styles.buttonText, { color: COLORS.textPrimary }]}>
+            Back
+          </Text>
+        </TouchableOpacity>
+
+        {/* ✅ Call Formik handleSubmit instead of onNext */}
+        <TouchableOpacity
+          style={[styles.button, { flex: 1 }]}
+          onPress={handleSubmit}
+        >
+          <Text style={styles.buttonText}>Next</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  )}
+</Formik>
+
       </ScrollView>
     </KeyboardAvoidingView>
   );

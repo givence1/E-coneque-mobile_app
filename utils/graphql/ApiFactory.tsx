@@ -1,6 +1,5 @@
 import { removeEmptyFields } from "../functions";
 import { uploadGraphQLMutation } from "./UploadGraphql";
-import { useAuthStore } from "@/store/authStore";
 
 type SubmitOptions = {
   newData: any;
@@ -11,6 +10,7 @@ type SubmitOptions = {
   query: any;
   params: any;
   router: any;
+  token: any;
   redirect: boolean;
   redirectPath: string;
   returnResponseField?: boolean;
@@ -19,6 +19,8 @@ type SubmitOptions = {
   reload?: boolean;
   getFileMap?: (item: any) => Record<string, File>;
 };
+
+
 
 export const ApiFactory = async ({
   newData,
@@ -35,16 +37,18 @@ export const ApiFactory = async ({
   returnResponseField = false,
   returnResponseObject = false,
   actionLabel = "processing",
+  token,
   getFileMap
 }: SubmitOptions) => {
+
   const items = Array.isArray(newData || editData) ? (newData || editData) : [(newData || editData)];
   const successMessages: string[] = [];
   const errorMessages: string[] = [];
   let responseFieldData: any = null;
-  // Get token from authStore
-  const { token } = useAuthStore.getState();
+
   for (let index = 0; index < items.length; index++) {
     let res: any = items[index];
+
     try {
       const response = await uploadGraphQLMutation({
         query: query.loc?.source.body || "",

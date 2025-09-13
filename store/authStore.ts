@@ -2,8 +2,8 @@ import { client } from '@/utils/graphql/client';
 import { JwtPayload } from '@/utils/interfaces';
 import { NodeSchoolHigherInfo, NodeSchoolIdentification } from '@/utils/schemas/interfaceGraphql';
 import { gql } from '@apollo/client';
-import { create } from 'zustand';
 import { jwtDecode } from 'jwt-decode';
+import { create } from 'zustand';
 
 
 
@@ -24,10 +24,11 @@ interface AuthStore {
   checkAuth: () => void;
   storeFeesId: (id: number) => void;
   storeProfileId: (id: number) => void;
+  storeRegistrationId: (field: "registration_lec_id" | "registration_hig_id" | "registration_sec_id" | "registration_pri_id", value: number) => void;
   storeCampusInfo: (data: NodeSchoolHigherInfo) => void;
 }
 
-export const useAuthStore = create<AuthStore>((set) => ({
+export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
   feesId: null,
   profileId: null,
@@ -38,9 +39,16 @@ export const useAuthStore = create<AuthStore>((set) => ({
   campusInfo: null,
   role: "student",
 
-  storeFeesId: async (feesId: number) => { set({ feesId })},
-  storeProfileId: async (profileId: number) => { set({ profileId })},
-  storeCampusInfo: async (campusInfo: NodeSchoolHigherInfo) => { set({ campusInfo })},
+  storeFeesId: async (feesId: number) => { set({ feesId }) },
+  storeProfileId: async (profileId: number) => { set({ profileId }) },
+  storeCampusInfo: async (campusInfo: NodeSchoolHigherInfo) => { set({ campusInfo }) },
+  storeRegistrationId: (field: "registration_lec_id" | "registration_hig_id" | "registration_sec_id" | "registration_pri_id", value: number) => {
+    const currentUser = get().user;
+    set({
+      [field]: value,
+      user: currentUser ? { ...currentUser, [field]: value } : currentUser,
+    });
+  },
   login: async (loginData: any) => {
     set({ isLoading: true });
 

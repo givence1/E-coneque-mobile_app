@@ -1,6 +1,5 @@
 
 import { Alert, Linking } from "react-native";
-import { protocol, RootApi, tenant } from "./config";
 
 
 export const decodeUrlID = (urlID: string) => {
@@ -188,4 +187,14 @@ export const actionSubmit = async (data: any, url: string) => {
 };
 
 
+export function getAcademicYear(): string {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth(); // 0 = January, 7 = August
 
+    if (month < 7) {
+        return `${year - 1}/${year}`;
+    } else {
+        return `${year}/${year + 1}`;
+    }
+}

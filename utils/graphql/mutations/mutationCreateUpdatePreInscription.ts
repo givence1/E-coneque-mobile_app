@@ -1,11 +1,12 @@
 'use client';
+import { NodeCustomUser } from "@/utils/schemas/interfaceGraphql";
 import { gql } from "@apollo/client";
 import { ApiFactory } from "../ApiFactory";
 
 
 export const mutationCreateUpdatePreInscription = async (
-  { section, formData, p, routeToLink, router }:
-    { section: "H" | "S" | "P" | "V", formData: any, p: any, routeToLink: string, router: any }
+  { section, formData, p, routeToLink, router, token }:
+    { section: "H" | "S" | "P" | "V", formData: any, p: any, routeToLink: string, router: any, token: any }
 ) => {
 
   const data: any = {
@@ -148,9 +149,10 @@ export const mutationCreateUpdatePreInscription = async (
     returnResponseField: true,
     redirectPath: ``,
     actionLabel: "creating",
+    token
   });
 
-  console.log(preInscripSuccessFieldData);
+
 
   if (preInscripSuccessFieldData) {
     if (routeToLink) {
@@ -161,6 +163,141 @@ export const mutationCreateUpdatePreInscription = async (
     return false
   }
 }
+
+
+
+export const mutationCreateUpdatePreInscriptionLecturer = async (
+  { section, formData, p, routeToLink, router, token }:
+    { section: "H" | "S" | "P" | "V", formData: any, p: any, routeToLink: string, router: any, customuser?: NodeCustomUser, token: any }
+) => {
+
+  const generateRegNumber = (): string => {
+    const year = new Date().getFullYear().toString().slice(-2);
+    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+    return `${year}${random}`.slice(0, 10);
+  };
+
+  const data: any = {
+    ...formData,
+    registrationNumber: formData?.registrationNumber || generateRegNumber(),
+    language: formData?.language || p?.locale,
+    firstName: formData?.firstName?.toString().toUpperCase(),
+    lastName: formData?.lastName?.toString().toUpperCase(),
+    sex: formData?.sex.toString().toUpperCase(),
+    email: formData?.email?.toString().toLowerCase(),
+    telephone: formData?.telephone,
+    address: formData?.address?.toString().toUpperCase() || "-",
+    pob: formData?.pob?.toString().toUpperCase() || "-",
+    dob: formData?.dob || "1980-01-01",
+
+    nationality: formData?.nationality,
+    regionOfOrigin: formData?.regionOfOrigin || "-",
+    highestCertificate: formData?.highestCertificate,
+    yearObtained: formData?.yearObtained,
+    fatherName: formData?.fatherName,
+    motherName: formData?.motherName,
+    parentAddress: formData?.parentAddress,
+    action: formData?.action,
+    campusId: formData?.campusId || p?.school_id,
+    status: formData?.status,
+    admissionStatus: formData?.admissionStatus,
+    infoData: formData?.infoData,
+
+    delete: false,
+  };
+
+  const getFileMap = () => {
+    const fileMap: Record<string, File> = {};
+    if (data?.photo instanceof File) {
+      fileMap['photo'] = data.photo;
+    }
+    return fileMap;
+  };
+
+  const resId = await ApiFactory({
+    newData: data,
+    editData: data,
+    mutationName: "createUpdateDeletePreinscriptionLecturer",
+    modelName: "preinscriptionlecturer",
+    successField: "id",
+    query: queryPreInscriptionLecturer,
+    router: null,
+    params: null,
+    redirect: false,
+    reload: false,
+    returnResponseField: true,
+    redirectPath: ``,
+    actionLabel: "creating",
+    getFileMap: getFileMap || (() => ({})),
+    token
+  });
+  return resId
+ 
+}
+
+
+
+
+const queryPreInscriptionLecturer = gql`
+  mutation Create(
+    $id: ID
+    $registrationNumber: String
+    $language: String!
+    $firstName: String!
+    $lastName: String!
+    $sex: String!
+    $email: String!
+    $telephone: String!
+    $address: String!
+    $pob: String!
+    $dob: String!
+
+    $nationality: String!
+    $regionOfOrigin: String!
+    $highestCertificate: String!
+    $yearObtained: String!
+    $fatherName: String
+    $fatherTelephone: String
+    $parentAddress: String
+    $action: String!
+    $status: String!
+    $admissionStatus: Boolean!
+    $infoData: JSONString!
+    $delete: Boolean!
+  ) {
+    createUpdateDeletePreinscriptionLecturer(
+      id: $id
+      registrationNumber: $registrationNumber
+      language: $language
+      firstName: $firstName
+      lastName: $lastName
+      sex: $sex
+      address: $address
+      email: $email
+      telephone: $telephone
+      pob: $pob
+      dob: $dob
+
+      nationality: $nationality
+      regionOfOrigin: $regionOfOrigin
+      highestCertificate: $highestCertificate
+      yearObtained: $yearObtained
+      fatherName: $fatherName
+      fatherTelephone: $fatherTelephone
+      parentAddress: $parentAddress
+      action: $action
+      status: $status
+      admissionStatus: $admissionStatus
+      infoData: $infoData
+      delete: $delete
+    ) {
+      preinscriptionlecturer {
+        id firstName fullName
+      }
+    }
+  }
+`;
+
 
 
 const queryPreInscription = gql`

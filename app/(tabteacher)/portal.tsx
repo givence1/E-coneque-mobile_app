@@ -1,10 +1,17 @@
 import AppHeader from "@/components/AppHeader";
 import COLORS from "@/constants/colors";
+import { useAuthStore } from "@/store/authStore";
+import { decodeUrlID, getAcademicYear } from "@/utils/functions";
+import { EdgeCourse, EdgePublish, NodeCourse } from "@/utils/schemas/interfaceGraphql";
+import { gql, useQuery } from "@apollo/client";
 import { Ionicons } from "@expo/vector-icons";
+import { Picker as SelectPicker } from "@react-native-picker/picker";
 import { router } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Modal,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -27,152 +34,193 @@ type ClassItem = {
   portal: PortalStatus;
 };
 
-// ✅ Mock data (replace with API)
-const teachingClasses: ClassItem[] = [
-  {
-    id: "1",
-    specialty: "Computer Science",
-    level: "Level 100",
-    course: "Mathematics",
-    semester: 2,
-    portal: { ca: true, exam: false, resit: false },
-  },
-  {
-    id: "2",
-    specialty: "Electronics",
-    level: "Level 100",
-    course: "Electronics",
-    semester: 1,
-    portal: { ca: false, exam: true, resit: false },
-  },
-  {
-    id: "3",
-    specialty: "Computer Science",
-    level: "Level 200",
-    course: "Data Structures",
-    semester: 2,
-    portal: { ca: false, exam: false, resit: true },
-  },
-];
+
 
 export default function LecturerPortalScreen() {
-  const [selectedClass, setSelectedClass] = useState<ClassItem | null>(null);
+
+  const { user } = useAuthStore();
+
+  const [year, setYear] = useState(getAcademicYear());
+  const [myPortals, setMyPortals] = useState<EdgePublish[]>();
+  const [portalTypes, setPortalTypes] = useState<string[]>();
+
+  const { data: dataCourses, loading, error } = useQuery(GET_COURSES, {
+    variables: { assignedToId: user?.user_id, academicYear: year },
+  });
+
+  const { data: dataPortal, loading: loadingPortal } = useQuery(GET_PORTAL, {
+    variables: { academicYear: year },
+  });
+
+  useEffect(() => {
+    const courses = dataCourses?.allCourses?.edges
+    const portals = dataPortal?.allPublishes?.edges
+    if (courses?.length > 0 && portals?.length > 0) {
+      const si = courses.map((c: EdgeCourse) => parseInt(decodeUrlID(c.node.specialty.id) || "0"))
+      const specialtyIDS = ([...new Set<number>(si)]);
+      const filteredPublish = portals.filter((obj: EdgePublish) => specialtyIDS.includes(parseInt(decodeUrlID(obj.node.specialty.id) || "0")));
+      setMyPortals(filteredPublish)
+    }
+  }, [dataCourses, dataPortal])
+
+  const [selectedCourse, setSelectedCourse] = useState<NodeCourse | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
-  const openModal = (classItem: ClassItem) => {
-    setSelectedClass(classItem);
-    setModalVisible(true);
+  const openModal = (course: NodeCourse, ca: boolean, exam: boolean, resit: boolean) => {
+    const portalList: string[] = [];
+    if (ca) portalList.push('CA');
+    if (exam) portalList.push('EXAM');
+    if (resit) portalList.push('RESIT');
+    if (portalList.length > 0) {
+      setPortalTypes(portalList);
+      setSelectedCourse(course);
+      setModalVisible(true);
+    }
   };
 
   const closeModal = () => {
     setModalVisible(false);
-    setSelectedClass(null);
+    setSelectedCourse(null);
   };
 
-  const handleUpload = (type: "ca" | "exam" | "resit") => {
-    if (!selectedClass) return;
+  const handleUpload = (type: string) => {
+    if (!selectedCourse) return;
     closeModal();
 
     // ✅ Navigate to upload screen with params
     router.push({
-      pathname: "/pagesHigher/UploadMarksDetailScreen",
+      pathname: "/pagesHigher/UploadMarks",
       params: {
-        level: selectedClass.level,
-        course: selectedClass.course,
-        specialty: selectedClass.specialty,
-        semester: selectedClass.semester,
-        type, // ca, exam, resit
+        courseId: decodeUrlID(selectedCourse.id),
+        specialtyId: decodeUrlID(selectedCourse.specialty?.id),
+        semester: selectedCourse.semester,
+        type,
       },
     });
   };
 
-  // ✅ Order: Semester 2 first
-  const orderedClasses = [...teachingClasses].sort(
-    (a, b) => b.semester - a.semester
-  );
 
   return (
     <View style={styles.container}>
       {/* Fixed Header */}
-      <AppHeader showBack showTabs  showTitle  />
+      <AppHeader showBack showTabs showTitle />
 
       {/* Scrollable Content */}
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <Text style={styles.heading}>📈 Upload Marks</Text>
+      {loading ?
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <ActivityIndicator />
+        </ScrollView>
 
-        {orderedClasses.map((item) => {
-          const anyOpen =
-            item.portal.ca || item.portal.exam || item.portal.resit;
+        :
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
 
-          return (
-            <View key={item.id} style={styles.card}>
-              {/* Card Header */}
-              <View style={styles.cardHeader}>
-                <Ionicons name="book-outline" size={22} color={COLORS.primary} />
-                <View>
-                  <Text style={styles.cardTitle}>{item.course}</Text>
-                  <Text style={styles.cardSubtitle}>
-                    {item.specialty} • {item.level} • Semester {item.semester}
-                  </Text>
+
+          <Text style={styles.heading}>📈 Upload Marks - {year}</Text>
+
+          <SelectPicker
+            selectedValue={year}
+            onValueChange={(v) => setYear(v)}
+            mode={Platform.OS === "android" ? "dropdown" : undefined}
+            style={{ flex: 1, color: COLORS.textPrimary, marginBottom: 10 }}
+            dropdownIconColor={COLORS.textSecondary}
+          >
+            {dataCourses?.allAcademicYears?.map((y: string) => <SelectPicker.Item key={y} label={y} value={y} />)}
+          </SelectPicker>
+
+
+          {dataCourses?.allCourses?.edges?.filter((c: EdgeCourse) => c.node.specialty.academicYear === year).map((item: EdgeCourse) => {
+            // const anyOpen = item.portal.ca || item.portal.exam || item.portal.resit;
+            const thisCourse = item.node
+            const semester = item.node.semester
+            const specialtyId = parseInt(decodeUrlID(item.node.specialty.id) || "0")
+            const thisPortal = myPortals?.filter((p: EdgePublish) => p.node.semester === semester && parseInt(decodeUrlID(p.node.specialty.id) || "0") === specialtyId)
+
+            const anyOpen = true;
+            let portalCa = false;
+            let portalExam = false;
+            let portalResit = false;
+            if (thisPortal && thisPortal?.length > 0) {
+              portalCa = thisPortal[0]?.node.portalCa;
+              portalExam = thisPortal[0]?.node.portalExam;
+              portalResit = thisPortal[0]?.node.portalResit;
+            }
+
+            return (
+              <View key={thisCourse.id} style={styles.card}>
+                {/* Card Header */}
+                <View style={styles.cardHeader}>
+                  <Ionicons name="book-outline" size={22} color={COLORS.primary} />
+                  <View>
+                    <Text style={styles.cardTitle}>{thisCourse.mainCourse.courseName}</Text>
+                    <Text style={styles.cardSubtitle}>
+                      {thisCourse.specialty.mainSpecialty?.specialtyName} • {thisCourse.specialty?.level?.level} • Semester {thisCourse?.semester}
+                    </Text>
+                  </View>
                 </View>
-              </View>
 
-              {/* Portal status */}
-              <View style={styles.statusRow}>
-                <Ionicons
-                  name={item.portal.ca ? "checkmark-circle" : "close-circle"}
-                  size={18}
-                  color={item.portal.ca ? "green" : "red"}
-                />
-                <Text style={styles.statusText}>CA Portal</Text>
-              </View>
-              <View style={styles.statusRow}>
-                <Ionicons
-                  name={item.portal.exam ? "checkmark-circle" : "close-circle"}
-                  size={18}
-                  color={item.portal.exam ? "green" : "red"}
-                />
-                <Text style={styles.statusText}>Exam Portal</Text>
-              </View>
-              <View style={styles.statusRow}>
-                <Ionicons
-                  name={item.portal.resit ? "checkmark-circle" : "close-circle"}
-                  size={18}
-                  color={item.portal.resit ? "green" : "red"}
-                />
-                <Text style={styles.statusText}>Resit Portal</Text>
-              </View>
+                {/* Portal status */}
+                <View style={styles.statusRow}>
+                  <Ionicons
+                    name={portalCa ? "checkmark-circle" : "close-circle"}
+                    size={18}
+                    color={portalCa ? "green" : "red"}
+                  />
+                  <Text style={styles.statusText}>CA Portal</Text>
+                </View>
+                <View style={styles.statusRow}>
+                  <Ionicons
+                    name={portalExam ? "checkmark-circle" : "close-circle"}
+                    size={18}
+                    color={portalExam ? "green" : "red"}
+                  />
+                  <Text style={styles.statusText}>Exam Portal</Text>
+                </View>
+                <View style={styles.statusRow}>
+                  <Ionicons
+                    name={portalResit ? "checkmark-circle" : "close-circle"}
+                    size={18}
+                    color={portalResit ? "green" : "red"}
+                  />
+                  <Text style={styles.statusText}>Resit Portal</Text>
+                </View>
 
-              {/* Upload button */}
-              <TouchableOpacity
-                style={[
-                  styles.btn,
-                  { backgroundColor: anyOpen ? COLORS.primary : COLORS.border },
-                ]}
-                disabled={!anyOpen}
-                onPress={() => openModal(item)}
-              >
-                <Ionicons
-                  name="cloud-upload-outline"
-                  size={18}
-                  color={anyOpen ? "#fff" : COLORS.textSecondary}
-                />
-                <Text
+                {/* Upload button */}
+                <TouchableOpacity
                   style={[
-                    styles.btnText,
-                    { color: anyOpen ? "#fff" : COLORS.textSecondary },
+                    styles.btn,
+                    { backgroundColor: anyOpen ? COLORS.primary : COLORS.border },
                   ]}
+                  disabled={!anyOpen}
+                  onPress={() => openModal(thisCourse, portalCa, portalExam, portalResit)}
                 >
-                  Upload Marks
-                </Text>
-              </TouchableOpacity>
-            </View>
-          );
-        })}
-      </ScrollView>
+                  <Ionicons
+                    name="cloud-upload-outline"
+                    size={18}
+                    color={anyOpen ? "#fff" : COLORS.textSecondary}
+                  />
+                  <Text
+                    style={[
+                      styles.btnText,
+                      { color: anyOpen ? "#fff" : COLORS.textSecondary },
+                    ]}
+                  >
+                    Upload Marks
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            );
+          })}
+        </ScrollView>
+      }
+
+
+
 
       {/* ✅ Modal Popup */}
       <Modal
@@ -189,39 +237,26 @@ export default function LecturerPortalScreen() {
             </TouchableOpacity>
 
             <Text style={styles.modalTitle}>
-              Choose Upload Type for {selectedClass?.course}
+              Choose Upload Type for {selectedCourse?.mainCourse?.courseName}
             </Text>
 
-            {selectedClass?.portal.ca && (
-              <TouchableOpacity
+            {portalTypes?.map((p: string) =>  <TouchableOpacity
                 style={styles.modalBtn}
-                onPress={() => handleUpload("ca")}
+                onPress={() => handleUpload(p)}
               >
-                <Text style={styles.modalBtnText}>Upload CA</Text>
-              </TouchableOpacity>
-            )}
-            {selectedClass?.portal.exam && (
-              <TouchableOpacity
-                style={styles.modalBtn}
-                onPress={() => handleUpload("exam")}
-              >
-                <Text style={styles.modalBtnText}>Upload Exam</Text>
-              </TouchableOpacity>
-            )}
-            {selectedClass?.portal.resit && (
-              <TouchableOpacity
-                style={styles.modalBtn}
-                onPress={() => handleUpload("resit")}
-              >
-                <Text style={styles.modalBtnText}>Upload Resit</Text>
-              </TouchableOpacity>
-            )}
+                <Text style={styles.modalBtnText}>Upload {p}</Text>
+              </TouchableOpacity>)}
+
           </View>
         </View>
       </Modal>
+
+
     </View>
   );
 }
+
+
 
 const styles = StyleSheet.create({
   container: {
@@ -324,3 +359,48 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
 });
+
+
+const GET_COURSES = gql`
+  query GetData (
+    $assignedToId: Decimal!
+    $academicYear: String!
+  ) {
+    allAcademicYears
+    allCourses (
+        assignedToId: $assignedToId
+        academicYear: $academicYear
+    ) {
+        edges {
+            node {
+                id courseCode semester
+                mainCourse { courseName }
+                specialty { id academicYear
+                  mainSpecialty { specialtyName }
+                  level { level }
+                }
+            }
+        }
+    }
+}`
+
+
+const GET_PORTAL = gql`
+  query GetData (
+    $academicYear: String!
+  ) {
+    allPublishes (
+        academicYear: $academicYear
+    ) {
+        edges {
+            node {
+                id semester
+                portalCa portalExam portalResit
+                specialty { 
+                  id academicYear
+                  mainSpecialty { specialtyName }
+                }
+            }
+        }
+    }
+}`

@@ -1,6 +1,7 @@
 import AppHeader from "@/components/AppHeader";
 import COLORS from "@/constants/colors";
 import { useAuthStore } from "@/store/authStore";
+import { protocol, RootApi, tenant } from "@/utils/config";
 import { gql, useQuery } from "@apollo/client";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -51,6 +52,7 @@ export default function LecturerProfileScreen() {
   }
 
   const profile = data?.allLecturerProfiles?.edges?.[0]?.node || {};
+  console.log(profile?.customuser?.photo?.length ? `${protocol}${tenant}${RootApi}/media/` + profile?.customuser?.photo : require("../../assets/images/icon.jpg") );
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
@@ -65,7 +67,7 @@ export default function LecturerProfileScreen() {
         {/* Profile Header */}
         <View style={styles.headerCard}>
           <Image
-            source={{ uri: profile?.customuser?.photo || "https://via.placeholder.com/120" }}
+            source={`${profile?.customuser?.photo?.length > 1 ? protocol + tenant + RootApi + "/media/" + profile?.customuser?.photo : ""}` || require("../../assets/images/icon.jpg")}
             style={styles.avatar}
           />
           <Text style={styles.name}>{profile?.customuser?.fullName || "Not Available"}</Text>

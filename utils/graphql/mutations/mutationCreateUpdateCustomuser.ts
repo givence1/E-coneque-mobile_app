@@ -1,16 +1,17 @@
 'use client';
+import { capitalizeFirstLetter, removeEmptyFields } from "@/utils/functions";
 import { gql } from "@apollo/client";
 import { ApiFactory } from "../ApiFactory";
-import { capitalizeFirstLetter, removeEmptyFields } from "@/utils/functions";
 
 
 export const mutationCreateUpdateCustomuser = async (
-  { formData, p, routeToLink, router }:
-    { formData: any, p: any, routeToLink: string, router: any }
+  { formData, p, routeToLink, router, token }:
+    { formData: any, p: any, routeToLink: string, router: any, token: any }
 ) => {
 
   let dataCustomuser: any = {
     ...formData,
+    prefix: formData?.prefix || "x",
     password: formData?.password,
     username: formData?.username?.toString().toUpperCase(),
     uniqueId: formData?.uniqueId?.toString().toUpperCase(),
@@ -87,7 +88,8 @@ export const mutationCreateUpdateCustomuser = async (
     returnResponseField: true,
     redirectPath: ``,
     actionLabel: "creating",
-    getFileMap: getFileMap || (() => ({}))
+    getFileMap: getFileMap || (() => ({})),
+    token
   });
 
   if (userSuccessFieldData) {
