@@ -6,6 +6,7 @@ import { Picker as SelectPicker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import { Formik } from "formik";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next"; // ✅ add i18n hook
 import { Platform, Text, TextInput, TouchableOpacity, View } from "react-native";
 import * as Yup from "yup";
 
@@ -25,20 +26,6 @@ interface Step1Props {
   onPrevious: () => void;
 }
 
-const validationSchema = Yup.object().shape({
-  firstName: Yup.string().required("First Name is required"),
-  lastName: Yup.string().required("Last Name is required"),
-  sex: Yup.string().required("Gender is required"),
-  address: Yup.string().required("Address is required"),
-  pob: Yup.string().required("Place of Birth is required"),
-  dob: Yup.string().required("Date of Birth is required"),
-  telephone: Yup.string()
-    .required("Telephone is required")
-    .matches(/^\d+$/, "Must be digits only")
-    .min(9, "At least 9 digits"),
-  email: Yup.string().required("Email is required").email("Invalid email format"),
-});
-
 export default function Step1PersonalInfo({
   data,
   updateField,
@@ -47,6 +34,21 @@ export default function Step1PersonalInfo({
 }: Step1Props) {
   const router = useRouter();
   const [dobPickerVisible, setDobPickerVisible] = useState(false);
+  const { t } = useTranslation(); // ✅ translation hook
+
+  const validationSchema = Yup.object().shape({
+    firstName: Yup.string().required(t("validation.firstName")),
+    lastName: Yup.string().required(t("validation.lastName")),
+    sex: Yup.string().required(t("validation.gender")),
+    address: Yup.string().required(t("validation.address")),
+    pob: Yup.string().required(t("validation.pob")),
+    dob: Yup.string().required(t("validation.dob")),
+    telephone: Yup.string()
+      .required(t("validation.telephone"))
+      .matches(/^\d+$/, t("validation.telephoneDigits"))
+      .min(9, t("validation.telephoneLength")),
+    email: Yup.string().required(t("validation.email")).email(t("validation.emailFormat")),
+  });
 
   const onChangeDob = (
     event: DateTimePickerEvent,
@@ -67,61 +69,59 @@ export default function Step1PersonalInfo({
       <View style={styles.card}>
         {/* Step Indicator */}
         <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 24 }}>
-          {["Personal Info", "Role & Dept", "Specialty", "Confirm"].map((label, index) => {
-            const isActive = index === 0;
-            return (
-              <View key={label} style={{ alignItems: "center", flex: 1 }}>
-                <View
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 16,
-                    backgroundColor: isActive ? COLORS.primary : COLORS.border,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginBottom: 4,
-                  }}
-                >
+          {[t("steps.personalInfo"), t("steps.roleDept"), t("steps.specialty"), t("steps.confirm")].map(
+            (label, index) => {
+              const isActive = index === 0;
+              return (
+                <View key={label} style={{ alignItems: "center", flex: 1 }}>
+                  <View
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 16,
+                      backgroundColor: isActive ? COLORS.primary : COLORS.border,
+                      justifyContent: "center",
+                      alignItems: "center",
+                      marginBottom: 4,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 16,
+                        color: isActive ? "#fff" : COLORS.textSecondary,
+                        textAlign: "center",
+                      }}
+                    >
+                      {index + 1}
+                    </Text>
+                  </View>
                   <Text
                     style={{
-                      fontSize: 16,
-                      color: isActive ? "#fff" : COLORS.textSecondary,
+                      fontSize: 12,
+                      color: isActive ? COLORS.primary : COLORS.textSecondary,
                       textAlign: "center",
                     }}
                   >
-                    {index + 1}
+                    {label}
                   </Text>
                 </View>
-                <Text
-                  style={{
-                    fontSize: 12,
-                    color: isActive ? COLORS.primary : COLORS.textSecondary,
-                    textAlign: "center",
-                  }}
-                >
-                  {label}
-                </Text>
-              </View>
-            );
-          })}
+              );
+            }
+          )}
         </View>
 
-        <Formik
-          initialValues={data}
-          validationSchema={validationSchema}
-          onSubmit={onNext}
-        >
+        <Formik initialValues={data} validationSchema={validationSchema} onSubmit={onNext}>
           {({ handleSubmit, setFieldValue, values, errors, touched }) => (
             <>
               <View style={styles.formContainer}>
                 {/* First Name */}
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>First Name</Text>
+                  <Text style={styles.label}>{t("form.firstName")}</Text>
                   <View style={styles.inputContainer}>
                     <Ionicons name="person-outline" size={20} color={COLORS.primary} style={styles.inputIcon} />
                     <TextInput
                       style={styles.input}
-                      placeholder="First Name"
+                      placeholder={t("form.firstName")}
                       value={values.firstName}
                       onChangeText={(text) => {
                         updateField("firstName", text);
@@ -134,12 +134,12 @@ export default function Step1PersonalInfo({
 
                 {/* Last Name */}
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Last Name</Text>
+                  <Text style={styles.label}>{t("form.lastName")}</Text>
                   <View style={styles.inputContainer}>
                     <Ionicons name="person-outline" size={20} color={COLORS.primary} style={styles.inputIcon} />
                     <TextInput
                       style={styles.input}
-                      placeholder="Last Name"
+                      placeholder={t("form.lastName")}
                       value={values.lastName}
                       onChangeText={(text) => {
                         updateField("lastName", text);
@@ -152,7 +152,7 @@ export default function Step1PersonalInfo({
 
                 {/* Gender */}
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Gender</Text>
+                  <Text style={styles.label}>{t("form.gender")}</Text>
                   <View style={[styles.inputContainer, { paddingLeft: 40 }]}>
                     <Ionicons
                       name="male-female-outline"
@@ -169,9 +169,9 @@ export default function Step1PersonalInfo({
                       style={{ flex: 1, color: COLORS.textPrimary }}
                       dropdownIconColor={COLORS.textSecondary}
                     >
-                      <SelectPicker.Item label="Select Gender" value="" />
-                      <SelectPicker.Item label="Male" value="MALE" />
-                      <SelectPicker.Item label="Female" value="FEMALE" />
+                      <SelectPicker.Item label={t("form.selectGender")} value="" />
+                      <SelectPicker.Item label={t("gender.male")} value="MALE" />
+                      <SelectPicker.Item label={t("gender.female")} value="FEMALE" />
                     </SelectPicker>
                   </View>
                   {touched.sex && errors.sex && <Text style={{ color: "red" }}>{errors.sex}</Text>}
@@ -179,12 +179,12 @@ export default function Step1PersonalInfo({
 
                 {/* Address */}
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Address</Text>
+                  <Text style={styles.label}>{t("form.address")}</Text>
                   <View style={styles.inputContainer}>
                     <Ionicons name="location-outline" size={20} color={COLORS.primary} style={styles.inputIcon} />
                     <TextInput
                       style={styles.input}
-                      placeholder="Address"
+                      placeholder={t("form.address")}
                       value={values.address}
                       onChangeText={(text) => {
                         updateField("address", text);
@@ -197,12 +197,12 @@ export default function Step1PersonalInfo({
 
                 {/* Place of Birth */}
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Place of Birth</Text>
+                  <Text style={styles.label}>{t("form.pob")}</Text>
                   <View style={styles.inputContainer}>
                     <Ionicons name="location-outline" size={20} color={COLORS.primary} style={styles.inputIcon} />
                     <TextInput
                       style={styles.input}
-                      placeholder="Place of Birth"
+                      placeholder={t("form.pob")}
                       value={values.pob}
                       onChangeText={(text) => {
                         updateField("pob", text);
@@ -215,14 +215,14 @@ export default function Step1PersonalInfo({
 
                 {/* Date of Birth */}
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Date of Birth</Text>
+                  <Text style={styles.label}>{t("form.dob")}</Text>
                   <TouchableOpacity
                     onPress={() => setDobPickerVisible(true)}
                     style={[styles.inputContainer, { justifyContent: "flex-start" }]}
                   >
                     <Ionicons name="calendar-outline" size={20} color={COLORS.primary} style={styles.inputIcon} />
                     <Text style={[styles.input, { paddingVertical: 12 }]}>
-                      {values.dob || "Select Date of Birth"}
+                      {values.dob || t("form.dob")}
                     </Text>
                   </TouchableOpacity>
                   {dobPickerVisible && (
@@ -239,12 +239,12 @@ export default function Step1PersonalInfo({
 
                 {/* Telephone */}
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Telephone</Text>
+                  <Text style={styles.label}>{t("form.telephone")}</Text>
                   <View style={styles.inputContainer}>
                     <Ionicons name="call-outline" size={20} color={COLORS.primary} style={styles.inputIcon} />
                     <TextInput
                       style={styles.input}
-                      placeholder="Telephone"
+                      placeholder={t("form.telephone")}
                       keyboardType="phone-pad"
                       value={values.telephone}
                       onChangeText={(text) => {
@@ -258,12 +258,12 @@ export default function Step1PersonalInfo({
 
                 {/* Email */}
                 <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Email</Text>
+                  <Text style={styles.label}>{t("form.email")}</Text>
                   <View style={styles.inputContainer}>
                     <Ionicons name="mail-outline" size={20} color={COLORS.primary} style={styles.inputIcon} />
                     <TextInput
                       style={styles.input}
-                      placeholder="Email"
+                      placeholder={t("form.email")}
                       keyboardType="email-address"
                       autoCapitalize="none"
                       value={values.email}
@@ -283,19 +283,19 @@ export default function Step1PersonalInfo({
                   style={[styles.button, { backgroundColor: COLORS.border, flex: 1 }]}
                   onPress={onPrevious}
                 >
-                  <Text style={[styles.buttonText, { color: COLORS.textPrimary }]}>Back</Text>
+                  <Text style={[styles.buttonText, { color: COLORS.textPrimary }]}>{t("actions.back")}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={[styles.button, { flex: 1 }]} onPress={handleSubmit}>
-                  <Text style={styles.buttonText}>Next</Text>
+                  <Text style={styles.buttonText}>{t("actions.next")}</Text>
                 </TouchableOpacity>
               </View>
 
               {/* Footer */}
               <View style={styles.footer}>
-                <Text style={styles.footerText}>Already have an account back to</Text>
+                <Text style={styles.footerText}>{t("footer.alreadyAccount")}</Text>
                 <TouchableOpacity onPress={() => router.back()}>
-                  <Text style={styles.link}>Login</Text>
+                  <Text style={styles.link}>{t("footer.login")}</Text>
                 </TouchableOpacity>
               </View>
             </>

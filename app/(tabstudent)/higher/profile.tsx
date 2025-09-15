@@ -5,8 +5,11 @@ import { gql, useQuery } from "@apollo/client";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next"; // ✅ Translation hook
 import {
-  ActivityIndicator, Alert, Image,
+  ActivityIndicator,
+  Alert,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,19 +18,20 @@ import {
 } from "react-native";
 
 export default function StudentProfileScreen() {
+  const { t } = useTranslation();
   const { logout, profileId } = useAuthStore();
   const router = useRouter();
 
   const handleLogout = () => {
-  Alert.alert(
-    "Logout",
-    "Are you sure you want to logout?",
-    [
-      { text: "Cancel", style: "cancel" },
-      { text: "Yes", style: "destructive", onPress: () => logout() },
-    ]
-  );
-};
+    Alert.alert(
+      t("profile.logoutTitle"),
+      t("profile.logoutMessage"),
+      [
+        { text: t("profile.cancel"), style: "cancel" },
+        { text: t("profile.yes"), style: "destructive", onPress: () => logout() },
+      ]
+    );
+  };
 
   // Fetch student profile from backend
   const { data, loading, error } = useQuery(GET_PROFILE, {
@@ -39,6 +43,7 @@ export default function StudentProfileScreen() {
     return (
       <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
         <ActivityIndicator size="large" color={COLORS.primary} />
+        <Text>{t("ui.loading")}</Text>
       </View>
     );
   }
@@ -46,7 +51,7 @@ export default function StudentProfileScreen() {
   if (error) {
     return (
       <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
-        <Text style={{ color: "red" }}>Failed to load profile</Text>
+        <Text style={{ color: "red" }}>{t("profile.loadError")}</Text>
       </View>
     );
   }
@@ -56,7 +61,7 @@ export default function StudentProfileScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       {/* Fixed Header */}
-      <AppHeader showBack showTabs  showTitle  />
+      <AppHeader showBack showTabs showTitle />
 
       {/* Scrollable Content */}
       <ScrollView
@@ -70,65 +75,44 @@ export default function StudentProfileScreen() {
             source={{ uri: profile?.customuser?.photo || "https://via.placeholder.com/120" }}
             style={styles.avatar}
           />
-          <Text style={styles.name}>{profile?.customuser?.fullName || "Not Available"}</Text>
-          <Text style={styles.matric}>Matric: {profile?.customuser?.matricle}</Text>
+          <Text style={styles.name}>{profile?.customuser?.fullName || t("ui.noData")}</Text>
+          <Text style={styles.matric}>
+            {t("profile.id")}: {profile?.customuser?.matricle || "N/A"}
+          </Text>
         </View>
 
-        {/* Contact Info */}
+        {/* Personal Info */}
         <View style={styles.infoCard}>
-          <Text style={styles.sectionTitle}>📞 Contact Info</Text>
-          <InfoRow label="Email" value={profile?.customuser?.email} />
-          <InfoRow label="Phone" value={profile?.customuser?.telephone} />
-          <InfoRow label="Date Of Birth" value={profile?.customuser?.DOB} />
-          <InfoRow label="place Of Birth" value={profile?.customuser?.POB} />
+          <Text style={styles.sectionTitle}>ℹ️ {t("profile.personalInfo")}</Text>
+          <InfoRow label={t("profile.email")} value={profile?.customuser?.email} />
+          <InfoRow label={t("profile.phone")} value={profile?.customuser?.telephone} />
+          <InfoRow label={t("profile.dob")} value={profile?.customuser?.dob} />
+          <InfoRow label={t("profile.pob")} value={profile?.customuser?.pob} />
         </View>
 
         {/* Parent Info */}
         <View style={styles.infoCard}>
-          <Text style={styles.sectionTitle}>👨‍👩‍👧 Parent / Guardian Info</Text>
-          <InfoRow label="Father" value={profile?.customuser?.fatherName} />
-          <InfoRow label="Father Tel" value={profile?.customuser?.fatherTelephone} />
-          <InfoRow label="Mother" value={profile?.customuser?.motherName} />
-          <InfoRow label="Mother Tel" value={profile?.customuser?.motherTelephone} />
+          <Text style={styles.sectionTitle}>👨‍👩‍👧 {t("ui.parentInfo")}</Text>
+          <InfoRow label={t("profile.fatherName")} value={profile?.customuser?.fatherName} />
+          <InfoRow label={t("profile.fatherPhone")} value={profile?.customuser?.fatherTelephone} />
+          <InfoRow label={t("profile.motherName")} value={profile?.customuser?.motherName} />
+          <InfoRow label={t("profile.motherPhone")} value={profile?.customuser?.motherTelephone} />
+          <InfoRow label={t("profile.parentAddress")} value={profile?.customuser?.parentAddress} />
         </View>
 
         {/* Academic Info */}
         <View style={styles.infoCard}>
-          <Text style={styles.sectionTitle}>🎓 Academic Info</Text>
-          <InfoRow label="Program" value={profile?.program?.name} />
-          <InfoRow label="Level" value={profile?.specialty?.level?.level} />
-          <InfoRow label="Department" value={profile?.specialty?.mainSpecialty?.specialtyName} />
-          <InfoRow label="Year" value={profile?.specialty?.academicYear} />
-        </View>
-
-        {/* Action Buttons (2-column grid) */}
-        <View style={styles.actionsGrid}>
-          {/* <ActionButton
-            icon="create-outline"
-            label="Edit Profile"
-            onPress={() => router.push("../../pagesHigher/profile/edit")}
-          />
-          <ActionButton
-            icon="clipboard-outline"
-            label="Attendance"
-            onPress={() => router.push("../../pagesHigher/profile/attendance")}
-          />
-          <ActionButton
-            icon="chatbox-ellipses-outline"
-            label="Complaint"
-            onPress={() => router.push("../../pagesHigher/profile/complaint")}
-          /> */}
-          {/* <ActionButton
-            icon="document-text-outline"
-            label="History"
-            onPress={() => router.push("../../pagesHigher/profile/ComplaintHistory")}
-          /> */}
+          <Text style={styles.sectionTitle}>🎓 {t("profile.academicInfo")}</Text>
+          <InfoRow label={t("profile.program")} value={profile?.program?.name} />
+          <InfoRow label={t("profile.level")} value={profile?.specialty?.level?.level} />
+          <InfoRow label={t("profile.department")} value={profile?.specialty?.mainSpecialty?.specialtyName} />
+          <InfoRow label={t("profile.yearObtained")} value={profile?.specialty?.academicYear} />
         </View>
 
         {/* Logout Button */}
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
           <Ionicons name="log-out-outline" size={20} color={COLORS.white} />
-          <Text style={styles.logoutText}>Logout</Text>
+          <Text style={styles.logoutText}>{t("profile.logout")}</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -141,22 +125,6 @@ const InfoRow = ({ label, value }: { label: string; value?: string }) => (
     <Text style={styles.infoLabel}>{label}:</Text>
     <Text style={styles.infoValue}>{value || "N/A"}</Text>
   </View>
-);
-
-/* ✅ Reusable Action Button */
-const ActionButton = ({
-  icon,
-  label,
-  onPress,
-}: {
-  icon: any;
-  label: string;
-  onPress: () => void;
-}) => (
-  <TouchableOpacity style={styles.actionBtn} onPress={onPress}>
-    <Ionicons name={icon} size={22} color={COLORS.primary} />
-    <Text style={styles.actionText}>{label}</Text>
-  </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
@@ -222,31 +190,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: COLORS.textPrimary,
   },
-  actionsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  actionBtn: {
-    width: "48%",
-    backgroundColor: COLORS.cardBackground,
-    paddingVertical: 18,
-    borderRadius: 12,
-    marginBottom: 12,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  actionText: {
-    marginTop: 6,
-    fontSize: 14,
-    fontWeight: "500",
-    color: COLORS.textDark,
-  },
   logoutBtn: {
     flexDirection: "row",
     justifyContent: "center",
@@ -285,6 +228,11 @@ const GET_PROFILE = gql`
             photo
             dob
             pob
+            fatherName
+            fatherTelephone
+            motherName
+            motherTelephone
+            parentAddress
           }
         }
       }

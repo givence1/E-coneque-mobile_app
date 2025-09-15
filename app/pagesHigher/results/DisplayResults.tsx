@@ -4,12 +4,14 @@ import { decodeUrlID } from '@/utils/functions';
 import { EdgeResult, NodePublish, NodeSchoolFees, NodeUserProfile } from '@/utils/schemas/interfaceGraphql';
 import { gql, useLazyQuery, useQuery } from '@apollo/client';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 const DisplayResults = (
     { result_type, results, semester, title }:
         { result_type: "ca" | "exam" | "resit" | "results", results: EdgeResult[] | undefined, semester: "I" | "II" | null, title: string }
 ) => {
+    const { t } = useTranslation();
     const { campusInfo, profileId } = useAuthStore();
     const [statusPlatform, setStatusPlatform] = useState<boolean>(false)
     const [statusFees, setStatusFees] = useState<boolean>(false)
@@ -83,23 +85,22 @@ const DisplayResults = (
     return (
         <View>
             <Text style={styles.title}>{title}</Text>
-            <Text style={styles.title}>Semester - {semester}</Text>
+            <Text style={styles.title}>{t("results.semester")} - {semester}</Text>
 
             <View style={styles.table}>
                 <View style={styles.rowHeader}>
-
-                    <Text style={[styles.cell, { flex: 3 }]}>Course</Text>
+                    <Text style={[styles.cell, { flex: 3 }]}>{t("results.course")}</Text>
                     {result_type === "results" ? (
                         <>
-                            <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>CA</Text>
-                            <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>Exam</Text>
-                            <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>Resit</Text>
-                            <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>Status</Text>
+                            <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>{t("results.ca")}</Text>
+                            <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>{t("results.exam")}</Text>
+                            <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>{t("results.resit")}</Text>
+                            <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>{t("results.status")}</Text>
                         </>
                     ) : (
                         <>
                             <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>{result_type.toUpperCase()}</Text>
-                            <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>Status</Text>
+                            <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>{t("results.status")}</Text>
                         </>
                     )}
                 </View>
@@ -109,25 +110,23 @@ const DisplayResults = (
                         <ActivityIndicator />
                         :
                         !statusPlatform ?
-                            <Text>Account Not Active</Text>
+                            <Text>{t("results.accountNotActive")}</Text>
                             :
                             !statusFees ?
-                                <Text>School Fees</Text>
+                                <Text>{t("results.schoolFees")}</Text>
                                 :
                                 !statusPublish ?
-                                    <Text>Results Not Published</Text>
+                                    <Text>{t("results.resultsNotPublished")}</Text>
                                     :
                                     results?.sort((a: EdgeResult, b: EdgeResult) => a.node.course.mainCourse.courseName > b.node.course.mainCourse.courseName ? 1 : a.node.course.mainCourse.courseName < b.node.course.mainCourse.courseName ? -1 : 0)?.map((item, index) => {
                                         const parsedResults = JSON.parse(item.node.infoData)
                                         const { ca, exam, resit } = parsedResults;
 
                                         if (result_type === "results") {
-                                            // Display all result types in one row
                                             const caPassLimit = (campusInfo?.caLimit || 20) / 2;
                                             const examPassLimit = (campusInfo?.examLimit || 40) / 2;
                                             const resitPassLimit = (campusInfo?.resitLimit || 40) / 2;
 
-                                            // Determine overall status (pass if any of the results is passing)
                                             const overallPassed = ca >= caPassLimit || exam >= examPassLimit || resit >= resitPassLimit;
 
                                             return (
@@ -137,12 +136,11 @@ const DisplayResults = (
                                                     <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>{exam}</Text>
                                                     <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>{resit || "-"}</Text>
                                                     <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>
-                                                        {overallPassed ? "✅" : "❌"}
+                                                        {overallPassed ? t("results.pass") : t("results.fail")}
                                                     </Text>
                                                 </View>
                                             );
                                         } else {
-                                            // Display single result type
                                             const mark = result_type === "ca" ? ca :
                                                 result_type === "exam" ? exam :
                                                     result_type === "resit" ? resit : 0;
@@ -153,11 +151,11 @@ const DisplayResults = (
 
                                             return (
                                                 <View key={index} style={styles.row}>
-                                                    {<Text style={[styles.cell, { flex: 1 }]}>{item.node.course.courseCode}</Text>}
+                                                    <Text style={[styles.cell, { flex: 1 }]}>{item.node.course.courseCode}</Text>
                                                     <Text style={[styles.cell, { flex: 4 }]}>{item.node.course.mainCourse.courseName}</Text>
                                                     <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>{mark}</Text>
                                                     <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>
-                                                        {mark >= passLimit ? "✅" : "❌"}
+                                                        {mark >= passLimit ? t("results.pass") : t("results.fail")}
                                                     </Text>
                                                 </View>
                                             );
@@ -170,11 +168,7 @@ const DisplayResults = (
     );
 }
 
-
-
 export default DisplayResults;
-
-
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: COLORS.background, padding: 16 },
@@ -209,14 +203,9 @@ const styles = StyleSheet.create({
     },
 });
 
-
 const GET_FEES = gql`
-  query GetData (
-    $userprofileId: Decimal!
-  ) {
-    allSchoolFees (
-        userprofileId: $userprofileId
-    ) {
+  query GetData ($userprofileId: Decimal!) {
+    allSchoolFees (userprofileId: $userprofileId) {
         edges {
             node {
                 id platformPaid balance
@@ -226,17 +215,11 @@ const GET_FEES = gql`
             }
         }
     }
-}`
+}`;
 
 const GET_PUBLISH = gql`
-  query GetData (
-    $specialtyId: Decimal!
-    $semester: String!
-  ) {
-    allPublishes (
-        specialtyId: $specialtyId
-        semester: $semester
-    ) {
+  query GetData ($specialtyId: Decimal!, $semester: String!) {
+    allPublishes (specialtyId: $specialtyId, semester: $semester) {
         edges {
             node {
                 id ca exam resit
@@ -244,4 +227,4 @@ const GET_PUBLISH = gql`
             }
         }
     }
-}`
+}`;

@@ -4,6 +4,7 @@ import { useAuthStore } from "@/store/authStore";
 import { EdgeCourse } from "@/utils/schemas/interfaceGraphql";
 import { gql, useQuery } from "@apollo/client";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   ScrollView,
@@ -11,7 +12,6 @@ import {
   Text,
   View,
 } from "react-native";
-
 
 type CourseNode = {
   courseCode: string;
@@ -26,6 +26,7 @@ type CourseNode = {
 
 export default function CoursesScreen() {
   const { profileId } = useAuthStore();
+  const { t } = useTranslation();
 
   // ⚠️ Replace this with actual specialtyId from profile
   const specialtyId = 1;
@@ -46,50 +47,77 @@ export default function CoursesScreen() {
   if (error) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={{ color: "red" }}>Failed to load courses</Text>
+        <Text style={{ color: "red" }}>{t("courses.loadError")}</Text>
       </View>
     );
   }
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-     <AppHeader showBack showTabs  showTitle  />
+      <AppHeader showBack showTabs showTitle />
 
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { paddingTop: 50 }, { paddingBottom: 2 }]}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: 50 },
+          { paddingBottom: 2 },
+        ]}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>My Courses</Text>
+        <Text style={styles.title}>{t("courses.myCourses")}</Text>
 
-          <View key={data?.allCourses?.edges[0].node?.specialty?.academicYear} style={styles.yearGroup}>
-            <Text style={styles.yearTitle}>Academic Year {data?.allCourses?.edges[0].node?.specialty?.academicYear}</Text>
-            
-            {/* Semester I */}
-              <View style={styles.semesterGroup}>
-                <Text style={styles.semesterTitle}>Semester I</Text>
-                {renderTable(data?.allCourses?.edges.filter((c: EdgeCourse) => c.node.semester === "I"), "I")}
-              </View>
+        <View
+          key={data?.allCourses?.edges[0].node?.specialty?.academicYear}
+          style={styles.yearGroup}
+        >
+          <Text style={styles.yearTitle}>
+            {t("courses.academicYear", {
+              year: data?.allCourses?.edges[0].node?.specialty?.academicYear,
+            })}
+          </Text>
 
-            {/* Semester II */}
-              <View style={styles.semesterGroup}>
-                <Text style={styles.semesterTitle}>Semester II</Text>
-                {renderTable(data?.allCourses?.edges.filter((c: EdgeCourse) => c.node.semester === "II"), "II")}
-              </View>
+          {/* Semester I */}
+          <View style={styles.semesterGroup}>
+            <Text style={styles.semesterTitle}>{t("courses.semesterI")}</Text>
+            {renderTable(
+              data?.allCourses?.edges.filter(
+                (c: EdgeCourse) => c.node.semester === "I"
+              ),
+              "I",
+              t
+            )}
           </View>
+
+          {/* Semester II */}
+          <View style={styles.semesterGroup}>
+            <Text style={styles.semesterTitle}>{t("courses.semesterII")}</Text>
+            {renderTable(
+              data?.allCourses?.edges.filter(
+                (c: EdgeCourse) => c.node.semester === "II"
+              ),
+              "II",
+              t
+            )}
+          </View>
+        </View>
       </ScrollView>
     </View>
   );
 }
 
-function renderTable(courses: EdgeCourse[], semester: string) {
+function renderTable(courses: EdgeCourse[], semester: string, t: any) {
   return (
     <View style={styles.table}>
       <View style={styles.headerRow}>
-        <Text style={[styles.cell, styles.headerCell, { flex: 1 }]}>#</Text>
-        <Text style={[styles.cell, styles.headerCell, { flex: 6 }]}>
-          Course Name
+        <Text style={[styles.cell, styles.headerCell, { flex: 1 }]}>
+          {t("courses.table.number")}
         </Text>
-        <Text style={[styles.cell, styles.headerCell, { flex: 1 }]}>Sem</Text>
+        <Text style={[styles.cell, styles.headerCell, { flex: 6 }]}>
+          {t("courses.table.name")}
+        </Text>
+        <Text style={[styles.cell, styles.headerCell, { flex: 1 }]}>
+          {t("courses.table.sem")}
+        </Text>
       </View>
 
       {courses.map((course, index) => (
@@ -101,25 +129,24 @@ function renderTable(courses: EdgeCourse[], semester: string) {
           ]}
         >
           <Text style={[styles.cell, { flex: 1 }]}>{index + 1}</Text>
-          <Text style={[styles.cell, { flex: 6 }]}>{course.node.mainCourse?.courseName}</Text>
-          <Text style={[styles.cell, { flex: 1 }]}>{course?.node?.semester}</Text>
+          <Text style={[styles.cell, { flex: 6 }]}>
+            {course.node.mainCourse?.courseName}
+          </Text>
+          <Text style={[styles.cell, { flex: 1 }]}>
+            {course?.node?.semester}
+          </Text>
         </View>
       ))}
     </View>
   );
 }
 
-
 const GET_COURSES = gql`
-  query GetStudentCourses(
-    $specialtyId: Decimal!
-  ) {
-    allCourses(
-    specialtyId: $specialtyId
-  ) {
+  query GetStudentCourses($specialtyId: Decimal!) {
+    allCourses(specialtyId: $specialtyId) {
       edges {
         node {
-        id
+          id
           courseCode
           semester
           specialty {
@@ -139,7 +166,7 @@ const styles = StyleSheet.create({
     paddingTop: 80,
     paddingHorizontal: 16,
     paddingBottom: 40,
-    marginTop: 10
+    marginTop: 10,
   },
   loadingContainer: {
     flex: 1,

@@ -6,18 +6,19 @@ import { gql, useQuery } from "@apollo/client";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next"; // ✅ Import translations hook
 import {
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
-
 
 const StudentHome = () => {
   const router = useRouter();
   const { feesId } = useAuthStore();
+  const { t } = useTranslation(); // ✅ get translation function
 
   const { data: dataFees, loading, error } = useQuery(GET_FEES, {
     variables: { id: feesId },
@@ -26,7 +27,7 @@ const StudentHome = () => {
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
       {/* Fixed Header */}
-      <AppHeader  showTabs  showTitle  />
+      <AppHeader showTabs showTitle />
 
       {/* Scrollable Content */}
       <ScrollView
@@ -49,44 +50,74 @@ const StudentHome = () => {
         <View style={localStyles.gridContainer}>
           {[
             {
-              label: "CA",
+              label: t("studentHome.ca"),
               route: "/pagesHigher/results/ca",
-              icon: <Feather name="file-text" size={24} color={COLORS.primary} />,
+              icon: (
+                <Feather name="file-text" size={24} color={COLORS.primary} />
+              ),
             },
             {
-              label: "Exam",
+              label: t("studentHome.exam"),
               route: "/pagesHigher/results/exam",
-              icon: <MaterialIcons name="edit" size={24} color={COLORS.primary} />,
+              icon: (
+                <MaterialIcons name="edit" size={24} color={COLORS.primary} />
+              ),
             },
             {
-              label: "Resit",
+              label: t("studentHome.resit"),
               route: "/pagesHigher/results/resit",
               icon: <Feather name="list" size={24} color={COLORS.primary} />,
             },
             {
-              label: "Results",
+              label: t("studentHome.results"),
               route: "/pagesHigher/results/results",
-              icon: <MaterialIcons name="school" size={24} color={COLORS.primary} />,
+              icon: (
+                <MaterialIcons name="school" size={24} color={COLORS.primary} />
+              ),
             },
             {
-              label: "Fees",
+              label: t("studentHome.fees"),
               route: "/pagesHigher/fee/fee",
-              icon: <Feather name="credit-card" size={24} color={COLORS.primary} />,
+              icon: (
+                <Feather
+                  name="credit-card"
+                  size={24}
+                  color={COLORS.primary}
+                />
+              ),
             },
             {
-              label: "Transcript",
+              label: t("studentHome.transcript"),
               route: "/pagesHigher/results/transcript",
-              icon: <MaterialIcons name="description" size={24} color={COLORS.primary} />,
+              icon: (
+                <MaterialIcons
+                  name="description"
+                  size={24}
+                  color={COLORS.primary}
+                />
+              ),
             },
             {
-              label: "Complaints",
+              label: t("studentHome.complaints"),
               route: "/pagesHigher/profile/complaint",
-              icon: <Ionicons name="alert-circle-outline" size={24} color={COLORS.primary} />,
+              icon: (
+                <Ionicons
+                  name="alert-circle-outline"
+                  size={24}
+                  color={COLORS.primary}
+                />
+              ),
             },
             {
-              label: "More",
+              label: t("studentHome.more"),
               route: "/pagesHigher/results/more",
-              icon: <Ionicons name="ellipsis-horizontal" size={24} color={COLORS.primary} />,
+              icon: (
+                <Ionicons
+                  name="ellipsis-horizontal"
+                  size={24}
+                  color={COLORS.primary}
+                />
+              ),
             },
           ].map((item, index) => (
             <TouchableOpacity
@@ -104,9 +135,7 @@ const StudentHome = () => {
   );
 };
 
-
 export default StudentHome;
-
 
 // Local Styles
 const localStyles = StyleSheet.create({
@@ -137,25 +166,31 @@ const localStyles = StyleSheet.create({
   },
 });
 
-
 const GET_FEES = gql`
-  query GetData (
-    $id: ID!
-  ) {
-    allSchoolFees (
-      id: $id
-    ) {
+  query GetData($id: ID!) {
+    allSchoolFees(id: $id) {
       edges {
         node {
-          id platformPaid
+          id
+          platformPaid
           userprofile {
             id
-            program { name }
-            customuser { id matricle fullName }
-            specialty { 
+            program {
+              name
+            }
+            customuser {
+              id
+              matricle
+              fullName
+            }
+            specialty {
               academicYear
-              level { level }
-              mainSpecialty { specialtyName }
+              level {
+                level
+              }
+              mainSpecialty {
+                specialtyName
+              }
             }
           }
         }

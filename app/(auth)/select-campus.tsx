@@ -6,6 +6,7 @@ import { EdgeSchoolHigherInfo, NodeCustomUser } from "@/utils/schemas/interfaceG
 import { gql, useQuery } from "@apollo/client";
 import { useRouter } from "expo-router";
 import React, { JSX } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   FlatList,
@@ -17,19 +18,20 @@ import {
   ViewStyle,
 } from "react-native";
 
-
 export default function SelectCampusScreen(): JSX.Element {
   const router = useRouter();
   const { user, token } = useAuthStore();
+  const { t } = useTranslation();
 
-  const { data: dataSchools, loading, error } = useQuery(GET_DATA, {
-    variables: { userId: user?.user_id }
-  }
-  );
+  const { data: dataSchools, loading } = useQuery(GET_DATA, {
+    variables: { userId: user?.user_id },
+  });
 
   const customuser = dataSchools?.allCustomusers?.edges[0]?.node;
-  const mySchools = dataSchools?.allSchoolInfos?.edges?.filter((sch: EdgeSchoolHigherInfo) => user?.school?.includes(parseInt(decodeUrlID(sch.node.id) || "")));
-  const schoolTypes = mySchools?.map((sch: EdgeSchoolHigherInfo) => sch?.node?.schoolType?.slice(-1));
+  const mySchools = dataSchools?.allSchoolInfos?.edges?.filter(
+    (sch: EdgeSchoolHigherInfo) =>
+      user?.school?.includes(parseInt(decodeUrlID(sch.node.id) || ""))
+  );
 
   const handleSelect = (item: EdgeSchoolHigherInfo): void => {
     router.replace({
@@ -38,15 +40,13 @@ export default function SelectCampusScreen(): JSX.Element {
     });
   };
 
-  const updateRegistrationLecturer = async (
-    { customuser }:
-      { customuser: NodeCustomUser | any }
-  ) => {
-
+  const updateRegistrationLecturer = async ({
+    customuser,
+  }: {
+    customuser: NodeCustomUser | any;
+  }) => {
     if (customuser && customuser?.role === "teacher") {
-      console.log(customuser);
       const { id, ...restCustomUser } = customuser || {};
-      console.log(customuser?.language || "en");
 
       const newData: any = {
         ...restCustomUser,
@@ -77,18 +77,7 @@ export default function SelectCampusScreen(): JSX.Element {
         delete: false,
       };
 
-      console.log(newData);
       try {
-        // const response = await mutationCreateUpdatePreInscriptionLecturer({
-        //   section: "H",
-        //   formData: newData,
-        //   p: null,
-        //   router: null,
-        //   routeToLink: "",
-        //   customuser,
-        // })
-
-
         const resId = await ApiFactory({
           newData: { ...removeEmptyFields(newData) },
           editData: { ...removeEmptyFields(newData) },
@@ -104,14 +93,10 @@ export default function SelectCampusScreen(): JSX.Element {
           redirectPath: ``,
           actionLabel: "creating",
           token,
-          // getFileMap: getFileMap || (() => ({}))
         });
-        console.log(resId);
-        // return;
-        if (resId && resId?.length > 5) {
-          const pId = parseInt(decodeUrlID(resId) || "")
-          console.log(pId);
 
+        if (resId && resId?.length > 5) {
+          const pId = parseInt(decodeUrlID(resId) || "");
           if (pId > 0) {
             const userData = {
               id: decodeUrlID(customuser?.id || ""),
@@ -119,7 +104,7 @@ export default function SelectCampusScreen(): JSX.Element {
               infoData: customuser?.infoData,
               language: customuser?.language || JSON.stringify(["en"]),
               delete: false,
-            }
+            };
             try {
               const userSuccessFieldData = await ApiFactory({
                 newData: removeEmptyFields(userData),
@@ -135,7 +120,7 @@ export default function SelectCampusScreen(): JSX.Element {
                 returnResponseField: true,
                 redirectPath: ``,
                 actionLabel: "creating",
-                token
+                token,
               });
 
               if (userSuccessFieldData.length > 5) {
@@ -145,90 +130,146 @@ export default function SelectCampusScreen(): JSX.Element {
               console.log(error);
             }
           }
-
         }
       } catch (error) {
         console.log(error);
       }
-
     }
 
     return true;
-  }
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Select Campus</Text>
+      <Text style={styles.header}>{t("campus.selectCampus")}</Text>
 
-      {loading ?
+      {loading ? (
         <ActivityIndicator />
-        :
-        !user?.registration_lec_id ?
-
-          <View>
-            <Text>Incomplete Lecturer Info</Text>
-            <Text>Click Below To Update Profile</Text>
-            <TouchableOpacity onPress={() => updateRegistrationLecturer({ customuser })} style={styles.button}>
-              <Text style={styles.buttonText}>Update</Text>
+      ) : !user?.registration_lec_id ? (
+        <View>
+          <Text>{t("campus.incompleteLecturerInfo")}</Text>
+          <Text>{t("campus.updateProfilePrompt")}</Text>
+          <TouchableOpacity
+            onPress={() => updateRegistrationLecturer({ customuser })}
+            style={styles.button}
+          >
+            <Text style={styles.buttonText}>{t("ui.update")}</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <FlatList
+          data={mySchools}
+          keyExtractor={(item) => item.node.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() => handleSelect(item)}
+            >
+              <Text style={styles.title}>{item.node.schoolName}</Text>
+              <Text style={styles.text}>
+                {item.node.town} - {item.node.address}
+              </Text>
+              <Text style={styles.text}>
+                {item.node.campus.replace("_", "-")}
+              </Text>
             </TouchableOpacity>
-          </View>
-          :
-
-          <FlatList
-            data={mySchools}
-            keyExtractor={(item) => item.node.id}
-            renderItem={({ item }) => (
-              <TouchableOpacity style={styles.card} onPress={() => handleSelect(item)}>
-                <Text style={styles.title} >
-                  {item.node.schoolName}
-                </Text>
-                <Text style={styles.text}>
-                  {item.node.town} - {item.node.address}
-                </Text>
-                <Text style={styles.text}>
-                  {item.node.campus.replace("_", "-")}
-                </Text>
-              </TouchableOpacity>
-            )}
-            contentContainerStyle={{ paddingVertical: 20 }}
-          />
-      }
-
+          )}
+          contentContainerStyle={{ paddingVertical: 20 }}
+        />
+      )}
     </View>
   );
 }
 
-
-
 const GET_DATA = gql`
-  query GetData (
-    $userId: ID!
-  ) {
+  query GetData($userId: ID!) {
     allSchoolInfos {
       edges {
         node {
-          id schoolName address town telephone
-          schoolType campus
+          id
+          schoolName
+          address
+          town
+          telephone
+          schoolType
+          campus
         }
       }
     }
-    allCustomusers (
-      id: $userId
-    ) {
+    allCustomusers(id: $userId) {
       edges {
         node {
-          id matricle role
-          fullName firstName lastName sex dob pob address telephone email 
-          nationality regionOfOrigin highestCertificate yearObtained
-          fatherName fatherTelephone parentAddress infoData
+          id
+          matricle
+          role
+          fullName
+          firstName
+          lastName
+          sex
+          dob
+          pob
+          address
+          telephone
+          email
+          nationality
+          regionOfOrigin
+          highestCertificate
+          yearObtained
+          fatherName
+          fatherTelephone
+          parentAddress
+          infoData
         }
       }
     }
   }
 `;
 
+// Add the missing query for customuser
+const queryCustomUser = gql`
+  query CustomUser($id: ID!) {
+    customuser(id: $id) {
+      id
+      preinscriptionLecturerId
+      infoData
+      language
+      delete
+    }
+  }
+`;
 
+// Add the missing query for preinscription lecturer
+const queryPreInscriptionLecturer = gql`
+  query PreInscriptionLecturer($id: ID!) {
+    preinscriptionlecturer(id: $id) {
+      id
+      registrationNumber
+      firstName
+      lastName
+      sex
+      email
+      telephone
+      address
+      pob
+      dob
+      nationality
+      regionOfOrigin
+      highestCertificate
+      yearObtained
+      fatherName
+      motherName
+      parentAddress
+      action
+      campusId
+      status
+      admissionStatus
+      infoData
+      delete
+    }
+  }
+`;
 
+// Styles unchanged…
 const styles = StyleSheet.create<{
   container: ViewStyle;
   header: TextStyle;
@@ -292,86 +333,3 @@ const styles = StyleSheet.create<{
     paddingHorizontal: 16,
   },
 });
-
-
-
-const queryPreInscriptionLecturer = gql`
-  mutation Create(
-    $id: ID
-    $registrationNumber: String
-    $language: String!
-    $firstName: String!
-    $lastName: String!
-    $sex: String!
-    $email: String!
-    $telephone: String!
-    $address: String!
-    $pob: String!
-    $dob: String!
-
-    $nationality: String!
-    $regionOfOrigin: String!
-    $highestCertificate: String!
-    $yearObtained: String!
-    $fatherName: String
-    $fatherTelephone: String
-    $parentAddress: String
-    $action: String!
-    $status: String!
-    $admissionStatus: Boolean!
-    $infoData: JSONString!
-    $delete: Boolean!
-  ) {
-    createUpdateDeletePreinscriptionLecturer(
-      id: $id
-      registrationNumber: $registrationNumber
-      language: $language
-      firstName: $firstName
-      lastName: $lastName
-      sex: $sex
-      address: $address
-      email: $email
-      telephone: $telephone
-      pob: $pob
-      dob: $dob
-
-      nationality: $nationality
-      regionOfOrigin: $regionOfOrigin
-      highestCertificate: $highestCertificate
-      yearObtained: $yearObtained
-      fatherName: $fatherName
-      fatherTelephone: $fatherTelephone
-      parentAddress: $parentAddress
-      action: $action
-      status: $status
-      admissionStatus: $admissionStatus
-      infoData: $infoData
-      delete: $delete
-    ) {
-      preinscriptionlecturer {
-        id firstName fullName
-      }
-    }
-  }
-`;
-
-
-const queryCustomUser = gql`
-  mutation Create(
-    $id: ID
-    $preinscriptionLecturerId: ID
-    $infoData: JSONString!
-    $delete: Boolean!
-  ) {
-    createUpdateDeleteCustomuser(
-      id: $id
-      preinscriptionLecturerId: $preinscriptionLecturerId
-      infoData: $infoData
-      delete: $delete
-    ) {
-      customuser {
-        id
-      }
-    }
-  }
-`;

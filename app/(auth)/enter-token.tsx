@@ -3,6 +3,7 @@ import { protocol, RootApi, tenant } from "@/utils/config";
 import { actionSubmit } from "@/utils/functions";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Linking,
@@ -17,6 +18,7 @@ import COLORS from "../../constants/colors";
 export default function EnterTokenScreen() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { t } = useTranslation();
   const { schoolIdentification } = useAuthStore();
 
   const [token, setToken] = useState("");
@@ -25,7 +27,7 @@ export default function EnterTokenScreen() {
 
   const handleSupport = () => {
     const phoneNumber = "237673351854";
-    const message = "Hello, I need help resetting my password.";
+    const message = t("support.resetMessage"); // 🔑 translatable
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
       message
     )}`;
@@ -42,18 +44,15 @@ export default function EnterTokenScreen() {
 
   const handleSubmit = async () => {
     if (!token || !newPassword || !confirmPassword) {
-      Alert.alert("Error", "All fields are required.");
+      Alert.alert(t("messages.error"), t("messages.allFieldsRequired"));
       return;
     }
     if (newPassword !== confirmPassword) {
-      Alert.alert("Error", "Passwords do not match.");
+      Alert.alert(t("messages.error"), t("messages.passwordMismatch"));
       return;
     }
     if (!validatePassword(newPassword)) {
-      Alert.alert(
-        "Invalid Password",
-        "Password must contain at least 1 uppercase letter, 1 number, and be at least 8 characters long."
-      );
+      Alert.alert(t("messages.invalidPassword"), t("messages.passwordRules"));
       return;
     }
 
@@ -63,11 +62,11 @@ export default function EnterTokenScreen() {
     const res = await actionSubmit({ token, password: newPassword }, url);
 
     if (res?.status?.toString() === "OK") {
-      Alert.alert("Success", "Password reset successfully!", [
+      Alert.alert(t("messages.success"), t("messages.passwordResetSuccess"), [
         { text: "OK", onPress: () => router.push("/(auth)") },
       ]);
     } else {
-      Alert.alert("Error", "Failed to reset password. Please try again.");
+      Alert.alert(t("messages.error"), t("messages.passwordResetFailed"));
     }
     setLoading(false);
   };
@@ -76,16 +75,16 @@ export default function EnterTokenScreen() {
     <View style={styles.container}>
       <View style={styles.card}>
         <Text style={styles.schoolName}>
-          {schoolIdentification?.name || "My School"}
+          {schoolIdentification?.name || t("ui.mySchool")}
         </Text>
 
-        <Text style={styles.title}>Enter Reset Token</Text>
-        <Text style={styles.subtitle}>Check your email for the reset token</Text>
+        <Text style={styles.title}>{t("login.enterToken")}</Text>
+        <Text style={styles.subtitle}>{t("login.checkEmailToken")}</Text>
 
         {/* Token Input */}
         <TextInput
           style={styles.input}
-          placeholder="Enter token"
+          placeholder={t("login.enterToken")}
           placeholderTextColor={COLORS.placeholderText}
           value={token}
           onChangeText={setToken}
@@ -94,7 +93,7 @@ export default function EnterTokenScreen() {
         {/* Password Inputs */}
         <TextInput
           style={styles.input}
-          placeholder="New Password"
+          placeholder={t("login.newPassword")}
           placeholderTextColor={COLORS.placeholderText}
           secureTextEntry
           value={newPassword}
@@ -102,7 +101,7 @@ export default function EnterTokenScreen() {
         />
         <TextInput
           style={styles.input}
-          placeholder="Confirm Password"
+          placeholder={t("login.confirmPassword")}
           placeholderTextColor={COLORS.placeholderText}
           secureTextEntry
           value={confirmPassword}
@@ -110,14 +109,9 @@ export default function EnterTokenScreen() {
         />
 
         {/* ✅ Password rules */}
-        <Text style={styles.passwordHint}>
-          Password must contain:
-          {"\n"}• At least 1 uppercase letter
-          {"\n"}• At least 1 number
-          {"\n"}• Minimum 8 characters
-        </Text>
+        <Text style={styles.passwordHint}>{t("messages.passwordHint")}</Text>
 
-        {/* Submit Button - Always visible */}
+        {/* Submit Button */}
         <TouchableOpacity
           style={[
             styles.button,
@@ -127,14 +121,14 @@ export default function EnterTokenScreen() {
           disabled={loading || !validatePassword(newPassword)}
         >
           <Text style={styles.buttonText}>
-            {loading ? "Submitting..." : "Submit"}
+            {loading ? t("ui.submitting") : t("ui.submit")}
           </Text>
         </TouchableOpacity>
 
         <View style={styles.divider} />
 
         <TouchableOpacity onPress={handleSupport}>
-          <Text style={styles.link}>Contact Support</Text>
+          <Text style={styles.link}>{t("ui.contactSupport")}</Text>
         </TouchableOpacity>
         <Text style={styles.footerText}>@2025</Text>
       </View>

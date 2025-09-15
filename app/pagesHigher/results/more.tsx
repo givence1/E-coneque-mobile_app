@@ -3,14 +3,16 @@ import COLORS from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function TranscriptScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   return (
     <View style={styles.container}>
-      <AppHeader showBack showTitle  />
+      <AppHeader showBack showTitle />
 
       <ScrollView
         contentContainerStyle={{
@@ -23,7 +25,7 @@ export default function TranscriptScreen() {
         <View style={styles.gridContainer}>
           {[
             {
-              label: "History",
+              label: t("transcript.history"),
               route: "/pagesHigher/profile/ComplaintHistory",
               icon: (
                 <Ionicons
@@ -34,7 +36,7 @@ export default function TranscriptScreen() {
               ),
             },
             // {
-            //   label: "Request",
+            //   label: t("transcriptScreen.request"),
             //   route: "/pagesHigher/transcript/request",
             //   icon: (
             //     <Ionicons

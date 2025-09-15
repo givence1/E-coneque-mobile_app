@@ -4,6 +4,7 @@ import { protocol, RootApi, tenant } from "@/utils/config";
 import { actionSubmit } from "@/utils/functions";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Linking,
@@ -17,12 +18,13 @@ import {
 export default function CheckUserScreen() {
   const router = useRouter();
   const { schoolIdentification } = useAuthStore();
+  const { t } = useTranslation();
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     if (!username.trim()) {
-      Alert.alert("Error", "Please enter your matricule or username");
+      Alert.alert(t("ui.error"), t("ui.enterUsername"));
       return;
     }
 
@@ -35,15 +37,17 @@ export default function CheckUserScreen() {
 
       if (res?.exists) {
         // ✅ User found → go to create password page
-        Alert.alert("Success", "User found! Please create your new password.", [
-          { text: "OK", onPress: () => router.push("/(auth)/create-password") },
-        ]);
+        Alert.alert(
+          t("ui.success"),
+          t("ui.userFound"),
+          [{ text: "OK", onPress: () => router.push("/(auth)/enter-token") }]
+        );
       } else {
         // ❌ User not found → show error
-        Alert.alert("Error", "User does not exist. Please check your input.");
+        Alert.alert(t("ui.error"), t("ui.userNotExist"));
       }
     } catch (err) {
-      Alert.alert("Error", "Something went wrong. Please try again.");
+      Alert.alert(t("ui.error"), t("ui.somethingWrong"));
     } finally {
       setLoading(false);
     }
@@ -51,10 +55,8 @@ export default function CheckUserScreen() {
 
   const handleSupport = () => {
     const phoneNumber = "237673351854";
-    const message = "Hello, I need help checking my account.";
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-      message
-    )}`;
+    const message = t("ui.supportMessage");
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     Linking.openURL(url);
   };
 
@@ -63,19 +65,19 @@ export default function CheckUserScreen() {
       <View style={styles.card}>
         {/* School Name */}
         <Text style={styles.schoolName}>
-          {schoolIdentification?.name || "My School"}
+          {schoolIdentification?.name || t("ui.mySchool")}
         </Text>
 
         {/* Title */}
-        <Text style={styles.title}>Check User</Text>
+        <Text style={styles.title}>{t("ui.checkUser")}</Text>
 
         {/* Label */}
-        <Text style={styles.label}>Matricule or Username</Text>
+        <Text style={styles.label}>{t("ui.matriculeOrUsername")}</Text>
 
         {/* Input */}
         <TextInput
           style={styles.input}
-          placeholder="Enter matricule or username"
+          placeholder={t("ui.enterUsernamePlaceholder")}
           placeholderTextColor={COLORS.placeholderText}
           value={username}
           onChangeText={setUsername}
@@ -83,7 +85,7 @@ export default function CheckUserScreen() {
 
         {/* Back to Login */}
         <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.link}>Back to Login</Text>
+          <Text style={styles.link}>{t("ui.backToLogin")}</Text>
         </TouchableOpacity>
 
         {/* Submit Button */}
@@ -93,7 +95,7 @@ export default function CheckUserScreen() {
           disabled={loading}
         >
           <Text style={styles.buttonText}>
-            {loading ? "Checking..." : "Check Now"}
+            {loading ? t("ui.checking") : t("ui.checkNow")}
           </Text>
         </TouchableOpacity>
 
@@ -102,7 +104,7 @@ export default function CheckUserScreen() {
 
         {/* Footer */}
         <TouchableOpacity onPress={handleSupport}>
-          <Text style={styles.link}>Contact Support</Text>
+          <Text style={styles.link}>{t("ui.contactSupport")}</Text>
         </TouchableOpacity>
         <Text style={styles.footerText}>@2025</Text>
       </View>

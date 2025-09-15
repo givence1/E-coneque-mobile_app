@@ -15,7 +15,6 @@ const AnnouncementsScreen = () => {
         contentContainerStyle={{ padding: 16, paddingBottom: 2 }}
         showsVerticalScrollIndicator={false}
       >
-         <Text style={styles.title}>My Courses</Text>
         {/* Announcements */}
         <View style={styles.card}>
           <View style={styles.cardHeader}>

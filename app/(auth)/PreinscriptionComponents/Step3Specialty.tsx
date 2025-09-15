@@ -3,6 +3,7 @@ import COLORS from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { Formik } from "formik";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -36,15 +37,6 @@ type Step3Props = {
   section: "H" | "S" | "P";
 };
 
-const validationSchema = Yup.object().shape({
-  specialtyone: Yup.string().required("First Specialty is required"),
-  specialtytwo: Yup.string().required("Second Specialty is required"),
-  academicYear: Yup.string().required("Academic Year is required"),
-  program: Yup.string().required("Program is required"),
-  level: Yup.string().required("Level is required"),
-  session: Yup.string().required("Session is required"),
-});
-
 export default function Step3Specialty({
   data,
   updateField,
@@ -62,6 +54,8 @@ export default function Step3Specialty({
   apiProgramsPrim,
   section,
 }: Step3Props) {
+  const { t } = useTranslation();
+
   // Pick correct API lists based on section
   const levelOptions =
     section === "H" ? apiLevels : section === "S" ? apiLevelsSec : apiLevelsPrim;
@@ -72,44 +66,53 @@ export default function Step3Specialty({
   const programOptions =
     section === "H" ? apiPrograms : section === "S" ? apiProgramsSec : apiProgramsPrim;
 
+  const sessionOptions = ["morning", "evening"];
+
+  // Use keys matching Step4Confirmation
   const optionsMap: Record<string, string[]> = {
-    specialtyoneName: apiMainSpecialties,
-    specialtytwo: apiMainSpecialties,
+    specialtyoneId: apiMainSpecialties,
+    specialtytwoId: apiMainSpecialties,
     academicYear: yearOptions,
-    program: programOptions,
+    programId: programOptions,
     level: levelOptions,
-    session: ["Morning", "Evening"],
+    session: sessionOptions,
   };
+
+  const validationSchema = Yup.object().shape({
+    specialtyoneId: Yup.string().required(
+      t("validation.required", { field: t("form.specialtyone") })
+    ),
+    specialtytwoId: Yup.string().required(
+      t("validation.required", { field: t("form.specialtytwo") })
+    ),
+    academicYear: Yup.string().required(
+      t("validation.required", { field: t("form.academicYear") })
+    ),
+    programId: Yup.string().required(
+      t("validation.required", { field: t("form.program") })
+    ),
+    level: Yup.string().required(
+      t("validation.required", { field: t("form.level") })
+    ),
+    session: Yup.string().required(
+      t("validation.required", { field: t("form.session") })
+    ),
+  });
 
   const [popupField, setPopupField] = useState<string | null>(null);
 
-  const renderPopup = (field: string) => (
-    <Modal transparent animationType="fade" visible={!!popupField}>
-      <View style={local.popupOverlay}>
-        <View style={local.popupContainer}>
-          <Text style={local.popupTitle}>Select {field}</Text>
-          <FlatList
-            data={optionsMap[field]}
-            keyExtractor={(item) => item}
-            renderItem={({ item }) => (
-              <Pressable
-                style={local.popupItem}
-                onPress={() => {
-                  updateField(field, item);
-                  setPopupField(null);
-                }}
-              >
-                <Text style={local.popupItemText}>{item}</Text>
-              </Pressable>
-            )}
-          />
-          <Pressable onPress={() => setPopupField(null)} style={local.popupCancel}>
-            <Text style={local.popupCancelText}>Cancel</Text>
-          </Pressable>
-        </View>
-      </View>
-    </Modal>
-  );
+  const getFieldLabel = (field: string) => {
+    switch (field) {
+      case "specialtyoneId":
+        return t("form.specialtyone");
+      case "specialtytwoId":
+        return t("form.specialtytwo");
+      case "programId":
+        return t("form.program");
+      default:
+        return t(`form.${field}`);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -122,77 +125,110 @@ export default function Step3Specialty({
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
+        {/* Step indicator (3rd step) */}
         <StepIndicator idx={2} />
 
-      <Formik
-  initialValues={data}
-  validationSchema={validationSchema}
-  onSubmit={onNext}
->
-  {({ errors, touched, handleSubmit }) => (
-    <View style={styles.card}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Specialty Details</Text>
-      </View>
-
-      <View style={styles.formContainer}>
-        {Object.keys(optionsMap).map((field) => (
-          <View key={field} style={styles.inputGroup}>
-            <Text style={styles.label}>
-              {field.replace(/([A-Z])/g, " $1")}
-            </Text>
-            <TouchableOpacity
-              onPress={() => setPopupField(field)}
-              style={[styles.inputContainer, { justifyContent: "flex-start" }]}
-            >
-              <Ionicons
-                name="chevron-down-outline"
-                size={20}
-                color={COLORS.primary}
-                style={styles.inputIcon}
-              />
-              <Text style={[styles.input, { paddingVertical: 12 }]}>
-                {data[field] || `Select ${field}`}
-              </Text>
-            </TouchableOpacity>
-            {errors[field] && touched[field] && (
-              <Text style={{ color: "red", fontSize: 12 }}>{errors[field]}</Text>
-            )}
-          </View>
-        ))}
-
-        {popupField && renderPopup(popupField)}
-      </View>
-
-      {/* Navigation Buttons */}
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          gap: 12,
-          marginTop: 24,
-        }}
-      >
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: COLORS.border, flex: 1 }]}
-          onPress={onPrevious}
+        <Formik
+          initialValues={data}
+          enableReinitialize
+          validationSchema={validationSchema}
+          onSubmit={(values) => {
+            Object.keys(values).forEach((k) => updateField(k, values[k]));
+            onNext();
+          }}
         >
-          <Text style={[styles.buttonText, { color: COLORS.textPrimary }]}>
-            Back
-          </Text>
-        </TouchableOpacity>
+          {({ values, errors, touched, setFieldValue, handleSubmit }) => (
+            <View style={styles.card}>
+              <View style={styles.formContainer}>
+                {Object.keys(optionsMap).map((field) => (
+                  <View key={field} style={styles.inputGroup}>
+                    <Text style={styles.label}>{getFieldLabel(field)}</Text>
+                    <TouchableOpacity
+                      onPress={() => setPopupField(field)}
+                      style={[styles.inputContainer, { justifyContent: "flex-start" }]}
+                    >
+                      <Ionicons
+                        name="chevron-down-outline"
+                        size={20}
+                        color={COLORS.primary}
+                        style={styles.inputIcon}
+                      />
+                      <Text style={[styles.input, { paddingVertical: 12 }]}>
+                        {values[field]
+                          ? field === "session"
+                            ? t(`session.${values[field]}`)
+                            : values[field]
+                          : t("form.selectField", { field: getFieldLabel(field) })}
+                      </Text>
+                    </TouchableOpacity>
+                    {errors[field] && touched[field] && (
+                      <Text style={{ color: "red", fontSize: 12 }}>{errors[field]}</Text>
+                    )}
 
-        {/* ✅ Use handleSubmit instead of onNext */}
-        <TouchableOpacity
-          style={[styles.button, { flex: 1 }]}
-          onPress={handleSubmit}
-        >
-          <Text style={styles.buttonText}>Next</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  )}
-</Formik>
+                    {/* Popup modal */}
+                    {popupField === field && (
+                      <Modal transparent animationType="fade" visible={true}>
+                        <View style={local.popupOverlay}>
+                          <View style={local.popupContainer}>
+                            <Text style={local.popupTitle}>
+                              {t("form.selectField", { field: getFieldLabel(field) })}
+                            </Text>
+                            <FlatList
+                              data={optionsMap[field]}
+                              keyExtractor={(item) => item}
+                              renderItem={({ item }) => (
+                                <Pressable
+                                  style={local.popupItem}
+                                  onPress={() => {
+                                    setFieldValue(field, item);
+                                    setPopupField(null);
+                                  }}
+                                >
+                                  <Text style={local.popupItemText}>
+                                    {field === "session" ? t(`session.${item}`) : item}
+                                  </Text>
+                                </Pressable>
+                              )}
+                            />
+                            <Pressable
+                              onPress={() => setPopupField(null)}
+                              style={local.popupCancel}
+                            >
+                              <Text style={local.popupCancelText}>{t("actions.cancel")}</Text>
+                            </Pressable>
+                          </View>
+                        </View>
+                      </Modal>
+                    )}
+                  </View>
+                ))}
+              </View>
+
+              {/* Navigation Buttons */}
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  gap: 12,
+                  marginTop: 24,
+                }}
+              >
+                <TouchableOpacity
+                  style={[styles.button, { backgroundColor: COLORS.border, flex: 1 }]}
+                  onPress={onPrevious}
+                >
+                  <Text style={[styles.buttonText, { color: COLORS.textPrimary }]}>
+                    {t("actions.back")}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={[styles.button, { flex: 1 }]} onPress={handleSubmit}>
+                  <Text style={styles.buttonText}>{t("actions.next")}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        </Formik>
       </ScrollView>
     </KeyboardAvoidingView>
   );

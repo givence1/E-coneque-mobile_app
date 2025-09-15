@@ -1,9 +1,18 @@
 import COLORS from "@/constants/colors";
 import { useAuthStore } from "@/store/authStore";
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
-import React from "react";
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  Modal,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 type AppHeaderProps = {
   showBack?: boolean;
@@ -14,8 +23,30 @@ type AppHeaderProps = {
 
 export default function AppHeader({ showBack, showTitle, title, showTabs }: AppHeaderProps) {
   const router = useRouter();
-  const { user, schoolIdentification } = useAuthStore();
+  const { user, schoolIdentification, language, setLanguage } = useAuthStore();
   const role = user?.role?.toLowerCase();
+
+  const { i18n } = useTranslation();
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // Load persisted language on mount
+  useEffect(() => {
+    (async () => {
+      const storedLang = await AsyncStorage.getItem("appLanguage");
+      if (storedLang && storedLang !== language) {
+        setLanguage(storedLang);
+        i18n.changeLanguage(storedLang);
+      }
+    })();
+  }, []);
+
+  // Whenever language changes in store, update i18n & persist
+  useEffect(() => {
+    if (language) {
+      i18n.changeLanguage(language);
+      AsyncStorage.setItem("appLanguage", language);
+    }
+  }, [language]);
 
   const handleProfilePress = () => {
     switch (role) {
@@ -25,16 +56,12 @@ export default function AppHeader({ showBack, showTitle, title, showTabs }: AppH
       case "student":
         router.push("/(auth)/select-profile");
         break;
-      // case "parent":
-      //   router.push("/(auth)/p");
-      //   break;
-      // case "admin":
-      //   router.push("/(auth)/admin-dashboard");
-      //   break;
-      // default:
-      //   router.push("/(auth)/"); // fallback for unknown or unauthenticated users
-      //   break;
     }
+  };
+
+  const handleSelectLanguage = (lang: string) => {
+    setLanguage(lang); // triggers store update, i18n change, and persistence
+    setModalVisible(false);
   };
 
   return (
@@ -60,9 +87,18 @@ export default function AppHeader({ showBack, showTitle, title, showTabs }: AppH
 
         {/* Right Section */}
         <View style={styles.right}>
+          {/* ▼ Language dropdown toggle */}
+          <TouchableOpacity style={styles.icon} onPress={() => setModalVisible(true)}>
+            <Ionicons name="chevron-down" size={20} color="white" />
+            <Text style={styles.langText}>{language?.toUpperCase()}</Text>
+          </TouchableOpacity>
+
+          {/* Notifications */}
           <TouchableOpacity style={styles.icon}>
             <Ionicons name="notifications-outline" size={22} color="white" />
           </TouchableOpacity>
+
+          {/* Profile */}
           <TouchableOpacity style={styles.icon} onPress={handleProfilePress}>
             <Ionicons name="person-circle-outline" size={26} color="#fff" />
           </TouchableOpacity>
@@ -75,6 +111,31 @@ export default function AppHeader({ showBack, showTitle, title, showTabs }: AppH
           <Text style={{ color: "#fff" }}>Tabs Placeholder</Text>
         </View>
       )}
+
+      {/* Language Selection Modal */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <TouchableOpacity style={styles.modalOverlay} onPress={() => setModalVisible(false)}>
+          <View style={styles.modalBox}>
+            {[
+              { code: "en", label: "English" },
+              { code: "fr", label: "Français" },
+            ].map(({ code, label }) => (
+              <TouchableOpacity
+                key={code}
+                style={styles.modalItem}
+                onPress={() => handleSelectLanguage(code)}
+              >
+                <Text style={styles.modalText}>{label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -86,14 +147,11 @@ const styles = StyleSheet.create({
     width: "100%",
     zIndex: 99,
     backgroundColor: COLORS.primary,
-
     paddingTop: Platform.OS === "android" ? 25 : 35,
     paddingBottom: 6,
     height: Platform.OS === "android" ? 55 : 65,
-
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
-
     elevation: 4,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -108,9 +166,10 @@ const styles = StyleSheet.create({
   },
   left: { flexDirection: "row", alignItems: "center" },
   center: { flex: 1, alignItems: "center" },
-  title: { color: "#fff", fontSize: 13, fontWeight: "700", textAlign: "center" },
+  title: { color: "#fff", fontSize: 10, fontWeight: "700", textAlign: "center" },
   right: { flexDirection: "row", alignItems: "center" },
-  icon: { marginHorizontal: 4 },
+  icon: { marginHorizontal: 4, flexDirection: "row", alignItems: "center" },
+  langText: { color: "#fff", marginLeft: 3, fontSize: 12, fontWeight: "600" },
   tabs: {
     marginTop: 8,
     paddingVertical: 6,
@@ -118,4 +177,23 @@ const styles = StyleSheet.create({
     borderTopColor: "rgba(255,255,255,0.2)",
     alignItems: "center",
   },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.3)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalBox: {
+    backgroundColor: "#fff",
+    padding: 12,
+    borderRadius: 10,
+    width: 180,
+    alignItems: "center",
+  },
+  modalItem: {
+    paddingVertical: 10,
+    width: "100%",
+    alignItems: "center",
+  },
+  modalText: { fontSize: 14, fontWeight: "600", color: COLORS.primary },
 });

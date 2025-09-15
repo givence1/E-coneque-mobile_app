@@ -1,12 +1,11 @@
 import { client } from '@/utils/graphql/client';
+import i18n from '@/utils/i18n'; // we’ll create this
 import { JwtPayload } from '@/utils/interfaces';
 import { NodeSchoolHigherInfo, NodeSchoolIdentification } from '@/utils/schemas/interfaceGraphql';
 import { gql } from '@apollo/client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 import { create } from 'zustand';
-
-
-
 
 interface AuthStore {
   user: JwtPayload | null;
@@ -18,6 +17,7 @@ interface AuthStore {
   schoolIdentification: NodeSchoolIdentification | null;
   campusInfo: NodeSchoolHigherInfo | null;
   role: "student" | "teacher" | "parent" | "admin" | any;
+  language: string;
 
   login: (loginData?: any) => Promise<{ token: string, refresh?: string }>;
   logout: () => void;
@@ -26,6 +26,8 @@ interface AuthStore {
   storeProfileId: (id: number) => void;
   storeRegistrationId: (field: "registration_lec_id" | "registration_hig_id" | "registration_sec_id" | "registration_pri_id", value: number) => void;
   storeCampusInfo: (data: NodeSchoolHigherInfo) => void;
+  setLanguage: (lang: string) => void;
+  loadLanguage: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
@@ -38,20 +40,22 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   schoolIdentification: null,
   campusInfo: null,
   role: "student",
+  language: "en",
 
   storeFeesId: async (feesId: number) => { set({ feesId }) },
   storeProfileId: async (profileId: number) => { set({ profileId }) },
   storeCampusInfo: async (campusInfo: NodeSchoolHigherInfo) => { set({ campusInfo }) },
-  storeRegistrationId: (field: "registration_lec_id" | "registration_hig_id" | "registration_sec_id" | "registration_pri_id", value: number) => {
+
+  storeRegistrationId: (field, value) => {
     const currentUser = get().user;
     set({
       [field]: value,
       user: currentUser ? { ...currentUser, [field]: value } : currentUser,
     });
   },
+
   login: async (loginData: any) => {
     set({ isLoading: true });
-
     try {
       const { data } = await client.mutate({
         mutation: LOGIN_MUTATION,
@@ -88,27 +92,36 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   checkAuth: async () => {
     set({ isCheckingAuth: true });
-
     try {
-      const { data } = await client.query({
-        query: querySchool,
-      });
+      const { data } = await client.query({ query: querySchool });
       const school = data?.allSchoolInfos?.edges?.[0]?.node?.schoolIdentification;
 
-      await new Promise((res) => setTimeout(res, 1000)); // ⏱️ delay 1s after fetch
+      await new Promise((res) => setTimeout(res, 1000));
 
       set({
         schoolIdentification: school,
         isCheckingAuth: false,
       });
-
     } catch (error) {
       console.error("School info fetch failed", error);
       set({ schoolIdentification: null, isCheckingAuth: false });
     }
   },
-}));
 
+  setLanguage: (lang: string) => {
+    set({ language: lang });
+    i18n.changeLanguage(lang);
+    AsyncStorage.setItem("appLanguage", lang);
+  },
+
+  loadLanguage: async () => {
+    const savedLang = await AsyncStorage.getItem("appLanguage");
+    if (savedLang) {
+      set({ language: savedLang });
+      i18n.changeLanguage(savedLang);
+    }
+  },
+}));
 
 const querySchool = gql`
   query {
@@ -119,13 +132,16 @@ const querySchool = gql`
           schoolIdentification {
             name
             logo
-            hasHigher hasSecondary hasPrimary hasVocational
+            hasHigher
+            hasSecondary
+            hasPrimary
+            hasVocational
           }
         }
       }
     }
   }
-`
+`;
 
 const LOGIN_MUTATION = gql`
   mutation Login(
@@ -138,4 +154,4 @@ const LOGIN_MUTATION = gql`
       refresh
     }
   }
-`
+`;

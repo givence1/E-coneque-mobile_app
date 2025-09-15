@@ -1,0 +1,478 @@
+export const translationKeysFr = {
+  // Login & Auth
+  login: {
+    matricule: "Matricule",
+    password: "Mot de passe",
+    rememberMe: "Se souvenir de moi",
+    loginButton: "Connexion",
+    loginAsParent: "Connexion Parent",
+    forgotPassword: "Mot de passe oublié ?",
+    enterToken: "Entrer le code",
+    checkUser: "Vérifier l’utilisateur",
+    register: "S'inscrire",
+    invalidInput: "Entrée invalide",
+    invalidCredentials: "Identifiants invalides",
+    loginFailed: "Échec de connexion",
+    error: "Une erreur s'est produite. Veuillez réessayer.",
+    checkInternet: "Vérifiez votre connexion Internet.",
+    back: "Retour",
+    asParent: "Comme Parent",
+    newPassword: "Nouveau mot de passe",
+    confirmPassword: "Confirmer le mot de passe",
+    checkEmailToken: "Vérifiez votre email pour le code de réinitialisation",
+    forgotPasswordTitle: "Mot de passe oublié",
+    forgotPasswordSubtitle: "Entrez l'email de votre compte",
+    enterEmail: "Entrez votre email",
+    backToLogin: "Retour à la connexion",
+  },
+
+  // Profile
+  profile: {
+    logout: "Déconnexion",
+    cancel: "Annuler",
+    yes: "Oui",
+    id: "ID",
+    logoutMessage: "Êtes-vous sûr de vouloir vous déconnecter ?",
+    logoutTitle: "Déconnexion",
+    loadError: "Échec du chargement du profil",
+    editProfile: "Modifier le profil",
+    contactInfo: "Infos de contact",
+    academicInfo: "Infos académiques",
+    department: "Département",
+    specialty: "Spécialité",
+    highestCertificate: "Diplôme le plus élevé",
+    yearObtained: "Année d’obtention",
+    email: "Email",
+    phone: "Téléphone",
+    dob: "Date de naissance",
+    pob: "Lieu de naissance",
+    personalInfo: "Infos personnelles",
+    roleDept: "Rôle & Département",
+    confirm: "Confirmer",
+    firstName: "Prénom",
+    lastName: "Nom",
+    gender: "Genre",
+    address: "Adresse",
+    campus: "Campus",
+    nationality: "Nationalité",
+    regionOfOrigin: "Région d'origine",
+    subjectsGrades: "Matières & Notes",
+    fatherName: "Nom du père",
+    motherName: "Nom de la mère",
+    fatherPhone: "Téléphone du père",
+    motherPhone: "Téléphone de la mère",
+    parentAddress: "Adresse du parent",
+    level: "Niveau",
+    program: "Programme",
+    academicYear: "Année académique",
+    session: "Session",
+    morning: "Matin",
+    evening: "Soir",
+    selectGender: "Sélectionner le genre",
+    male: "Homme",
+    female: "Femme",
+    selectDob: "Sélectionner la date de naissance",
+  },
+
+  // Tabs & Navigation
+  tabs: {
+    home: "Accueil",
+    courses: "Cours",
+    marksUpload: "Saisie notes",
+    announcements: "Annonces",
+    profile: "Profil",
+  },
+
+  // Quizzes
+  quizzes: {
+    questionCapital: "Quelle est la capitale du Cameroun ?",
+    questionRamRom: "Expliquez la différence entre la RAM et la ROM.",
+    options: ["Yaoundé", "Douala", "Buea", "Bamenda"],
+    enterAnswer: "Tapez votre réponse...",
+  },
+
+  // Fees
+fees: {
+  tuition: "Frais de scolarité",
+  platformCharges: "Frais de plateforme",
+  idCard: "Carte d'étudiant",
+  enterReason: "Entrez votre motif...",
+  paymentRequired: "Paiement requis",
+  matricule: "Matricule",
+  specialty: "Spécialité",
+  academicYear: "Année académique",
+  level: "Niveau",
+  payment1: "Premier versement",
+  payment2: "Deuxième versement",
+  payment3: "Troisième versement",
+  transactions: "Toutes les transactions",
+  txId: "ID de transaction",
+  reason: "Motif",
+  amount: "Montant",
+  totalPaid: "Total payé",
+  balance: "Solde",
+  requestMoratorium: "Demander un moratoire",
+  moratorium: "Moratoire",
+  accountStatus: "Statut du compte",
+  noFees: "Aucun frais trouvé.",
+  noTransactions: "Aucune transaction pour le moment.",
+},
+
+
+  // Alerts / Messages
+  messages: {
+    error: "Erreur",
+    success: "Succès",
+    failedLoadProfile: "Échec du chargement du profil",
+    enterMarks: "Veuillez saisir au moins une note avant de soumettre.",
+    marksUploaded: "Notes enregistrées avec succès !",
+    marksSaved: "{{count}} notes ont été enregistrées avec succès !",
+    notAvailable: "Non disponible",
+    na: "N/A",
+    logoutConfirm: "Êtes-vous sûr de vouloir vous déconnecter ?",
+    enterUsername: "Veuillez entrer votre matricule ou nom d’utilisateur",
+    userFound: "Utilisateur trouvé ! Veuillez créer votre nouveau mot de passe.",
+    userNotExist: "L’utilisateur n’existe pas. Veuillez vérifier votre saisie.",
+    somethingWrong: "Une erreur s'est produite. Veuillez réessayer.",
+    allFieldsRequired: "Tous les champs sont obligatoires.",
+    passwordMismatch: "Les mots de passe ne correspondent pas.",
+    invalidPassword: "Mot de passe invalide",
+    passwordRules:
+      "Le mot de passe doit contenir au moins 1 lettre majuscule, 1 chiffre et avoir au moins 8 caractères.",
+    passwordHint:
+      "Le mot de passe doit contenir :\n• Au moins 1 lettre majuscule\n• Au moins 1 chiffre\n• Minimum 8 caractères",
+    passwordResetSuccess: "Mot de passe réinitialisé avec succès !",
+    passwordResetFailed: "Échec de la réinitialisation du mot de passe. Veuillez réessayer.",
+    resetTokenSent: "Un code de réinitialisation a été envoyé à votre email. Veuillez vérifier votre boîte de réception.",
+    resetTokenFailed: "Échec de l’envoi du code de réinitialisation. Veuillez réessayer.",
+  },
+
+  // UI Labels
+  ui: {
+  complaintType: "Type de réclamation",
+  selectType: "Sélectionner un type",
+  feeIssue: "Problème de frais",
+  resultProblem: "Problème de résultat",
+  lecturerMisconduct: "Mauvais comportement de l’enseignant",
+  attendance: "Présence",
+  other: "Autre",
+  message: "Message",
+  describeIssue: "Décrivez votre problème...",
+  submitComplaint: "Soumettre la réclamation",
+  error: "Erreur",
+  errorMessage: "Veuillez sélectionner un type et saisir votre message.",
+  submitted: "Soumis",
+  submittedMessage: "Votre réclamation a été soumise.",
+  save: "Enregistrer",
+  submit: "Soumettre",
+  cancel: "Annuler",
+  select: "Sélectionner",
+  choose: "Choisir",
+  add: "Ajouter",
+  remove: "Supprimer",
+
+  // École & Connexion
+  mySchool: "Mon École",
+  checkUser: "Vérifier l’utilisateur",
+  matriculeOrUsername: "Matricule ou Nom d’utilisateur",
+  enterUsernamePlaceholder: "Entrez votre matricule ou nom d’utilisateur",
+  backToLogin: "Retour à la connexion",
+
+  // Actions & Boutons
+  checking: "Vérification...",
+  checkNow: "Vérifier maintenant",
+  contactSupport: "Contacter le support",
+  sendResetToken: "Envoyer le code de réinitialisation",
+  submitting: "Soumission...",
+  saving: "Enregistrement...",
+  loading: "Chargement...",
+  sending: "Envoi...",
+
+  // Statuts & Messages
+  noData: "Aucune donnée disponible",
+  success: "Succès",
+  enterUsername: "Veuillez entrer votre matricule ou nom d’utilisateur",
+  userFound: "Utilisateur trouvé. Procédez à la création du mot de passe.",
+  userNotExist: "Utilisateur inexistant dans nos registres",
+  somethingWrong: "Un problème est survenu. Veuillez réessayer.",
+
+  // Support WhatsApp
+  supportMessage: "Bonjour, j’ai besoin d’aide pour vérifier mon compte.",
+},
+
+  // Buttons
+  button: {
+    back: "Retour",
+    next: "Suivant",
+    previous: "Précédent",
+  },
+
+  // Campus
+  campus: {
+    selectCampus: "Sélectionnez un campus",
+    incompleteLecturerInfo: "Informations incomplètes sur l’enseignant",
+    updateProfilePrompt: "Cliquez ci-dessous pour mettre à jour le profil",
+    update: "Mettre à jour",
+  },
+
+  // Support
+  support: {
+    defaultMessage: "Bonjour, j’ai besoin d’aide pour vérifier mon compte.",
+    resetMessage: "Bonjour, j’ai besoin d’aide pour réinitialiser mon mot de passe.",
+  },
+
+  // Academic
+  academic: {
+    selectYear: "Sélectionnez l’année académique",
+    year: "Année académique",
+    level: "Niveau",
+    program: "Programme",
+  },
+
+  // Status
+  status: {
+    active: "Actif",
+    inactive: "Inactif",
+  },
+
+  // Sections / Pre-inscriptions
+  sections: {
+    selectSection: "Sélectionnez une section",
+    university: "Pré-inscription universitaire",
+    secondary: "Pré-inscription secondaire",
+    primary: "Pré-inscription primaire",
+  },
+
+  // Courses
+  courses: {
+    myCourses: "Mes cours",
+    academicYear: "Année académique {{year}}",
+    semesterI: "Semestre I",
+    semesterII: "Semestre II",
+    loadError: "Échec du chargement des cours",
+    table: {
+      number: "#",
+      name: "Nom du cours",
+      sem: "Sem",
+    },
+  },
+
+
+  // Validation
+  validation: {
+    firstName: "Le prénom est obligatoire",
+    lastName: "Le nom est obligatoire",
+    gender: "Le genre est obligatoire",
+    address: "L’adresse est obligatoire",
+    pob: "Le lieu de naissance est obligatoire",
+    dob: "La date de naissance est obligatoire",
+    telephone: "Le téléphone est obligatoire",
+    email: "Un email valide est obligatoire",
+    password: "Le mot de passe est obligatoire",
+    confirmPassword: "La confirmation du mot de passe est obligatoire",
+    passwordsMismatch: "Les mots de passe ne correspondent pas",
+     required: "{{field}} est obligatoire",
+  
+  },
+
+   steps: {
+    personalInfo: "Informations personnelles",
+    roleDept: "Rôle & Département",
+    specialty: "Spécialité",
+    confirm: "Confirmation",
+  },
+
+  form: {
+    // Step 1
+    firstName: "Prénom",
+    lastName: "Nom",
+    gender: "Sexe",
+    selectGender: "Sélectionner le sexe",
+    address: "Adresse",
+    pob: "Lieu de naissance",
+    dob: "Date de naissance",
+    telephone: "Téléphone",
+    email: "E-mail",
+
+    // Step 2
+    campusId: "Campus",
+    nationality: "Nationalité",
+    regionOfOrigin: "Région d'origine",
+    highestCertificate: "Diplôme le plus élevé",
+    yearObtained: "Année d'obtention",
+    grade: "Moyenne / Note",
+    fatherName: "Nom du père",
+    fatherTelephone: "Téléphone du père",
+    motherName: "Nom de la mère",
+    motherTelephone: "Téléphone de la mère",
+    parentAddress: "Adresse du parent",
+    selectField: "Sélectionner {{field}}",
+
+    // Step 3
+    specialty: "Spécialité",
+    department: "Département",
+    role: "Rôle",
+     specialtyone: "Premier choix de spécialité",
+  specialtytwo: "Deuxième choix de spécialité",
+  academicYear: "Année académique",
+  program: "Programme",
+  level: "Niveau",
+  session: "Session",
+  morning: "Matin",
+  evening: "Soir",
+
+    // Step 4
+    confirmation: "Veuillez confirmer vos informations avant de soumettre",
+  },
+
+  gender: {
+    male: "Homme",
+    female: "Femme",
+  },
+
+  nationalities: {
+    cameroon: "Camerounais(e)",
+    international: "International(e)",
+  },
+
+  regions: {
+    southWest: "Sud-Ouest",
+    northWest: "Nord-Ouest",
+    west: "Ouest",
+    south: "Sud",
+    center: "Centre",
+    littoral: "Littoral",
+    east: "Est",
+    adamawa: "Adamaoua",
+    nord: "Nord",
+    farNord: "Extrême-Nord",
+  },
+
+  certificates: {
+    olevel: "BEPC / GCE O'Level",
+    alevel: "BAC / GCE A'Level",
+    hnd: "BTS / HND",
+    bachelor: "Licence",
+    master: "Master",
+  },
+
+  actions: {
+    back: "Retour",
+    next: "Suivant",
+    submit: "Soumettre",
+    cancel: "Annuler",
+  },
+
+
+  footer: {
+    alreadyAccount: "Vous avez déjà un compte ?",
+    login: "Connexion",
+  },
+  preinscription:{
+    selectSection: "Sélectionnez une section",
+    university: "Pré-inscription universitaire",
+    secondary: "Pré-inscription secondaire",
+    primary: "Pré-inscription primaire",
+  },
+  studentHome: {
+  ca: "CC", // Contrôle Continu
+  exam: "Examen",
+  resit: "Rattrapage",
+  results: "Résultats",
+  fees: "Frais",
+  transcript: "Relevé de notes",
+  complaints: "Réclamations",
+  history: "Historique",
+  more: "Plus",
+},
+
+portal: {
+  uploadMarks: "Téléverser les Notes",
+  semester: "Semestre",
+  caPortal: "Portail de Contrôle Continu",
+  examPortal: "Portail d’Examen",
+  resitPortal: "Portail de Rattrapage",
+  chooseType: "Choisir le type de téléversement pour",
+  upload: "Téléverser",
+},
+
+results: {
+  title: "Résultats d'examen",
+    resit: "rattrapage",
+    all: "Tous les résultats",
+    semester: "Sélectionnez le semestre",
+    semesters: ["I", "II"],
+    saveMarks: "Enregistrer les notes",
+    noChanges: "Aucun changement à enregistrer",
+  enterMarks: "Saisir les notes des étudiants",
+  course: "Cours",
+  level: "Niveau",
+  assessmentType: "Type d'évaluation",
+  modifiedEntries: "{{count}} {{count, plural, one {entrée modifiée} other {entrées modifiées}}}",
+  studentName: "Nom de l'étudiant",
+  mark: "Note",
+  successTitle: "Succès",
+  successMessage: "{{count}} notes ont été enregistrées avec succès !",
+  selectSemester: "Sélectionner le semestre",
+  semester1: "Semestre I",
+  semester2: "Semestre II",
+  caTitle: "RÉSULTATS DES ÉVALUATIONS CONTINUES",
+  ca: "CC",
+  exam: "Examen",
+  status: "Statut",
+  accountNotActive: "Compte inactif",
+  schoolFees: "Frais scolaires",
+  resultsNotPublished: "Résultats non publiés",
+  pass: "✅",
+  fail: "❌",
+},
+examResults: {
+  title: "Résultats des Examens",
+  selectSemester: "Sélectionnez le semestre",
+  semesterI: "Semestre I",
+  semesterII: "Semestre II"
+},
+lecturer:{
+  announcements: "Annonces",
+  announcementMessage: "Le portail de quiz fermera vendredi à 17h. Assurez-vous que toutes les notes sont téléversées avant cette date.",
+},
+
+ transcript: {
+    title: "Demande de Relevé de Notes",
+    description: "Vous pouvez demander votre relevé de notes une fois que tous les frais de scolarité et les frais de plateforme ont été payés.",
+    platformFee: "Frais de Plateforme",
+    schoolFees: "Frais de Scolarité",
+    apply: "Demander un Relevé de Notes",
+    submitted: "Demande de relevé de notes soumise !",
+    paymentRequired: "Paiement Requis",
+    paymentMessage: "Vous devez payer les éléments suivants avant de demander un relevé de notes :\n\n{{missing}}",
+    history: "Historique",
+    request: "Demande",
+  },
+  attestation: {
+    title: "Attestation Scolaire",
+    description: "Vous pouvez demander votre attestation scolaire à tout moment. Aucun paiement ou frais supplémentaire n’est requis.",
+    apply: "Demander une Attestation",
+    attestationSubmitted: "Demande d’attestation scolaire soumise !"
+  },
+
+  profileHeader: {
+  noFees: "Aucun frais",
+  matricule: "Matricule",
+  performance: "Performance globale",
+},
+dashHigher: {
+  higher: "SUPÉRIEUR",
+  studentOverview: "Aperçu des étudiants",
+  students: "Étudiants",
+  attendance: "Présence",
+  avgGrade: "Moy. Note",
+  lecturerOverview: "Aperçu des enseignants",
+  classes: "Classes",
+  courses: "Cours",
+  uploadMarks: "Saisie des notes",
+  uploadMessage: "Accédez à vos cours et saisissez les notes ici.",
+},
+
+
+};

@@ -7,6 +7,7 @@ import { gql, useQuery } from "@apollo/client";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { JSX } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FlatList,
   StyleSheet,
@@ -18,13 +19,12 @@ import {
 } from "react-native";
 import COLORS from "../../constants/colors";
 
-
-
 export default function SelectYearScreen(): JSX.Element {
   const router = useRouter();
+  const { t } = useTranslation();
   const { user, storeFeesId, storeProfileId, storeCampusInfo } = useAuthStore();
 
-  const { data: dataProfiles, loading, error } = useQuery(GET_PROFILES, {
+  const { data: dataProfiles } = useQuery(GET_PROFILES, {
     variables: { customuserId: user?.user_id },
   });
 
@@ -57,38 +57,60 @@ export default function SelectYearScreen(): JSX.Element {
     }
     router.replace({
       pathname: `/(tabstudent)/${section}`,
-      // params: { feesId },
     });
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Select Academic Year</Text>
+      <Text style={styles.header}>{t("academic.selectYear")}</Text>
 
-      {dataProfiles?.allSchoolFees?.edges?.length ?
+      {dataProfiles?.allSchoolFees?.edges?.length ? (
         <FlatList<EdgeSchoolFees>
           data={dataProfiles?.allSchoolFees?.edges ?? []}
           keyExtractor={(item) => item.node.id.toString()}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.card} onPress={() => handleSelect(item, "higher")}>
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() => handleSelect(item, "higher")}
+            >
               <Text style={styles.title}>
-                <Ionicons name="school-outline" size={16} /> {item.node.userprofile?.specialty?.mainSpecialty?.specialtyName}
+                <Ionicons name="school-outline" size={16} />{" "}
+                {item.node.userprofile?.specialty?.mainSpecialty?.specialtyName}
               </Text>
               <Text style={styles.text}>
-                <Ionicons name="calendar-outline" size={16} /> Academic Year: {item.node.userprofile?.specialty?.academicYear}
+                <Ionicons name="calendar-outline" size={16} /> {t("academic.year")}:{" "}
+                {item.node.userprofile?.specialty?.academicYear}
               </Text>
               <Text style={styles.text}>
-                <Ionicons name="layers-outline" size={16} /> Level: {item.node.userprofile?.specialty?.level?.level}
+                <Ionicons name="layers-outline" size={16} /> {t("academic.level")}:{" "}
+                {item.node.userprofile?.specialty?.level?.level}
               </Text>
               <Text style={styles.text}>
-                <MaterialCommunityIcons name="book-outline" size={16} /> Program: {item.node.userprofile?.program?.name}
+                <MaterialCommunityIcons name="book-outline" size={16} />{" "}
+                {t("academic.program")}: {item.node.userprofile?.program?.name}
                 {item.node.platformPaid ? (
-                  <Text style={{ color: "green", fontWeight: "bold", flexDirection: "row", alignItems: "center" }}>
-                    <Ionicons name="checkmark-circle" size={16} color="green" /> Active
+                  <Text
+                    style={{
+                      color: "green",
+                      fontWeight: "bold",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Ionicons name="checkmark-circle" size={16} color="green" />{" "}
+                    {t("status.active")}
                   </Text>
                 ) : (
-                  <Text style={{ color: "red", fontWeight: "bold", flexDirection: "row", alignItems: "center" }}>
-                    <Ionicons name="close-circle" size={16} color="red" /> Inactive
+                  <Text
+                    style={{
+                      color: "red",
+                      fontWeight: "bold",
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Ionicons name="close-circle" size={16} color="red" />{" "}
+                    {t("status.inactive")}
                   </Text>
                 )}
               </Text>
@@ -96,10 +118,7 @@ export default function SelectYearScreen(): JSX.Element {
           )}
           contentContainerStyle={{ paddingVertical: 20 }}
         />
-        :
-        null
-      }
-
+      ) : null}
     </View>
   );
 }
@@ -147,68 +166,102 @@ const styles = StyleSheet.create<{
   },
 });
 
-
-
-
 const GET_PROFILES = gql`
-  query GetData (
-    $customuserId: Decimal!
-  ) {
-    allSchoolFees (
-      customuserId: $customuserId
-    ) {
+  query GetData($customuserId: Decimal!) {
+    allSchoolFees(customuserId: $customuserId) {
       edges {
         node {
-          id platformPaid
+          id
+          platformPaid
           userprofile {
             id
-            program { name }
-            customuser { id matricle fullName }
-            specialty { 
+            program {
+              name
+            }
+            customuser {
+              id
+              matricle
+              fullName
+            }
+            specialty {
               academicYear
-              level { level }
-              mainSpecialty { specialtyName }
+              level {
+                level
+              }
+              mainSpecialty {
+                specialtyName
+              }
               school {
-                id schoolName town address telephone country
-                caLimit examLimit resitLimit seqLimit
+                id
+                schoolName
+                town
+                address
+                telephone
+                country
+                caLimit
+                examLimit
+                resitLimit
+                seqLimit
               }
             }
           }
         }
       }
     }
-    allSchoolFeesSec (
-      customuserId: $customuserId
-    ) {
+    allSchoolFeesSec(customuserId: $customuserId) {
       edges {
         node {
-          id platformPaid
+          id
+          platformPaid
           userprofilesec {
             id
-            customuser { id matricle fullName }
+            customuser {
+              id
+              matricle
+              fullName
+            }
             classroomsec {
               school {
-                id schoolName town address telephone country
-                caLimit examLimit resitLimit seqLimit
+                id
+                schoolName
+                town
+                address
+                telephone
+                country
+                caLimit
+                examLimit
+                resitLimit
+                seqLimit
               }
             }
           }
         }
       }
     }
-    allSchoolFeesPrim (
-      customuserId: $customuserId
-    ) {
+    allSchoolFeesPrim(customuserId: $customuserId) {
       edges {
         node {
-          id platformPaid
+          id
+          platformPaid
           userprofileprim {
             id
-            customuser { id matricle fullName }
+            customuser {
+              id
+              matricle
+              fullName
+            }
             classroomprim {
               school {
-                id schoolName town address telephone country
-                caLimit examLimit resitLimit seqLimit
+                id
+                schoolName
+                town
+                address
+                telephone
+                country
+                caLimit
+                examLimit
+                resitLimit
+                seqLimit
               }
             }
           }

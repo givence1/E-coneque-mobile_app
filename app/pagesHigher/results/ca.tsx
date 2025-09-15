@@ -5,6 +5,7 @@ import { EdgeResult } from "@/utils/schemas/interfaceGraphql";
 import { gql, useQuery } from "@apollo/client";
 import { Picker } from "@react-native-picker/picker";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   ScrollView,
@@ -13,75 +14,83 @@ import {
 } from "react-native";
 import DisplayResults from "./DisplayResults";
 
-
 export default function CAResults() {
-
-  const [semester, setSemester] = useState<"I" | "II" | null>(null)
+  const { t } = useTranslation(); 
+  const [semester, setSemester] = useState<"I" | "II" | null>(null);
   const { profileId } = useAuthStore();
 
-  const { data: dataResults, loading: searchResults, error } = useQuery(GET_RESULTS, {
+  const { data: dataResults, loading: searchResults } = useQuery(GET_RESULTS, {
     variables: {
       studentId: profileId,
     },
   });
-  const [resultList, setResultList] = useState<EdgeResult[]>()
-  console.log(dataResults);
+
+  const [resultList, setResultList] = useState<EdgeResult[]>();
 
   useEffect(() => {
     if (semester && dataResults?.allResults?.edges?.length) {
-      const fil = dataResults?.allResults?.edges.filter((item: EdgeResult) => item.node?.course?.semester === semester)
-      setResultList(fil)
+      const fil = dataResults?.allResults?.edges.filter(
+        (item: EdgeResult) => item.node?.course?.semester === semester
+      );
+      setResultList(fil);
     }
-  }, [semester])
-
+  }, [semester]);
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-
       {/* ✅ Fixed header outside the ScrollView */}
-            <AppHeader showBack showTitle />
+      <AppHeader showBack showTitle />
 
-    <ScrollView style={styles.container} contentContainerStyle={[styles.scrollContent, { paddingTop: 50 }]} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: 50 }]}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ✅ Semester Picker */}
+        <View style={styles.dropdownWrapper}>
+          <Picker
+            selectedValue={semester}
+            onValueChange={(value) => setSemester(value)}
+            style={styles.picker}
+            itemStyle={styles.pickerItem}
+            dropdownIconColor={COLORS.primary}
+          >
+            <Picker.Item
+              label={t("results.selectSemester")}
+              value={null}
+              style={styles.optionPlaceholder}
+            />
+            <Picker.Item
+              label={t("results.semester1")}
+              value="I"
+              style={styles.optionItem}
+            />
+            <Picker.Item
+              label={t("results.semester2")}
+              value="II"
+              style={styles.optionItem}
+            />
+          </Picker>
+        </View>
 
-      <View style={styles.dropdownWrapper}>
-  <Picker
-    selectedValue={semester}
-    onValueChange={(value) => setSemester(value)}
-    style={styles.picker}  
-    itemStyle={styles.pickerItem}       
-    dropdownIconColor={COLORS.primary}
-  >
-    <Picker.Item label="Select semester" value={null} style={styles.optionPlaceholder} />
-    <Picker.Item label="I" value="I" style={styles.optionItem} />
-    <Picker.Item label="II" value="II" style={styles.optionItem} />
-  </Picker>
-</View>
-
-
-      {!searchResults ?
-        <DisplayResults
-          title="CONTINUOUS ASSESSMENT RESULTS"
-          result_type="ca"
-          results={resultList}
-          semester={semester}
-        />
-        :
-        <ActivityIndicator size="large" />
-      }
-    </ScrollView>
-  </View>
+        {/* ✅ Results or Loading */}
+        {!searchResults ? (
+          <DisplayResults
+            title={t("results.caTitle")}
+            result_type="ca"
+            results={resultList}
+            semester={semester}
+          />
+        ) : (
+          <ActivityIndicator size="large" />
+        )}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background, padding: 16 },
-  title: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: COLORS.primary,
-    textAlign: "center",
-    marginBottom: 10,
-  },
   scrollContent: {
     flexGrow: 1,
     paddingBottom: 60,
@@ -92,13 +101,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: COLORS.cardBackground,
     marginBottom: 20,
-  },  
+  },
   picker: {
     height: 50,
     paddingHorizontal: 1,
     color: COLORS.textPrimary,
   },
-    pickerItem: {
+  pickerItem: {
     fontSize: 16,
     color: COLORS.textPrimary,
   },
@@ -108,25 +117,25 @@ const styles = StyleSheet.create({
   },
   optionItem: {
     fontSize: 16,
-    color: COLORS.textDark, 
+    color: COLORS.textDark,
   },
 });
 
-
-
 const GET_RESULTS = gql`
-  query GetData (
-    $studentId: Decimal!
-  ) {
-    allResults (
-      studentId: $studentId
-    ) {
+  query GetData($studentId: Decimal!) {
+    allResults(studentId: $studentId) {
       edges {
         node {
           id
-          student { customuser { fullName }}
+          student {
+            customuser {
+              fullName
+            }
+          }
           course {
-            mainCourse { courseName }
+            mainCourse {
+              courseName
+            }
             semester
             courseCode
           }

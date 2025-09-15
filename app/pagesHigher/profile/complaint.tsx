@@ -1,5 +1,6 @@
 import AppHeader from "@/components/AppHeader";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -7,14 +8,13 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TextStyle,
   TouchableOpacity,
   View,
-  ViewStyle
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import COLORS from "../../../constants/colors";
 
+// ---------- Types ----------
 type ComplaintType = string | null;
 
 type DropDownItem = {
@@ -23,91 +23,88 @@ type DropDownItem = {
 };
 
 const Complaint: React.FC = () => {
-  const [open, setOpen] = useState<boolean>(false);
+  const { t } = useTranslation();
+
+  const [open, setOpen] = useState(false);
   const [type, setType] = useState<ComplaintType>(null);
   const [items, setItems] = useState<DropDownItem[]>([
-    { label: "Fee Issue", value: "fee" },
-    { label: "Result Problem", value: "result" },
-    { label: "Lecturer Misconduct", value: "lecturer" },
-    { label: "Attendance", value: "attendance" },
-    { label: "Other", value: "other" },
+    { label: t("ui.feeIssue"), value: "fee" },
+    { label: t("ui.resultProblem"), value: "result" },
+    { label: t("ui.lecturerMisconduct"), value: "lecturer" },
+    { label: t("ui.attendance"), value: "attendance" },
+    { label: t("ui.other"), value: "other" },
   ]);
 
-  const [message, setMessage] = useState<string>("");
+  const [message, setMessage] = useState("");
 
   const handleSubmit = () => {
     if (!type || !message.trim()) {
-      Alert.alert("Error", "Please select a type and enter your message.");
+      Alert.alert(t("ui.error"), t("ui.errorMessage"));
       return;
     }
 
-    Alert.alert("Submitted", "Your complaint has been submitted.");
+    Alert.alert(t("ui.submitted"), t("ui.submittedMessage"));
     setType(null);
     setMessage("");
   };
 
   return (
-     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+    <View style={styles.wrapper}>
+      {/* Fixed Header */}
+      <AppHeader showBack showTitle />
 
-      {/* ✅ Fixed header outside the ScrollView */}
-            <AppHeader showBack showTitle />
-    <KeyboardAvoidingView
-      style={[styles.container, { paddingTop: 50 }]}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-
-    >
-      <Text style={styles.label}>Complaint Type</Text>
-      <DropDownPicker
-        open={open}
-        value={type}
-        items={items}
-        setOpen={setOpen}
-        setValue={setType}
-        setItems={setItems}
-        placeholder="Select type"
-        style={styles.dropdown}
-        dropDownContainerStyle={{ borderColor: "#ccc" }}
-      />
-
-      <Text style={styles.label}>Message</Text>
-      <TextInput
-        placeholder="Describe your issue..."
-        value={message}
-        onChangeText={setMessage}
-        style={[styles.input, { height: 120 }]}
-        multiline
-      />
-
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: COLORS.primary }]}
-        onPress={handleSubmit}
+      {/* Content */}
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        <Text style={styles.buttonText}>Submit Complain</Text>
-      </TouchableOpacity>
-    </KeyboardAvoidingView>
+        <Text style={styles.label}>{t("ui.complaintType")}</Text>
+        <DropDownPicker
+          open={open}
+          value={type}
+          items={items}
+          setOpen={setOpen}
+          setValue={setType}
+          setItems={setItems}
+          placeholder={t("ui.selectType")}
+          style={styles.dropdown}
+          dropDownContainerStyle={{ borderColor: "#ccc" }}
+        />
+
+        <Text style={styles.label}>{t("ui.message")}</Text>
+        <TextInput
+          placeholder={t("ui.describeIssue")}
+          value={message}
+          onChangeText={setMessage}
+          style={[styles.input, { height: 120 }]}
+          multiline
+        />
+
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>{t("ui.submitComplaint")}</Text>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
     </View>
   );
 };
 
-type Style = {
-  container: ViewStyle;
-  label: TextStyle;
-  dropdown: ViewStyle;
-  input: TextStyle;
-  button: ViewStyle;
-  buttonText?: TextStyle;
-};
-
-const styles = StyleSheet.create<Style>({
+// ---------- Styles ----------
+const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
   container: {
+    flex: 1,
     backgroundColor: COLORS.cardBackground,
     padding: 16,
-    flex: 1,
+    paddingTop: 70, // space under header
   },
   label: {
     fontWeight: "600",
     marginTop: 16,
     marginBottom: 6,
+    color: COLORS.textPrimary,
   },
   dropdown: {
     borderColor: "#ccc",
@@ -121,6 +118,7 @@ const styles = StyleSheet.create<Style>({
     padding: 10,
     marginTop: 5,
     marginBottom: 20,
+    textAlignVertical: "top",
   },
   button: {
     backgroundColor: COLORS.primary,

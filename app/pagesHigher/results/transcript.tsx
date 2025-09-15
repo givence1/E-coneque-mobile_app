@@ -2,11 +2,20 @@ import AppHeader from "@/components/AppHeader";
 import COLORS from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useTranslation } from "react-i18next";
+import {
+  Alert,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function TranscriptScreen() {
+  const { t } = useTranslation();
+
   // Mock values (replace with actual API data)
-  const platformPaid = false;   // boolean
+  const platformPaid = false; // boolean
   const schoolFeesPaid = true; // boolean
 
   const canApplyTranscript = platformPaid && schoolFeesPaid;
@@ -14,24 +23,22 @@ export default function TranscriptScreen() {
   const handleTranscriptApply = () => {
     if (canApplyTranscript) {
       // ✅ proceed to transcript application
-      console.log("Transcript application submitted!");
+      console.log(t("transcript.submitted"));
     } else {
       // ❌ Show message about missing fees
       let missing: string[] = [];
-      if (!platformPaid) missing.push("Platform Fee");
-      if (!schoolFeesPaid) missing.push("School Fees");
+      if (!platformPaid) missing.push(t("transcript.platformFee"));
+      if (!schoolFeesPaid) missing.push(t("transcript.schoolFees"));
 
       Alert.alert(
-        "Payment Required",
-        `You need to pay the following before applying for transcript:\n\n${missing.join(
-          " & "
-        )}`
+        t("transcript.paymentRequired"),
+        t("transcript.paymentMessage", { missing: missing.join(" & ") })
       );
     }
   };
 
   const handleAttestationApply = () => {
-    console.log("School attestation application submitted!");
+    console.log(t("transcript.attestationSubmitted"));
   };
 
   return (
@@ -41,10 +48,9 @@ export default function TranscriptScreen() {
       <View style={[styles.container, { paddingTop: 70 }]}>
         {/* Transcript Application Card */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Transcript Application</Text>
+          <Text style={styles.cardTitle}>{t("transcript.title")}</Text>
           <Text style={styles.cardDescription}>
-            You may now apply for your transcript once all school fees are
-            completed and the platform fee has been paid.
+            {t("transcript.description")}
           </Text>
 
           <View style={styles.row}>
@@ -53,7 +59,7 @@ export default function TranscriptScreen() {
               size={20}
               color={platformPaid ? "green" : "red"}
             />
-            <Text style={styles.rowText}>Platform Charge</Text>
+            <Text style={styles.rowText}>{t("transcript.platformFee")}</Text>
           </View>
 
           <View style={styles.row}>
@@ -62,7 +68,7 @@ export default function TranscriptScreen() {
               size={20}
               color={schoolFeesPaid ? "green" : "red"}
             />
-            <Text style={styles.rowText}>School Fees</Text>
+            <Text style={styles.rowText}>{t("transcript.schoolFees")}</Text>
           </View>
 
           <TouchableOpacity
@@ -70,17 +76,16 @@ export default function TranscriptScreen() {
             onPress={handleTranscriptApply}
           >
             <Text style={[styles.buttonText, { color: "#fff" }]}>
-              Apply for Transcript
+              {t("transcript.apply")}
             </Text>
           </TouchableOpacity>
         </View>
 
         {/* School Attestation Card */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>School Attestation</Text>
+          <Text style={styles.cardTitle}>{t("attestation.title")}</Text>
           <Text style={styles.cardDescription}>
-            You may apply for your school attestation at any time. No payment or
-            additional fee is required.
+            {t("attestation.description")}
           </Text>
 
           <TouchableOpacity
@@ -88,7 +93,7 @@ export default function TranscriptScreen() {
             onPress={handleAttestationApply}
           >
             <Text style={[styles.buttonText, { color: "#fff" }]}>
-              Apply for Attestation
+              {t("attestation.apply")}
             </Text>
           </TouchableOpacity>
         </View>

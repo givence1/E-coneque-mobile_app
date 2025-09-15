@@ -8,6 +8,7 @@ import { ApolloProvider } from '@apollo/client';
 import { client } from '@/utils/graphql/client';
 import { useAuthStore } from '@/store/authStore';
 import BootingScreen from '@/components/BootingScreen';
+import '../utils/i18n';
 
 // Prevent auto-hide before everything is loaded
 SplashScreen.preventAutoHideAsync();

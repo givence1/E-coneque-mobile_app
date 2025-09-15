@@ -3,6 +3,7 @@ import { protocol, RootApi, tenant } from "@/utils/config";
 import { actionSubmit } from "@/utils/functions";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Linking,
@@ -17,13 +18,16 @@ import COLORS from "../../constants/colors";
 export default function ForgotPasswordScreen() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { schoolIdentification } = useAuthStore(); // ✅ get school name from store
+  const { t } = useTranslation();
+  const { schoolIdentification } = useAuthStore();
   const [email, setEmail] = useState("");
 
   const handleSupport = () => {
     const phoneNumber = "237673351854";
-    const message = "Hello, I need help resetting my password.";
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    const message = t("support.resetMessage");
+    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+      message
+    )}`;
     Linking.openURL(url);
   };
 
@@ -35,27 +39,26 @@ export default function ForgotPasswordScreen() {
   const handleSubmit = async () => {
     setLoading(true);
     if (!validateEmail()) return;
-    const url = `${protocol}${tenant}${RootApi}/password_reset/`;
 
-    const res = await actionSubmit({ email: email?.toString().toLowerCase() }, url);
+    const url = `${protocol}${tenant}${RootApi}/password_reset/`;
+    const res = await actionSubmit(
+      { email: email?.toString().toLowerCase() },
+      url
+    );
 
     if (res?.status.toString() === "OK") {
-      // ✅ Show success alert and redirect
       Alert.alert(
-        "Success",
-        "A reset token has been sent to your email. Please check your inbox.",
+        t("messages.success"),
+        t("messages.resetTokenSent"),
         [
           {
             text: "OK",
-            onPress: () => {
-              // 👉 Navigate to token entry page
-              router.push("/(auth)/enter-token");
-            },
+            onPress: () => router.push("/(auth)/enter-token"),
           },
         ]
       );
     } else {
-      Alert.alert("Error", "Failed to send reset token. Please try again.");
+      Alert.alert(t("messages.error"), t("messages.resetTokenFailed"));
     }
     setLoading(false);
   };
@@ -63,14 +66,16 @@ export default function ForgotPasswordScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.schoolName}>{schoolIdentification?.name || "My School"}</Text>
+        <Text style={styles.schoolName}>
+          {schoolIdentification?.name || t("ui.mySchool")}
+        </Text>
 
-        <Text style={styles.title}>Forgotten Password</Text>
-        <Text style={styles.subtitle}>Enter the email of your account</Text>
+        <Text style={styles.title}>{t("login.forgotPasswordTitle")}</Text>
+        <Text style={styles.subtitle}>{t("login.forgotPasswordSubtitle")}</Text>
 
         <TextInput
           style={styles.input}
-          placeholder="Enter email"
+          placeholder={t("login.enterEmail")}
           placeholderTextColor={COLORS.placeholderText}
           value={email}
           onChangeText={setEmail}
@@ -78,13 +83,17 @@ export default function ForgotPasswordScreen() {
         />
 
         <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.link}>Back to Login</Text>
+          <Text style={styles.link}>{t("login.backToLogin")}</Text>
         </TouchableOpacity>
 
         {validateEmail() ? (
-          <TouchableOpacity style={styles.button} onPress={handleSubmit} disabled={loading}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleSubmit}
+            disabled={loading}
+          >
             <Text style={styles.buttonText}>
-              {loading ? "Sending..." : "Send Reset Token"}
+              {loading ? t("ui.sending") : t("ui.sendResetToken")}
             </Text>
           </TouchableOpacity>
         ) : null}
@@ -92,7 +101,7 @@ export default function ForgotPasswordScreen() {
         <View style={styles.divider} />
 
         <TouchableOpacity onPress={handleSupport}>
-          <Text style={styles.link}>Contact Support</Text>
+          <Text style={styles.link}>{t("ui.contactSupport")}</Text>
         </TouchableOpacity>
         <Text style={styles.footerText}>@2025</Text>
       </View>

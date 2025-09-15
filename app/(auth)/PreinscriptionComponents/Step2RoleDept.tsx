@@ -3,8 +3,10 @@ import COLORS from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { Formik } from "formik";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FlatList,
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -14,6 +16,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
 import * as Yup from "yup";
@@ -28,193 +31,189 @@ type Step2Props = {
   apiSchools: string[];
 };
 
-const validationSchema = Yup.object().shape({
-  campusId: Yup.string().required("Campus is required"),
-  nationality: Yup.string().required("Nationality is required"),
-  regionOfOrigin: Yup.string().required("Region is required"),
-  highestCertificate: Yup.string().required("Certificate is required"),
-  yearObtained: Yup.string().required("Year obtained is required"),
-});
-
 export default function Step2RoleDept({
   data,
   updateField,
   onNext,
   onPrevious,
-  section,
   apiSchools,
 }: Step2Props) {
+  const { t } = useTranslation();
+
   const optionsMap: Record<string, string[]> = {
     campusId: apiSchools,
-    nationality: [
-      "Cameroon",
-      // "Nigeria",
-      // "Tchad",
-      // "Congo",
-      // "Guinea",
-      // "Gabon",
-      "International",
+    nationality: [t("nationalities.cameroon"), t("nationalities.international")],
+    regionOfOrigin: [
+      t("regions.southWest"),
+      t("regions.northWest"),
+      t("regions.west"),
+      t("regions.south"),
+      t("regions.center"),
+      t("regions.littoral"),
+      t("regions.east"),
+      t("regions.adamawa"),
+      t("regions.nord"),
+      t("regions.farNord"),
     ],
-    regionOfOrigin: ["South West", "North West", "West", "South", "Center", "Littoral", "East", "Adamawa", "Nord", "Far Nord"],
-    highestCertificate: ["GCE O/L", "GCE A/L", "HND", "Bachelor's", "Master" ],
+    highestCertificate: [
+      t("certificates.olevel"),
+      t("certificates.alevel"),
+      t("certificates.hnd"),
+      t("certificates.bachelor"),
+      t("certificates.master"),
+    ],
     yearObtained: Array.from({ length: 15 }, (_, i) => `${new Date().getFullYear() - i}`),
   };
 
+  const validationSchema = Yup.object().shape({
+    campusId: Yup.string().required(t("validation.required", { field: t("form.campusId") })),
+    nationality: Yup.string().required(t("validation.required", { field: t("form.nationality") })),
+    regionOfOrigin: Yup.string().required(t("validation.required", { field: t("form.regionOfOrigin") })),
+    highestCertificate: Yup.string().required(t("validation.required", { field: t("form.highestCertificate") })),
+    yearObtained: Yup.string().required(t("validation.required", { field: t("form.yearObtained") })),
+    grade: Yup.string().required(t("validation.required", { field: t("form.grade") })),
+    fatherName: Yup.string().required(t("validation.required", { field: t("form.fatherName") })),
+    fatherTelephone: Yup.string().required(t("validation.required", { field: t("form.fatherTelephone") })),
+    motherName: Yup.string().required(t("validation.required", { field: t("form.motherName") })),
+    motherTelephone: Yup.string().required(t("validation.required", { field: t("form.motherTelephone") })),
+    parentAddress: Yup.string().required(t("validation.required", { field: t("form.parentAddress") })),
+  });
+
   const [popupField, setPopupField] = useState<string | null>(null);
 
-  const renderPopup = (field: string) => (
-    <Modal transparent animationType="fade" visible={!!popupField}>
-      <View style={local.popupOverlay}>
-        <View style={local.popupContainer}>
-          <Text style={local.popupTitle}>Select {field}</Text>
-          <FlatList
-            data={optionsMap[field]}
-            keyExtractor={(item) => item}
-            renderItem={({ item }) => (
-              <Pressable
-                style={local.popupItem}
-                onPress={() => {
-                  updateField(field, item);
-                  setPopupField(null);
-                }}
-              >
-                <Text style={local.popupItemText}>{item}</Text>
-              </Pressable>
-            )}
-          />
-          <Pressable onPress={() => setPopupField(null)} style={local.popupCancel}>
-            <Text style={local.popupCancelText}>Cancel</Text>
-          </Pressable>
-        </View>
-      </View>
-    </Modal>
-  );
-
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 70}
-    >
-      <ScrollView
-        contentContainerStyle={[styles.container, { paddingBottom: 40 }]}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 70}
       >
-        {/* Step Indicator */}
-        <StepIndicator idx={1} />
+        <ScrollView
+          contentContainerStyle={[styles.container, { paddingBottom: 40, flexGrow: 1 }]}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <StepIndicator idx={1} />
 
-        <Formik
-  initialValues={data}
-  validationSchema={Yup.object().shape({
-    campusId: Yup.string().required("Campus is required"),
-    nationality: Yup.string().required("Nationality is required"),
-    regionOfOrigin: Yup.string().required("Region is required"),
-    highestCertificate: Yup.string().required("Certificate is required"),
-    yearObtained: Yup.string().required("Year obtained is required"),
-    grade: Yup.string().required("Grade is required"),
-    fatherName: Yup.string().required("Father's name is required"),
-    fatherTelephone: Yup.string().required("Father's telephone is required"),
-    motherName: Yup.string().required("Mother's name is required"),
-    motherTelephone: Yup.string().required("Mother's telephone is required"),
-    parentAddress: Yup.string().required("Parent's address is required"),
-  })}
-  onSubmit={onNext} // ✅ Only proceed if validation passes
->
-  {({ errors, touched, handleSubmit }) => (
-    <View style={styles.formContainer}>
-      {/* Dropdown Fields */}
-      {Object.keys(optionsMap).map((field) => (
-        <View key={field} style={styles.inputGroup}>
-          <Text style={styles.label}>
-            {field.replace(/([A-Z])/g, " $1")}
-          </Text>
-          <TouchableOpacity
-            onPress={() => setPopupField(field)}
-            style={[styles.inputContainer, { justifyContent: "flex-start" }]}
+          <Formik
+            initialValues={data} // start with parent data
+            enableReinitialize // ✅ syncs when going back
+            validationSchema={validationSchema}
+            onSubmit={(values) => {
+              Object.keys(values).forEach((k) => updateField(k, values[k])); // push all values to parent
+              onNext();
+            }}
           >
-            <Ionicons
-              name="chevron-down-outline"
-              size={20}
-              color={COLORS.primary}
-              style={styles.inputIcon}
-            />
-            <Text style={[styles.input, { paddingVertical: 12 }]}>
-              {data[field] || `Select ${field}`}
-            </Text>
-          </TouchableOpacity>
-          {errors[field] && touched[field] && (
-            <Text style={{ color: "red", fontSize: 12 }}>{errors[field]}</Text>
-          )}
-        </View>
-      ))}
+            {({ values, errors, touched, handleChange, handleSubmit, setFieldValue }) => (
+              <View style={styles.formContainer}>
+                {/* Dropdown Fields */}
+                {Object.keys(optionsMap).map((field) => (
+                  <View key={field} style={styles.inputGroup}>
+                    <Text style={styles.label}>{t(`form.${field}`)}</Text>
+                    <TouchableOpacity
+                      onPress={() => setPopupField(field)}
+                      style={[styles.inputContainer, { justifyContent: "flex-start" }]}
+                    >
+                      <Ionicons
+                        name="chevron-down-outline"
+                        size={20}
+                        color={COLORS.primary}
+                        style={styles.inputIcon}
+                      />
+                      <Text style={[styles.input, { paddingVertical: 12 }]}>
+                        {values[field] || t("form.selectField", { field: t(`form.${field}`) })}
+                      </Text>
+                    </TouchableOpacity>
+                    {errors[field] && touched[field] && (
+                      <Text style={{ color: "red", fontSize: 12 }}>{errors[field]}</Text>
+                    )}
 
-      {popupField && renderPopup(popupField)}
+                    {/* Popup modal */}
+                    {popupField === field && (
+                      <Modal transparent animationType="fade" visible={true}>
+                        <View style={local.popupOverlay}>
+                          <View style={local.popupContainer}>
+                            <Text style={local.popupTitle}>
+                              {t("form.selectField", { field: t(`form.${field}`) })}
+                            </Text>
+                            <FlatList
+                              data={optionsMap[field]}
+                              keyExtractor={(item) => item}
+                              renderItem={({ item }) => (
+                                <Pressable
+                                  style={local.popupItem}
+                                  onPress={() => {
+                                    setFieldValue(field, item);
+                                    setPopupField(null);
+                                  }}
+                                >
+                                  <Text style={local.popupItemText}>{item}</Text>
+                                </Pressable>
+                              )}
+                            />
+                            <Pressable onPress={() => setPopupField(null)} style={local.popupCancel}>
+                              <Text style={local.popupCancelText}>{t("actions.cancel")}</Text>
+                            </Pressable>
+                          </View>
+                        </View>
+                      </Modal>
+                    )}
+                  </View>
+                ))}
 
-      {/* Manual Inputs */}
-      {[
-        { key: "grade", label: "Grade" },
-        { key: "fatherName", label: "Father's Name" },
-        { key: "fatherTelephone", label: "Father's Telephone" },
-        { key: "motherName", label: "Mother's Name" },
-        { key: "motherTelephone", label: "Mother's Telephone" },
-        { key: "parentAddress", label: "Parent's Address" },
-      ].map(({ key, label }) => (
-        <View key={key} style={styles.inputGroup}>
-          <Text style={styles.label}>{label}</Text>
-          <View style={styles.inputContainer}>
-            <Ionicons
-              name="person-outline"
-              size={20}
-              color={COLORS.primary}
-              style={styles.inputIcon}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder={label}
-              placeholderTextColor={COLORS.placeholderText}
-              value={data[key] || ""}
-              onChangeText={(text) => updateField(key, text)}
-            />
-          </View>
-          {errors[key] && touched[key] && (
-            <Text style={{ color: "red", fontSize: 12 }}>{errors[key]}</Text>
-          )}
-        </View>
-      ))}
+                {/* Manual Text Inputs */}
+                {[
+                  { key: "grade", label: t("form.grade") },
+                  { key: "fatherName", label: t("form.fatherName") },
+                  { key: "fatherTelephone", label: t("form.fatherTelephone") },
+                  { key: "motherName", label: t("form.motherName") },
+                  { key: "motherTelephone", label: t("form.motherTelephone") },
+                  { key: "parentAddress", label: t("form.parentAddress") },
+                ].map(({ key, label }) => (
+                  <View key={key} style={styles.inputGroup}>
+                    <Text style={styles.label}>{label}</Text>
+                    <View style={styles.inputContainer}>
+                      <Ionicons
+                        name="person-outline"
+                        size={20}
+                        color={COLORS.primary}
+                        style={styles.inputIcon}
+                      />
+                      <TextInput
+                        style={styles.input}
+                        placeholder={label}
+                        placeholderTextColor={COLORS.placeholderText}
+                        value={values[key] || ""}
+                        onChangeText={handleChange(key)}
+                      />
+                    </View>
+                    {errors[key] && touched[key] && (
+                      <Text style={{ color: "red", fontSize: 12 }}>{errors[key]}</Text>
+                    )}
+                  </View>
+                ))}
 
-      {/* Navigation Buttons */}
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          gap: 12,
-          marginTop: 24,
-        }}
-      >
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: COLORS.border, flex: 1 }]}
-          onPress={onPrevious}
-        >
-          <Text style={[styles.buttonText, { color: COLORS.textPrimary }]}>
-            Back
-          </Text>
-        </TouchableOpacity>
+                {/* Navigation Buttons */}
+                <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12, marginTop: 24 }}>
+                  <TouchableOpacity
+                    style={[styles.button, { backgroundColor: COLORS.border, flex: 1 }]}
+                    onPress={onPrevious}
+                  >
+                    <Text style={[styles.buttonText, { color: COLORS.textPrimary }]}>
+                      {t("actions.back")}
+                    </Text>
+                  </TouchableOpacity>
 
-        {/* ✅ Call Formik handleSubmit instead of onNext */}
-        <TouchableOpacity
-          style={[styles.button, { flex: 1 }]}
-          onPress={handleSubmit}
-        >
-          <Text style={styles.buttonText}>Next</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  )}
-</Formik>
-
-      </ScrollView>
-    </KeyboardAvoidingView>
+                  <TouchableOpacity style={[styles.button, { flex: 1 }]} onPress={handleSubmit}>
+                    <Text style={styles.buttonText}>{t("actions.next")}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </Formik>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }
 

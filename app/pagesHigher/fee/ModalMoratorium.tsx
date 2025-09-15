@@ -6,6 +6,7 @@ import { NodeSchoolFees } from "@/utils/schemas/interfaceGraphql";
 import { gql } from "@apollo/client";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FlatList,
   Modal,
@@ -16,51 +17,70 @@ import {
   View,
 } from "react-native";
 
-
-
-
-const ModalMoratorium = (
-  { fees, modalVisible, setModalVisible }:
-    { fees: NodeSchoolFees, modalVisible: boolean, setModalVisible: any, setMoratoriumStatus: any }
-) => {
+const ModalMoratorium = ({
+  fees,
+  modalVisible,
+  setModalVisible,
+  setMoratoriumStatus,
+}: {
+  fees: NodeSchoolFees;
+  modalVisible: boolean;
+  setModalVisible: any;
+  setMoratoriumStatus: any;
+}) => {
+  const { t } = useTranslation();
   const [reason, setReason] = useState("");
   const { profileId } = useAuthStore();
-  const [schedules, setSchedules] = useState<{ id: number; amount: string; due_date: string; error?: string }[]>([]);
+  const [schedules, setSchedules] = useState<
+    { id: number; amount: string; due_date: string; error?: string }[]
+  >([]);
 
   const addSchedule = () => {
     if (schedules.length < 4) {
-      setSchedules([...schedules, { id: Date.now(), amount: "", due_date: "", error: "" }]);
+      setSchedules([
+        ...schedules,
+        { id: Date.now(), amount: "", due_date: "", error: "" },
+      ]);
     }
   };
 
   const removeSchedule = (id: number) => {
-    setSchedules(schedules.filter(s => s.id !== id));
+    setSchedules(schedules.filter((s) => s.id !== id));
   };
 
-  const updateSchedule = (id: number, field: "amount" | "due_date" | "error", value: any) => {
-    setSchedules(schedules.map(s => s.id === id ? { ...s, [field]: value } : s));
+  const updateSchedule = (
+    id: number,
+    field: "amount" | "due_date" | "error",
+    value: any
+  ) => {
+    setSchedules(
+      schedules.map((s) => (s.id === id ? { ...s, [field]: value } : s))
+    );
   };
 
   const handleDateChange = (id: number, val: string) => {
     const formattedDate = formatDateInput(val);
     const validation = validateDate(formattedDate);
 
-    setSchedules(schedules.map(s => {
-      if (s.id === id) {
-        return {
-          ...s,
-          due_date: formattedDate,
-          error: formattedDate.length === 10 && !validation?.isValid
-            ? validation?.error || "Invalid date"
-            : ""
-        };
-      }
-      return s;
-    }));
+    setSchedules(
+      schedules.map((s) => {
+        if (s.id === id) {
+          return {
+            ...s,
+            due_date: formattedDate,
+            error:
+              formattedDate.length === 10 && !validation?.isValid
+                ? validation?.error || t("invalidDate")
+                : "",
+          };
+        }
+        return s;
+      })
+    );
   };
 
   const formatDateInput = (text: string) => {
-    let cleaned = text.replace(/\D/g, '');
+    let cleaned = text.replace(/\D/g, "");
     if (cleaned.length > 8) {
       cleaned = cleaned.substring(0, 8);
     }
@@ -71,13 +91,20 @@ const ModalMoratorium = (
     } else if (cleaned.length < 6) {
       return `${cleaned.substring(0, 4)}-${cleaned.substring(4)}`;
     } else {
-      return `${cleaned.substring(0, 4)}-${cleaned.substring(4, 6)}-${cleaned.substring(6, 8)}`;
+      return `${cleaned.substring(0, 4)}-${cleaned.substring(
+        4,
+        6
+      )}-${cleaned.substring(6, 8)}`;
     }
   };
 
-
   const handleApply = async () => {
-    const validation = validateMoratoriumApplication(schedules, reason, fees?.balance);
+    const validation = validateMoratoriumApplication(
+      schedules,
+      reason,
+      fees?.balance,
+      t
+    );
 
     if (!validation.isValid) {
       alert(validation.message);
@@ -85,18 +112,20 @@ const ModalMoratorium = (
     }
 
     const sortedSchedules = [...schedules]
-      .sort((a, b) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime())
+      .sort(
+        (a, b) =>
+          new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
+      )
       .map(({ due_date, amount }) => ({
         due_date,
-        amount: parseFloat(amount)
+        amount: parseFloat(amount),
       }));
 
-    const requestedSchedule = JSON.stringify(sortedSchedules.map((s: any) => {
-      return { amount: s.amount, due_date: s.due_date }
-    })
+    const requestedSchedule = JSON.stringify(
+      sortedSchedules.map((s: any) => {
+        return { amount: s.amount, due_date: s.due_date };
+      })
     );
- 
-
 
     const dataForMutation = {
       userprofileId: profileId,
@@ -105,10 +134,7 @@ const ModalMoratorium = (
       requestedSchedule,
       comment: "",
       delete: false,
-    }
-
-       console.log(dataForMutation);
-    // return
+    };
 
     const successData = await ApiFactory({
       newData: dataForMutation,
@@ -126,14 +152,11 @@ const ModalMoratorium = (
       actionLabel: "creating",
     });
 
-    console.log(successData);
     if (successData) {
-      alert("Submitted Successfully");
-      setModalVisible(false)
+      alert(t("submittedSuccessfully"));
+      setModalVisible(false);
     }
-
   };
-
 
   return (
     <Modal
@@ -152,28 +175,29 @@ const ModalMoratorium = (
             <Ionicons name="close" size={20} color="black" />
           </TouchableOpacity>
 
-          <Text style={styles.modalTitle}>Moratoire Application</Text>
+          <Text style={styles.modalTitle}>{t("moratoriumApplication")}</Text>
           <Text style={styles.modalInfo}>
-            Class: {fees?.userprofile?.specialty?.mainSpecialty?.specialtyName}
+            {t("class")}:{" "}
+            {fees?.userprofile?.specialty?.mainSpecialty?.specialtyName}
           </Text>
           <Text style={styles.modalInfo}>
-            Year / Level: {fees?.userprofile?.specialty?.academicYear} - {fees?.userprofile?.specialty?.level?.level}
+            {t("yearLevel")}: {fees?.userprofile?.specialty?.academicYear} -{" "}
+            {fees?.userprofile?.specialty?.level?.level}
           </Text>
           <Text style={styles.modalInfo}>
-            Balance: {fees?.balance.toLocaleString()} F
+            {t("balance")}: {fees?.balance.toLocaleString()} F
           </Text>
 
-          <Text style={styles.modalSubtitle}>Requested Schedule</Text>
+          <Text style={styles.modalSubtitle}>{t("requestedSchedule")}</Text>
 
           <FlatList
             data={schedules}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <View style={styles.scheduleRow}>
-
                 <TextInput
                   style={styles.amountInput}
-                  placeholder="Amount"
+                  placeholder={t("amount")}
                   keyboardType="numeric"
                   value={item.amount}
                   onChangeText={(val) => updateSchedule(item.id, "amount", val)}
@@ -183,9 +207,9 @@ const ModalMoratorium = (
                   <TextInput
                     style={[
                       styles.dateInput,
-                      item.error && styles.dateInputError
+                      item.error && styles.dateInputError,
                     ]}
-                    placeholder="YYYY-MM-DD"
+                    placeholder={t("dateFormat")}
                     value={item.due_date}
                     onChangeText={(val) => handleDateChange(item.id, val)}
                     keyboardType="numbers-and-punctuation"
@@ -195,8 +219,6 @@ const ModalMoratorium = (
                     <Text style={styles.errorText}>{item.error}</Text>
                   ) : null}
                 </View>
-
-
 
                 <TouchableOpacity onPress={() => removeSchedule(item.id)}>
                   <Ionicons name="close-circle" size={22} color="red" />
@@ -212,7 +234,7 @@ const ModalMoratorium = (
           )}
 
           <TextInput
-            placeholder="Enter your reason (motif)..."
+            placeholder={t("enterReason")}
             style={styles.input}
             multiline
             value={reason}
@@ -220,7 +242,7 @@ const ModalMoratorium = (
           />
 
           <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
-            <Text style={styles.applyButtonText}>Apply</Text>
+            <Text style={styles.applyButtonText}>{t("apply")}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -325,66 +347,63 @@ const styles = StyleSheet.create({
   },
 });
 
-
-const validateMoratoriumApplication = (schedules: { id: number; amount: string; due_date: string; error?: string }[], reason: string, balance: number): { isValid: boolean; message?: string } => {
-  // Check if at least one schedule exists
+const validateMoratoriumApplication = (
+  schedules: { id: number; amount: string; due_date: string; error?: string }[],
+  reason: string,
+  balance: number,
+  t: any
+): { isValid: boolean; message?: string } => {
   if (schedules.length === 0) {
-    return { isValid: false, message: "Please add at least one schedule." };
+    return { isValid: false, message: t("addAtLeastOneSchedule") };
   }
 
-  // Check if reason is provided and has minimum length
   if (reason.trim() === "") {
-    return { isValid: false, message: "Please provide a reason for the moratorium." };
+    return { isValid: false, message: t("provideReason") };
   }
 
   if (reason.trim().length < 10) {
-    return { isValid: false, message: "Reason must be at least 10 characters long." };
+    return { isValid: false, message: t("reasonTooShort") };
   }
 
-  // Check if all amounts are valid numbers and positive
-  const invalidAmounts = schedules.some(schedule => {
+  const invalidAmounts = schedules.some((schedule) => {
     const amount = parseFloat(schedule.amount);
     return isNaN(amount) || amount <= 0;
   });
 
   if (invalidAmounts) {
-    return { isValid: false, message: "All amounts must be valid positive numbers." };
+    return { isValid: false, message: t("invalidAmount") };
   }
 
-  // Calculate total amount from all schedules
   const totalAmount = schedules.reduce((sum: number, schedule: any) => {
     return sum + parseFloat(schedule.amount);
   }, 0);
 
-  // Check if total amount matches the balance
   if (totalAmount !== balance) {
     return {
       isValid: false,
-      message: `Total amount (${totalAmount.toLocaleString()} F) must equal the balance (${balance.toLocaleString()} F).`
+      message: t("amountNotMatchBalance", {
+        total: totalAmount.toLocaleString(),
+        balance: balance.toLocaleString(),
+      }),
     };
   }
 
-  // Check if any schedule has validation errors
-  const hasErrors = schedules.some(schedule => schedule.error);
+  const hasErrors = schedules.some((schedule) => schedule.error);
   if (hasErrors) {
-    return { isValid: false, message: "Please fix all date validation errors before applying." };
+    return { isValid: false, message: t("fixDateErrors") };
   }
 
-  // Additional validation: Re-validate all dates to ensure they're completely valid
-  const invalidDates = schedules.some(schedule => {
+  const invalidDates = schedules.some((schedule) => {
     const validation = validateDate(schedule.due_date);
     return !validation.isValid;
   });
 
   if (invalidDates) {
-    return { isValid: false, message: "Please ensure all dates are valid (YYYY-MM-DD format and exist in calendar)." };
+    return { isValid: false, message: t("ensureValidDates") };
   }
 
-  // If all validations pass
   return { isValid: true };
 };
-
-
 
 const query = gql`
   mutation CreateUpdateDeleteMoratoire(

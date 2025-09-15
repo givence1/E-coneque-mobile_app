@@ -2,6 +2,7 @@ import COLORS from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   ScrollView,
   StyleSheet,
@@ -14,20 +15,21 @@ import globalStyles from "../../../assets/styles/signup.styles";
 type Step4ConfirmationProps = {
   data: FormData;
   onPrevious: () => void;
-  onSubmit: () => Promise<void>;  
+  onSubmit: () => Promise<void>;
   section: "H" | "S" | "P";
 };
 
 export default function Step4Confirmation({
   data,
   onPrevious,
-  onSubmit
+  onSubmit,
 }: Step4ConfirmationProps) {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleFinalSubmit = async () => {
     try {
-      await onSubmit(); 
+      await onSubmit();
       router.replace("/(auth)/signup");
     } catch (error) {
       console.error("Submit failed:", error);
@@ -40,7 +42,7 @@ export default function Step4Confirmation({
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={[styles.section]}>Confirm Your Information</Text>
+        <Text style={[styles.section]}>{t("confirm.title")}</Text>
 
         {/* PERSONAL INFORMATION */}
         <View style={styles.card}>
@@ -50,35 +52,35 @@ export default function Step4Confirmation({
               size={20}
               color={COLORS.primary}
             />
-            <Text style={styles.cardTitle}>Personal Information</Text>
+            <Text style={styles.cardTitle}>{t("steps.personalInfo")}</Text>
           </View>
-          {renderField("First Name", data.firstName)}
-          {renderField("Last Name", data.lastName)}
-          {renderField("Gender", data.sex)}
-          {renderField("Address", data.address)}
-          {renderField("Date of Birth", data.dob)}
-          {renderField("Place of Birth", data.pob)}
-          {renderField("Telephone", data.telephone)}
-          {renderField("Email", data.email)}
+          {renderField(t("form.firstName"), data.firstName)}
+          {renderField(t("form.lastName"), data.lastName)}
+          {renderField(t("form.gender"), data.sex)}
+          {renderField(t("form.address"), data.address)}
+          {renderField(t("form.dob"), data.dob)}
+          {renderField(t("form.pob"), data.pob)}
+          {renderField(t("form.telephone"), data.telephone)}
+          {renderField(t("form.email"), data.email)}
         </View>
 
         {/* ROLE & DEPARTMENT */}
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <Ionicons name="school-outline" size={20} color={COLORS.primary} />
-            <Text style={styles.cardTitle}>Role / Department</Text>
+            <Text style={styles.cardTitle}>{t("steps.roleDept")}</Text>
           </View>
-          {renderField("Campus", data.campusId)}
-          {renderField("Nationality", data.nationality)}
-          {renderField("Region of Origin", data.regionOfOrigin)}
-          {renderField("Highest Certificate", data.highestCertificate)}
-          {renderField("Year Obtained", data.yearObtained)}
-          {renderField("Subjects Grade", data.grade)}
-          {renderField("Father's Name", data.fatherName)}
-          {renderField("Mother's Name", data.motherName)}
-          {renderField("Father's Phone", data.fatherTelephone)}
-          {renderField("Mother's Phone", data.motherTelephone)}
-          {renderField("Parent's Address", data.parentAddress)}
+          {renderField(t("form.campusId"), data.campusId)}
+          {renderField(t("form.nationality"), data.nationality)}
+          {renderField(t("form.regionOfOrigin"), data.regionOfOrigin)}
+          {renderField(t("form.highestCertificate"), data.highestCertificate)}
+          {renderField(t("form.yearObtained"), data.yearObtained)}
+          {renderField(t("form.grade"), data.grade)}
+          {renderField(t("form.fatherName"), data.fatherName)}
+          {renderField(t("form.motherName"), data.motherName)}
+          {renderField(t("form.fatherTelephone"), data.fatherTelephone)}
+          {renderField(t("form.motherTelephone"), data.motherTelephone)}
+          {renderField(t("form.parentAddress"), data.parentAddress)}
         </View>
 
         {/* SPECIALTY INFO */}
@@ -89,14 +91,14 @@ export default function Step4Confirmation({
               size={20}
               color={COLORS.primary}
             />
-            <Text style={styles.cardTitle}>Specialty Info</Text>
+            <Text style={styles.cardTitle}>{t("steps.specialty")}</Text>
           </View>
-          {renderField("Specialty - 1st Choice", data.specialtyoneId)}
-          {renderField("Specialty - 2nd Choice", data.specialtytwoId)}
-          {renderField("Academic Year", data.academicYear)}
-          {renderField("Program", data.programId)}
-          {renderField("Level", data.level)}
-          {renderField("Session", data.session)}
+          {renderField(t("form.specialtyone"), data.specialtyoneId)}
+          {renderField(t("form.specialtytwo"), data.specialtytwoId)}
+          {renderField(t("form.academicYear"), data.academicYear)}
+          {renderField(t("form.program"), data.programId)}
+          {renderField(t("form.level"), data.level)}
+          {renderField(t("form.session"), data.session)}
         </View>
 
         {/* BOTTOM BUTTONS */}
@@ -118,7 +120,7 @@ export default function Step4Confirmation({
             <Text
               style={[globalStyles.buttonText, { color: COLORS.textPrimary }]}
             >
-              Back
+              {t("actions.back")}
             </Text>
           </TouchableOpacity>
 
@@ -126,7 +128,7 @@ export default function Step4Confirmation({
             style={[globalStyles.button, { flex: 1 }]}
             onPress={handleFinalSubmit}
           >
-            <Text style={globalStyles.buttonText}>Submit</Text>
+            <Text style={globalStyles.buttonText}>{t("actions.submit")}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -134,7 +136,7 @@ export default function Step4Confirmation({
   );
 }
 
-// Field renderer with type annotations
+// Field renderer with translation support
 function renderField(label: string, value?: string) {
   return (
     <View style={styles.fieldRow} key={label}>
@@ -153,7 +155,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginVertical: 20,
     color: COLORS.textDark,
-    textAlign: "center"
+    textAlign: "center",
   },
   card: {
     backgroundColor: COLORS.cardBackground,

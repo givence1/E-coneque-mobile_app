@@ -8,6 +8,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   ScrollView,
   StyleSheet,
@@ -16,15 +17,12 @@ import {
   View,
 } from "react-native";
 
-
-
 export default function LecturerHomeScreen() {
   const router = useRouter();
   const { user } = useAuthStore();
-  const sp = useRoute()
-  const { schoolId, schoolType } = sp?.params
-
-  console.log(schoolType);
+  const sp = useRoute();
+  const { schoolType } = sp?.params || {};
+const { t, i18n } = useTranslation();
 
   return (
     <View style={styles.container}>
@@ -36,7 +34,11 @@ export default function LecturerHomeScreen() {
       >
         {/* ✅ Lecturer Info */}
         <View style={styles.profileCard}>
-          <Ionicons name="person-circle-outline" size={60} color={COLORS.primary} />
+          <Ionicons
+            name="person-circle-outline"
+            size={60}
+            color={COLORS.primary}
+          />
           <View>
             <Text style={styles.profileName}>{user?.matricle}</Text>
             <Text style={styles.profileSub}>{user?.full_name}</Text>
@@ -45,14 +47,13 @@ export default function LecturerHomeScreen() {
 
         {/* ✅ Announcements */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📢 Announcements</Text>
+          <Text style={styles.sectionTitle}>📢 {t("lecturer.announcements")}</Text>
           <TouchableOpacity
             style={styles.announcementCard}
             onPress={() => router.push("/(tabteacher)/announcements")}
           >
             <Text style={styles.announcementText}>
-              The quiz portal will close on Friday at 5 PM. Ensure all marks are
-              uploaded before then.
+              {t("lecturer.announcementMessage")}
             </Text>
           </TouchableOpacity>
         </View>
@@ -60,7 +61,6 @@ export default function LecturerHomeScreen() {
         {schoolType === "Section-H" ? <DashHigher /> : null}
         {schoolType === "Section-S" ? <DashSecondary /> : null}
         {schoolType === "Section-P" ? <DashPrimary /> : null}
-
       </ScrollView>
     </View>
   );
@@ -104,14 +104,4 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   announcementText: { fontSize: 14, color: COLORS.textDark },
-  statsRow: { flexDirection: "row", justifyContent: "space-between", gap: 12 },
-  statBox: {
-    flex: 1,
-    alignItems: "center",
-    backgroundColor: COLORS.cardBackground,
-    paddingVertical: 20,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
 });

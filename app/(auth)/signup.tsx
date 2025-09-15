@@ -3,6 +3,7 @@ import { useAuthStore } from "@/store/authStore";
 import { gql, useQuery } from "@apollo/client";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -12,12 +13,14 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 import PreinscriptionHigher from "./PreinscriptionComponents/PreinscriptionHigher";
 import PreinscriptionPrimary from "./PreinscriptionComponents/PreinscriptionPrimary";
 import PreinscriptionSecondary from "./PreinscriptionComponents/PreinscriptionSecondary";
 
 export default function Signup() {
   const { schoolIdentification } = useAuthStore();
+  const { t } = useTranslation();
   const [section, setSection] = useState<"H" | "S" | "P" | "V">();
 
   const { data } = useQuery(GET_DATA, { variables: { language: "en" } });
@@ -42,7 +45,7 @@ export default function Signup() {
         <ScrollView
           contentContainerStyle={[
             styles.content,
-            !section && { justifyContent: "center" }, // 👈 only center when no section
+            !section && { justifyContent: "center" },
           ]}
           keyboardShouldPersistTaps="handled"
         >
@@ -50,7 +53,9 @@ export default function Signup() {
             <View style={{ gap: 16, marginVertical: 5 }}>{renderSection()}</View>
           ) : (
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>Select a Section</Text>
+              <Text style={styles.cardTitle}>
+                {t("preinscription.selectSection")}
+              </Text>
 
               {schoolIdentification?.hasHigher && (
                 <TouchableOpacity
@@ -58,7 +63,7 @@ export default function Signup() {
                   style={styles.option}
                 >
                   <Text style={styles.optionText}>
-                    University Pre-Inscription
+                    {t("preinscription.university")}
                   </Text>
                   <Ionicons
                     name="arrow-forward"
@@ -74,7 +79,7 @@ export default function Signup() {
                   style={styles.option}
                 >
                   <Text style={styles.optionText}>
-                    Secondary Pre-Inscription
+                    {t("preinscription.secondary")}
                   </Text>
                   <Ionicons
                     name="arrow-forward"
@@ -90,7 +95,7 @@ export default function Signup() {
                   style={styles.option}
                 >
                   <Text style={styles.optionText}>
-                    Primary Pre-Inscription
+                    {t("preinscription.primary")}
                   </Text>
                   <Ionicons
                     name="arrow-forward"

@@ -5,7 +5,6 @@ import {
   Alert,
   FlatList,
   Image,
-  ImageStyle,
   KeyboardAvoidingView,
   ListRenderItem,
   Modal,
@@ -13,10 +12,8 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TextStyle,
   TouchableOpacity,
   View,
-  ViewStyle,
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import COLORS from "../../../constants/colors";
@@ -144,14 +141,17 @@ const ComplaintHistory: React.FC = () => {
 
   return (
     <View style={styles.container}>
-     <AppHeader showBack  showTitle  />
-      <Text style={styles.title}>Complaint History</Text>
-      <FlatList
-        data={complaintHistory}
-        keyExtractor={(item) => item.id}
-        renderItem={renderComplaint}
-        contentContainerStyle={{ paddingBottom: 20 }}
-      />
+      <AppHeader showBack showTitle />
+      <View style={styles.content}>
+        <Text style={styles.title}>Complaint History</Text>
+        <FlatList
+          data={complaintHistory}
+          keyExtractor={(item) => item.id}
+          renderItem={renderComplaint}
+          contentContainerStyle={{ paddingBottom: 20 }}
+          showsVerticalScrollIndicator={false}
+        />
+      </View>
 
       {/* Edit Modal */}
       <Modal
@@ -209,34 +209,15 @@ const ComplaintHistory: React.FC = () => {
 export default ComplaintHistory;
 
 // ---------- Styles ----------
-type Styles = {
-  container: ViewStyle;
-  title: TextStyle;
-  card: ViewStyle;
-  row: ViewStyle;
-  label: TextStyle;
-  value: TextStyle;
-  status: TextStyle;
-  pending: TextStyle;
-  resolved: TextStyle;
-  inReview: TextStyle;
-  attachment: ViewStyle;
-  imagePreview: ImageStyle;
-  attachmentText: TextStyle;
-  modalOverlay: ViewStyle;
-  modalContent: ViewStyle;
-  modalTitle: TextStyle;
-  dropdown: ViewStyle;
-  input: TextStyle;
-  button: ViewStyle;
-  buttonText: TextStyle;
-};
-
-const styles = StyleSheet.create<Styles>({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-    padding: 16,
+  },
+  content: {
+    flex: 1,
+    paddingTop: 80, // space below header
+    paddingHorizontal: 16,
   },
   title: {
     fontSize: 20,
