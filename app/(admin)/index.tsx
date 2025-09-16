@@ -43,7 +43,7 @@ const StudentHome = () => {
             </View>
           </View>
           <Image
-            source={require("../../assets/images/icon.jpg")}
+            source={require("../../assets/images/icon.png")}
             style={localStyles.avatar}
           />
         </View>

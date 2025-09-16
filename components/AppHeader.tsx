@@ -164,10 +164,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  left: { flexDirection: "row", alignItems: "center" },
+  left: { flexDirection: "row", alignItems: "center", width: 60 },
   center: { flex: 1, alignItems: "center" },
-  title: { color: "#fff", fontSize: 10, fontWeight: "700", textAlign: "center" },
-  right: { flexDirection: "row", alignItems: "center" },
+  title: { color: "#fff", fontSize: 10, fontWeight: "700", textAlign: "center", width: 200 },
+  right: { flexDirection: "row", alignItems: "center", width: 100 },
   icon: { marginHorizontal: 4, flexDirection: "row", alignItems: "center" },
   langText: { color: "#fff", marginLeft: 3, fontSize: 12, fontWeight: "600" },
   tabs: {

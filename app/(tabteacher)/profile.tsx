@@ -116,7 +116,7 @@ export default function LecturerProfileScreen() {
             source={
               profile?.customuser?.photo?.length > 1
                 ? { uri: `${protocol}${tenant}${RootApi}/media/${profile?.customuser?.photo}` }
-                : require("../../assets/images/icon.jpg")
+                : require("../../assets/images/icon.png")
             }
             style={styles.avatar}
           />

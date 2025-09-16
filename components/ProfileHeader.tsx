@@ -60,14 +60,17 @@ const ProfileHeader = (
           <View style={[localStyles.progress, { width: "70%" }]} />
         </View>
       </View>
-      <Image
-        source={
-          profile?.customuser?.photo?.length > 1
-            ? { uri: protocol + tenant + RootApi + "/media/" + profile?.customuser?.photo }
-            : require("../assets/images/icon.jpg")
-        }
-        style={localStyles.avatar}
-      />
+     <Image
+  source={{
+    uri:
+      profile?.customuser?.photo?.length > 1
+        ? protocol + tenant + RootApi + "/media/" + profile?.customuser?.photo
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(
+            profile?.customuser?.username || "User"
+          )}&background=random&color=fff`,
+  }}
+  style={localStyles.avatar}
+/>
     </View>
   );
 };

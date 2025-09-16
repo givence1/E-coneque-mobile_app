@@ -58,7 +58,7 @@ const Header = (
             </View>
             <Pressable onPress={() => router.push("/(auth)/select-profile")}>
                 <Image
-                    source={require("../../assets/images/icon.jpg")}
+                    source={require("../../assets/images/icon.png")}
                     style={localStyles.avatar}
                 />
             </Pressable>
