@@ -3,7 +3,7 @@
 // export const NoDomainRootApi = "localhost:8000"
 
 export const protocol = "https://"
-//export const tenant = "apitest"
+// export const tenant = "apitest"
 // export const tenant = "apitestsec"
 export const tenant = "apibrains"
 export const RootApi = ".e-conneq.com"

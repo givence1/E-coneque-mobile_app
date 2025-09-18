@@ -1,11 +1,12 @@
 import AppHeader from "@/components/AppHeader";
 import COLORS from "@/constants/colors";
 import { useAuthStore } from "@/store/authStore";
+import { protocol, RootApi, tenant } from "@/utils/config"; // ✅ import same as lecturer
 import { gql, useQuery } from "@apollo/client";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
-import { useTranslation } from "react-i18next"; // ✅ Translation hook
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
@@ -57,13 +58,14 @@ export default function StudentProfileScreen() {
   }
 
   const profile = data?.allUserProfiles?.edges?.[0]?.node || {};
+  const userPhoto = profile?.customuser?.photo?.length > 1
+    ? { uri: `${protocol}${tenant}${RootApi}/media/${profile?.customuser?.photo}` }
+    : require("@/assets/images/icon.png"); // fallback like lecturer
 
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-      {/* Fixed Header */}
       <AppHeader showBack showTabs showTitle />
 
-      {/* Scrollable Content */}
       <ScrollView
         style={styles.container}
         contentContainerStyle={{ paddingTop: 50, paddingBottom: 50 }}
@@ -71,10 +73,7 @@ export default function StudentProfileScreen() {
       >
         {/* Profile Header */}
         <View style={styles.headerCard}>
-          <Image
-            source={{ uri: profile?.customuser?.photo || "https://via.placeholder.com/120" }}
-            style={styles.avatar}
-          />
+          <Image source={userPhoto} style={styles.avatar} />
           <Text style={styles.name}>{profile?.customuser?.fullName || t("ui.noData")}</Text>
           <Text style={styles.matric}>
             {t("profile.id")}: {profile?.customuser?.matricle || "N/A"}
@@ -92,7 +91,7 @@ export default function StudentProfileScreen() {
 
         {/* Parent Info */}
         <View style={styles.infoCard}>
-          <Text style={styles.sectionTitle}>👨‍👩‍👧 {t("ui.parentInfo")}</Text>
+          <Text style={styles.sectionTitle}>👨‍👩‍👧 {t("profile.parentInfo")}</Text>
           <InfoRow label={t("profile.fatherName")} value={profile?.customuser?.fatherName} />
           <InfoRow label={t("profile.fatherPhone")} value={profile?.customuser?.fatherTelephone} />
           <InfoRow label={t("profile.motherName")} value={profile?.customuser?.motherName} />
@@ -119,11 +118,12 @@ export default function StudentProfileScreen() {
   );
 }
 
-/* ✅ Reusable Row Component */
 const InfoRow = ({ label, value }: { label: string; value?: string }) => (
   <View style={styles.infoRow}>
     <Text style={styles.infoLabel}>{label}:</Text>
-    <Text style={styles.infoValue}>{value || "N/A"}</Text>
+    <Text style={styles.infoValue} numberOfLines={3} ellipsizeMode="tail">
+      {value || "N/A"}
+    </Text>
   </View>
 );
 
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
     paddingHorizontal: 16,
-    marginTop: 16
+    marginTop: 16,
   },
   headerCard: {
     alignItems: "center",
@@ -157,10 +157,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
     color: COLORS.textPrimary,
+    textAlign: "center",   
+    marginBottom: 4,
   },
   matric: {
     fontSize: 14,
     color: COLORS.textSecondary,
+    textAlign: "center",  
+    flexWrap: "wrap",
   },
   infoCard: {
     backgroundColor: COLORS.cardBackground,
@@ -180,15 +184,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 6,
+    flexWrap: "wrap",  
   },
   infoLabel: {
     fontSize: 14,
     color: COLORS.textSecondary,
+    flexShrink: 1,
+    maxWidth: "40%",   
   },
   infoValue: {
     fontSize: 14,
     fontWeight: "500",
     color: COLORS.textPrimary,
+    flexShrink: 1,
+    maxWidth: "60%",   
   },
   logoutBtn: {
     flexDirection: "row",
@@ -207,7 +216,7 @@ const styles = StyleSheet.create({
   },
 });
 
-// GraphQL query
+
 const GET_PROFILE = gql`
   query GetProfile($id: ID!) {
     allUserProfiles(id: $id) {

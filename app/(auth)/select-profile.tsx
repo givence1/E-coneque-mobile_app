@@ -22,7 +22,7 @@ import COLORS from "../../constants/colors";
 export default function SelectYearScreen(): JSX.Element {
   const router = useRouter();
   const { t } = useTranslation();
-  const { user, storeFeesId, storeProfileId, storeCampusInfo } = useAuthStore();
+  const { user, storeFeesId, storeProfileId, storeSpecialtyId, storeCampusInfo } = useAuthStore();
 
   const { data: dataProfiles } = useQuery(GET_PROFILES, {
     variables: { customuserId: user?.user_id },
@@ -36,21 +36,28 @@ export default function SelectYearScreen(): JSX.Element {
     storeFeesId(feesId);
 
     let profileId: string | undefined;
+    let specialtyId: string | undefined;
     let campus: NodeSchoolHigherInfo | undefined;
 
     if ("userprofile" in item.node) {
       profileId = item.node.userprofile?.id?.toString();
+      specialtyId = item.node.userprofile?.specialty?.id?.toString();
       campus = item.node.userprofile?.specialty?.school;
     } else if ("userprofilesec" in item.node) {
       profileId = item.node.userprofilesec?.id?.toString();
+      specialtyId = item.node.userprofilesec?.classroomsec?.id?.toString();
       campus = item.node.userprofilesec?.classroomsec?.school;
     } else if ("userprofileprim" in item.node) {
       profileId = item.node.userprofileprim?.id?.toString();
+      specialtyId = item.node.userprofileprim?.classroomprim?.id?.toString();
       campus = item.node.userprofileprim?.classroomprim?.school;
     }
 
     if (profileId) {
       storeProfileId(parseInt(decodeUrlID(profileId) || ""));
+    }
+    if (specialtyId) {
+      storeSpecialtyId(parseInt(decodeUrlID(specialtyId) || ""));
     }
     if (campus) {
       storeCampusInfo(campus);

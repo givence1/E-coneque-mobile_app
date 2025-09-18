@@ -59,6 +59,7 @@ export default function Step2RoleDept({
       t("certificates.olevel"),
       t("certificates.alevel"),
       t("certificates.hnd"),
+      t("certificates.baccalaureate"),
       t("certificates.bachelor"),
       t("certificates.master"),
     ],

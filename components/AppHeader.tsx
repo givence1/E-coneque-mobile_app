@@ -106,11 +106,11 @@ export default function AppHeader({ showBack, showTitle, title, showTabs }: AppH
       </View>
 
       {/* Optional Tabs */}
-      {showTabs && (
+      {/* {showTabs && (
         <View style={styles.tabs}>
-          <Text style={{ color: "#fff" }}>Tabs Placeholder</Text>
+          <Text style={{ color: "#b92424ff" }}>Tabs Placeholder</Text>
         </View>
-      )}
+      )} */}
 
       {/* Language Selection Modal */}
       <Modal

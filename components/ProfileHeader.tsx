@@ -29,8 +29,19 @@ const ProfileHeader = (
     profile = fees.node.userprofileprim;
   }
 
+  // ✅ Build correct photo URL or fallback
+  const userPhoto =
+    profile?.customuser?.photo && profile?.customuser?.photo.length > 1
+      ? { uri: `${protocol}${tenant}${RootApi}/media/${profile?.customuser?.photo}` }
+      : {
+          uri: `https://ui-avatars.com/api/?name=${encodeURIComponent(
+            profile?.customuser?.fullName || profile?.customuser?.username || "User"
+          )}&background=random&color=fff`,
+        };
+
   return (
     <View style={localStyles.infoCard}>
+      {/* Left side: Text info */}
       <View style={{ flex: 1 }}>
         <Text style={localStyles.name}>{profile?.customuser?.fullName}</Text>
         <Text style={localStyles.program}>
@@ -60,17 +71,9 @@ const ProfileHeader = (
           <View style={[localStyles.progress, { width: "70%" }]} />
         </View>
       </View>
-     <Image
-  source={{
-    uri:
-      profile?.customuser?.photo?.length > 1
-        ? protocol + tenant + RootApi + "/media/" + profile?.customuser?.photo
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(
-            profile?.customuser?.username || "User"
-          )}&background=random&color=fff`,
-  }}
-  style={localStyles.avatar}
-/>
+
+      {/* Right side: Avatar */}
+      <Image source={userPhoto} style={localStyles.avatar} />
     </View>
   );
 };
@@ -92,11 +95,13 @@ const localStyles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 16,
     marginBottom: 4,
+    flexWrap: "wrap",
   },
   program: {
     color: "white",
     fontSize: 14,
     marginBottom: 2,
+    flexWrap: "wrap",
   },
   level: {
     color: "white",

@@ -11,6 +11,7 @@ interface AuthStore {
   user: JwtPayload | null;
   feesId: number | null;
   profileId: number | null;
+  specialtyId: number | null;
   token: string | null;
   isCheckingAuth: boolean;
   isLoading: boolean;
@@ -24,6 +25,7 @@ interface AuthStore {
   checkAuth: () => void;
   storeFeesId: (id: number) => void;
   storeProfileId: (id: number) => void;
+  storeSpecialtyId: (id: number) => void;
   storeRegistrationId: (field: "registration_lec_id" | "registration_hig_id" | "registration_sec_id" | "registration_pri_id", value: number) => void;
   storeCampusInfo: (data: NodeSchoolHigherInfo) => void;
   setLanguage: (lang: string) => void;
@@ -34,6 +36,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
   feesId: null,
   profileId: null,
+  specialtyId: null,
   token: null,
   isCheckingAuth: false,
   isLoading: false,
@@ -44,6 +47,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   storeFeesId: async (feesId: number) => { set({ feesId }) },
   storeProfileId: async (profileId: number) => { set({ profileId }) },
+  storeSpecialtyId: async (specialtyId: number) => { set({ specialtyId }) },
   storeCampusInfo: async (campusInfo: NodeSchoolHigherInfo) => { set({ campusInfo }) },
 
   storeRegistrationId: (field, value) => {
