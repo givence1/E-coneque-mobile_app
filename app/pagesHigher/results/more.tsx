@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   },
   box: {
     width: "47%",
-    backgroundColor: "white",
+    backgroundColor: COLORS.cardBackground,
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,

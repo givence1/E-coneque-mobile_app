@@ -17,27 +17,57 @@
 // };
 
 // <<<<< THE BRAINS >>>>>
-const COLORS = {
-  primary: '#1A4B8C',           // Deep blue
-  secondary: '#FFD700',         // Gold
-  accent: '#CC0000',            // Crimson red
-  textPrimary: '#2C3E50',
-  textSecondary: '#546E7A',
-  textDark: "#002D27",
-  placeholderText: "#757575",
-  background: '#F5F7FA',
-  cardBackground: '#FFFFFF',
-  inputBackground: '#E8EAF6',
-  border: '#B0BEC5',
-  white: '#FFFFFF',
-  black: '#000000',
-  success: '#2E7D32',
-  warning: '#F57C00',
-  error: '#D32F2F',
-  info: '#0288D1'
-};
+// const COLORS = {
+//   primary: '#1A4B8C',           // Deep blue
+//   secondary: '#FFD700',         // Gold
+//   accent: '#CC0000',            // Crimson red
+//   textPrimary: '#2C3E50',
+//   textSecondary: '#546E7A',
+//   textDark: "#002D27",
+//   placeholderText: "#757575",
+//   background: '#F5F7FA',
+//   cardBackground: '#FFFFFF',
+//   inputBackground: '#E8EAF6',
+//   border: '#B0BEC5',
+//   white: '#FFFFFF',
+//   black: '#000000',
+//   success: '#2E7D32',
+//   warning: '#F57C00',
+//   error: '#D32F2F',
+//   info: '#0288D1'
+// };
 
 // <<<<< ST JOAN >>>>>
+
+// <<<<< DARK AUTH THEME >>>>>
+const COLORS = {
+  // Main branding
+  primary: "#3390EC",           // Blue (buttons, highlights)
+  warning: "#F57C00",           // Orange (warnings)
+  error: "#D32F2F",             // Red (errors)
+  success: "#2E7D32",           // Green (success)
+  info: "#0288D1",              // Info blue
+
+  // Backgrounds
+  background: "#1E2A38",        // App background (dark navy-gray)
+  cardBackground: "#2B3A4A",    // Card/panel background
+  inputBackground: "#3A4B5C",   // Input fields background
+
+  // Text colors
+  textPrimary: "#FFFFFF",       // Main text (white)
+  textSecondary: "#A0AABA",     // Secondary text (grayish)
+  textDark: "#C7D1E0",          // Muted light text (like code display)
+  placeholderText: "#757575",   // Placeholder in inputs
+
+  // Borders & dividers
+  border: "#4A5A6A",            // Divider/border gray
+
+  // Base
+  white: "#FFFFFF",
+  black: "#000000",
+};
+
+
 // const COLORS = { 
 //   primary: "#C8102E",           
 //   textPrimary: "#1A2BA3",       

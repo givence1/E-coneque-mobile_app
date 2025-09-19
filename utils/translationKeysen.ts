@@ -399,7 +399,7 @@ portal: {
 
 results: {
    title: "Exam Results",
-    resit: "Resit Results",
+    resit: "Resit",
     all: "All Results",
     semester: "Select semester",
     semesters: ["I", "II"],

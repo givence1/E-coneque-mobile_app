@@ -83,7 +83,7 @@ export default ProfileHeader;
 // Local Styles
 const localStyles = StyleSheet.create({
   infoCard: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.cardBackground,
     borderRadius: 10,
     padding: 16,
     margin: 16,

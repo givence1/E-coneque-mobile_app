@@ -71,7 +71,7 @@ export default function ExamResults() {
         {/* Results */}
         {!searchResults ? (
           <DisplayResults
-            title={t("results.allResults")}
+            title={t("results.all")}
             result_type="results"
             results={resultList}
             semester={semester}

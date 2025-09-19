@@ -26,14 +26,19 @@ export default function SelectYearScreen(): JSX.Element {
 
   const { data: dataProfiles } = useQuery(GET_PROFILES, {
     variables: { customuserId: user?.user_id },
+    skip: !user?.user_id,
   });
 
   const handleSelect = (
     item: EdgeSchoolFees | EdgeSchoolFeesSec | EdgeSchoolFeesPrim,
     section: "higher" | "secondary" | "primary"
   ): void => {
-    const feesId = parseInt(decodeUrlID(item.node.id.toString()) || "");
-    storeFeesId(feesId);
+    // ✅ FeesId
+    const feesId = parseInt(decodeUrlID(item.node.id.toString()) || "0", 10);
+    if (!isNaN(feesId)) {
+      storeFeesId(feesId);
+      console.log("Stored Fees ID:", feesId);
+    }
 
     let profileId: string | undefined;
     let specialtyId: string | undefined;
@@ -54,14 +59,26 @@ export default function SelectYearScreen(): JSX.Element {
     }
 
     if (profileId) {
-      storeProfileId(parseInt(decodeUrlID(profileId) || ""));
+      const parsed = parseInt(decodeUrlID(profileId) || "0", 10);
+      if (!isNaN(parsed)) {
+        storeProfileId(parsed);
+        console.log("Stored Profile ID:", parsed);
+      }
     }
+
     if (specialtyId) {
-      storeSpecialtyId(parseInt(decodeUrlID(specialtyId) || ""));
+      const parsed = parseInt(decodeUrlID(specialtyId) || "0", 10);
+      if (!isNaN(parsed)) {
+        storeSpecialtyId(parsed);
+        console.log("Stored Specialty ID:", parsed);
+      }
     }
+
     if (campus) {
       storeCampusInfo(campus);
+      console.log("Stored Campus:", campus.schoolName);
     }
+
     router.replace({
       pathname: `/(tabstudent)/${section}`,
     });
@@ -96,26 +113,12 @@ export default function SelectYearScreen(): JSX.Element {
                 <MaterialCommunityIcons name="book-outline" size={16} />{" "}
                 {t("academic.program")}: {item.node.userprofile?.program?.name}
                 {item.node.platformPaid ? (
-                  <Text
-                    style={{
-                      color: "green",
-                      fontWeight: "bold",
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}
-                  >
+                  <Text style={{ color: "green", fontWeight: "bold" }}>
                     <Ionicons name="checkmark-circle" size={16} color="green" />{" "}
                     {t("status.active")}
                   </Text>
                 ) : (
-                  <Text
-                    style={{
-                      color: "red",
-                      fontWeight: "bold",
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}
-                  >
+                  <Text style={{ color: "red", fontWeight: "bold" }}>
                     <Ionicons name="close-circle" size={16} color="red" />{" "}
                     {t("status.inactive")}
                   </Text>
@@ -150,7 +153,7 @@ const styles = StyleSheet.create<{
     marginBottom: 20,
   },
   card: {
-    backgroundColor: "#E3F0FF",
+    backgroundColor: COLORS.cardBackground,
     borderRadius: 16,
     padding: 16,
     marginBottom: 20,
@@ -168,7 +171,7 @@ const styles = StyleSheet.create<{
   },
   text: {
     fontSize: 14,
-    color: "#333",
+    color: COLORS.textPrimary,
     marginBottom: 4,
   },
 });
@@ -191,6 +194,7 @@ const GET_PROFILES = gql`
               fullName
             }
             specialty {
+              id
               academicYear
               level {
                 level
@@ -228,6 +232,7 @@ const GET_PROFILES = gql`
               fullName
             }
             classroomsec {
+              id
               school {
                 id
                 schoolName
@@ -258,6 +263,7 @@ const GET_PROFILES = gql`
               fullName
             }
             classroomprim {
+              id
               school {
                 id
                 schoolName

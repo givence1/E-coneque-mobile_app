@@ -90,7 +90,7 @@ export default function CAResults() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: COLORS.background, padding: 16 },
+  container: { flex: 1, backgroundColor: COLORS.background, padding: 16, borderRadius:50 },
   scrollContent: {
     flexGrow: 1,
     paddingBottom: 60,

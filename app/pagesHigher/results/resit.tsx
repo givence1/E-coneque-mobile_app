@@ -66,7 +66,7 @@ export default function CAResults() {
         {/* Results */}
         {!searchResults ? (
           <DisplayResults
-            title={t("results.resitResults")}
+            title={t("results.resit")}
             result_type="resit"
             results={resultList}
             semester={semester}

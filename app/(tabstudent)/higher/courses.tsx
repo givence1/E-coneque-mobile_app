@@ -13,28 +13,20 @@ import {
   View,
 } from "react-native";
 
-type CourseNode = {
-  courseCode: string;
-  semester: "I" | "II" | string;
-  specialty?: {
-    academicYear?: string;
-  };
-  mainCourse?: {
-    courseName?: string;
-  };
-};
 
 export default function CoursesScreen() {
-  const { profileId } = useAuthStore();
   const { t } = useTranslation();
+  const { specialtyId } = useAuthStore();
+  // const
 
-  // ⚠️ Replace this with actual specialtyId from profile
-  const specialtyId = 1;
 
   const { data, loading, error } = useQuery(GET_COURSES, {
-    variables: { specialtyId: Number(specialtyId) },
+    variables: {
+      specialtyId: Number(specialtyId)
+    },
     skip: !specialtyId,
   });
+
 
   if (loading) {
     return (
@@ -44,7 +36,7 @@ export default function CoursesScreen() {
     );
   }
 
-  if (error) {
+  if (error || !specialtyId) {
     return (
       <View style={styles.loadingContainer}>
         <Text style={{ color: "red" }}>{t("courses.loadError")}</Text>
@@ -105,7 +97,9 @@ export default function CoursesScreen() {
   );
 }
 
+
 function renderTable(courses: EdgeCourse[], semester: string, t: any) {
+
   return (
     <View style={styles.table}>
       <View style={styles.headerRow}>
@@ -120,7 +114,7 @@ function renderTable(courses: EdgeCourse[], semester: string, t: any) {
         </Text>
       </View>
 
-      {courses.map((course, index) => (
+      {courses?.map((course, index) => (
         <View
           key={course.node.id} // ✅ unique key now
           style={[
@@ -150,6 +144,7 @@ const GET_COURSES = gql`
           courseCode
           semester
           specialty {
+            id
             academicYear
           }
           mainCourse {

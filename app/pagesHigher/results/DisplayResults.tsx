@@ -151,7 +151,7 @@ const DisplayResults = (
 
                                             return (
                                                 <View key={index} style={styles.row}>
-                                                    <Text style={[styles.cell, { flex: 1 }]}>{item.node.course.courseCode}</Text>
+                                                    {/* <Text style={[styles.cell, { flex: 1 }]}>{item.node.course.courseCode}</Text> */}
                                                     <Text style={[styles.cell, { flex: 4 }]}>{item.node.course.mainCourse.courseName}</Text>
                                                     <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>{mark}</Text>
                                                     <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>
@@ -171,7 +171,7 @@ const DisplayResults = (
 export default DisplayResults;
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: COLORS.background, padding: 16 },
+    container: { flex: 1, backgroundColor: COLORS.background, padding: 16},
     title: {
         fontSize: 20,
         fontWeight: "700",
@@ -181,6 +181,7 @@ const styles = StyleSheet.create({
     },
     table: {
         borderWidth: 1,
+        borderRadius: 8,
         borderColor: COLORS.border,
         width: "100%"
     },
@@ -188,6 +189,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         backgroundColor: COLORS.primary,
         padding: 10,
+        borderRadius: 8,
     },
     row: {
         flexDirection: "row",

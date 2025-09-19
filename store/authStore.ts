@@ -12,7 +12,7 @@ interface AuthStore {
   feesId: number | null;
   profileId: number | null;
   specialtyId: number | null;
-  token: string | null;
+  token: string | null; 
   isCheckingAuth: boolean;
   isLoading: boolean;
   schoolIdentification: NodeSchoolIdentification | null;
