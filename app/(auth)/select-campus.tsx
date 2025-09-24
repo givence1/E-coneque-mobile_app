@@ -292,7 +292,7 @@ const styles = StyleSheet.create<{
     marginBottom: 20,
   },
   card: {
-    backgroundColor: "#E3F0FF",
+    backgroundColor: COLORS.cardBackground,
     borderRadius: 16,
     padding: 16,
     marginBottom: 20,
@@ -310,7 +310,7 @@ const styles = StyleSheet.create<{
   },
   text: {
     fontSize: 14,
-    color: "#333",
+    color: COLORS.textPrimary,
     marginBottom: 4,
   },
   button: {

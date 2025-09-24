@@ -21,6 +21,7 @@ interface Step1Props {
     telephone?: string;
     email?: string;
   };
+  section: "H" | "S" | "P" | "V"
   updateField: (field: string, value: string) => void;
   onNext: () => void;
   onPrevious: () => void;
@@ -286,7 +287,7 @@ export default function Step1PersonalInfo({
                   <Text style={[styles.buttonText, { color: COLORS.textPrimary }]}>{t("actions.back")}</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.button, { flex: 1 }]} onPress={handleSubmit}>
+                <TouchableOpacity style={[styles.button, { flex: 1 }]} onPress={() => handleSubmit()}>
                   <Text style={styles.buttonText}>{t("actions.next")}</Text>
                 </TouchableOpacity>
               </View>

@@ -1,4 +1,5 @@
 import { NodeClassRoomPrim } from "./interfaceGraphqlPrimary";
+import { NodeSeries } from "./interfaceGraphqlSecondary";
 
 // PageInfo interface
 interface PageInfo {
@@ -106,9 +107,141 @@ export interface NodeCustomUser {
   school: { edges: EdgeSchoolHigherInfo[] };
   dept: { edges: EdgeDepartment[] };
   classroomprim: NodeClassRoomPrim[];
+  preinscriptionLecturer: NodePreInscriptionLecturer;
+  preinscriptionStudent: NodePreInscription;
 }
 
-// UserProfile interface
+export interface NodePreInscriptionLecturer {
+  id: string;
+  registrationNumber: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  dob: string;
+  pob: string;
+  sex: string;
+  address: string;
+  telephone: string;
+  email: string;
+  campus: NodeSchoolHigherInfo;
+  fatherName: string;
+  motherName: string;
+  fatherTelephone: string;
+  motherTelephone: string;
+  parentAddress: string;
+  about: string;
+  nationality: string;
+  regionOfOrigin: string;
+  highestCertificate: string;
+  yearObtained: string;
+  status: string;
+  admissionStatus: boolean;
+  academicYear: string;
+  level: string;
+  session: string;
+  infoData: string;
+  nic: string;
+  niu: string;
+  cv: string;
+}
+
+
+export interface NodePreInscriptionStudent {
+  id: string;
+
+  // Flags
+  hasHigher: boolean;
+  hasSecondary: boolean;
+  hasPrimary: boolean;
+  hasVocational: boolean;
+
+  section?: string | null;
+
+  // Identity & registration
+  language: "en" | "fr";
+  registrationNumber: string;
+  matricle?: string | null;
+
+  // Personal details
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  sex: string;
+  address: string;
+  pob: string;
+  dob: string;
+
+  email?: string | null;
+  telephone?: string | null;
+
+  // Family details
+  fatherName?: string | null;
+  fatherTelephone?: string | null;
+  parentAddress?: string | null;
+  motherName?: string | null;
+  motherTelephone?: string | null;
+
+  // Academic years
+  academicYearHigher?: string | null;
+  academicYearSecondary?: string | null;
+  academicYearPrimary?: string | null;
+
+  // Admission info
+  status: string;
+  admissionStatus: boolean;
+  action: string;
+
+  // Nationality & region
+  nationality: string;
+  regionOfOrigin?: string | null;
+
+  // Certificates
+  highestCertificate?: string | null;
+  yearObtained?: string | null;
+  grade?: string | null;
+
+  // Documents
+  nic?: string | null; // file URL
+
+  // Higher education
+  campus?: NodeSchoolHigherInfo | null;
+  programHigher?: string | null;
+  levelHigher?: string | null;
+  sessionHigher?: string | null;
+  specialtyOne?: NodeMainSpecialty | null;
+  specialtyTwo?: NodeMainSpecialty | null;
+
+  // Secondary education
+  programSecondary?: string | null;
+  levelSecondary?: string | null;
+  sessionSecondary?: string | null;
+  stream?: string | null;
+  seriesOne?: NodeSeries | null;
+
+  // Primary education
+  programPrimary?: string | null;
+  levelPrimary?: string | null;
+
+  // Metadata
+  createdAt: string;
+  updatedAt: string;
+}
+
+
+export interface NodeLecturerProfile {
+  id: string;
+  customuser: NodeCustomUser;
+  specialty: NodeSpecialty;
+  department: NodeDomain;
+  contractType: string;
+  hireDate: string;
+  cv: string;
+  nui: string;
+  cni: string;
+  infoData: string | any;
+}
+
+
 export interface NodeUserProfile {
   id: string;
   session: string;
@@ -784,4 +917,3 @@ export interface NodeTimeTable {
 export interface EdgeTimeTable {
   node: NodeTimeTable;
 }
-

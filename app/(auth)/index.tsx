@@ -106,7 +106,7 @@ export default function Login() {
   };
 
   const handleSupport = () => {
-    const phoneNumber = "237673351854";
+    const phoneNumber = "237693358642";
     const message = "Hello, I need help with my login.";
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     Linking.openURL(url);
@@ -131,7 +131,7 @@ export default function Login() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#fff" }}
+      style={{ flex: 1, backgroundColor: COLORS.background }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       keyboardVerticalOffset={Platform.OS === "ios" ? 80 : 0}
     >

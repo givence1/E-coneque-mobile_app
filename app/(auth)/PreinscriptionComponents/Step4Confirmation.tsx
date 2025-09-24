@@ -1,9 +1,10 @@
 import COLORS from "@/constants/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,8 +16,8 @@ import globalStyles from "../../../assets/styles/signup.styles";
 type Step4ConfirmationProps = {
   data: FormData;
   onPrevious: () => void;
-  onSubmit: () => Promise<void>;
-  section: "H" | "S" | "P";
+  onSubmit: () => Promise<boolean>; // returns true if success
+  section: "H" | "S" | "P" | "V";
 };
 
 export default function Step4Confirmation({
@@ -26,13 +27,43 @@ export default function Step4Confirmation({
 }: Step4ConfirmationProps) {
   const router = useRouter();
   const { t } = useTranslation();
+  const [loading, setLoading] = useState(false);
 
   const handleFinalSubmit = async () => {
+    setLoading(true);
     try {
-      await onSubmit();
-      router.replace("/(auth)/signup");
+      const success = await onSubmit();
+
+      if (success) {
+        Alert.alert(
+          t("confirm.title"),
+          t("confirm.success"),
+          [
+            {
+              text: t("actions.ok"),
+              onPress: () => router.replace("/(auth)/signup"),
+            },
+          ],
+          { cancelable: false }
+        );
+      } else {
+        Alert.alert(
+          t("confirm.title"),
+          t("confirm.error"),
+          [{ text: t("actions.ok") }],
+          { cancelable: false }
+        );
+      }
     } catch (error) {
       console.error("Submit failed:", error);
+      Alert.alert(
+        t("confirm.title"),
+        t("confirm.error"),
+        [{ text: t("actions.ok") }],
+        { cancelable: false }
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -116,6 +147,7 @@ export default function Step4Confirmation({
               { backgroundColor: COLORS.border, flex: 1 },
             ]}
             onPress={onPrevious}
+            disabled={loading}
           >
             <Text
               style={[globalStyles.buttonText, { color: COLORS.textPrimary }]}
@@ -127,8 +159,11 @@ export default function Step4Confirmation({
           <TouchableOpacity
             style={[globalStyles.button, { flex: 1 }]}
             onPress={handleFinalSubmit}
+            disabled={loading}
           >
-            <Text style={globalStyles.buttonText}>{t("actions.submit")}</Text>
+            <Text style={globalStyles.buttonText}>
+              {loading ? t("actions.submitting") : t("actions.submit")}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

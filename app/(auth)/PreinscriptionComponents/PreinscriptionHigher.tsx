@@ -1,32 +1,54 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
 import COLORS from "@/constants/colors";
+import { useAuthStore } from "@/store/authStore";
+import { capitalizeFirstLetter, decodeUrlID, errorLog } from "@/utils/functions";
+import { mutationCreateUpdatePreInscription } from "@/utils/graphql/mutations/mutationCreateUpdatePreInscription";
+import {
+  EdgeLevel,
+  EdgeMainSpecialty,
+  EdgeProgram,
+  EdgeSchoolHigherInfo,
+} from "@/utils/schemas/interfaceGraphql";
+import React, { useState } from "react";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import Step1PersonalInfo from "./Step1PersonalInfo";
 import Step2RoleDept from "./Step2RoleDept";
 import Step3Specialty from "./Step3Specialty";
 import Step4Confirmation, { FormData } from "./Step4Confirmation";
-import { EdgeLevel, EdgeMainSpecialty, EdgeProgram, EdgeSchoolHigherInfo } from "@/utils/schemas/interfaceGraphql";
-import { mutationCreateUpdatePreInscription } from "@/utils/graphql/mutations/mutationCreateUpdatePreInscription";
-import { capitalizeFirstLetter, decodeUrlID, errorLog } from "@/utils/functions";
 
 type RecordMap = {
-  id: number,
-  name: string
-}
+  id: number | string;
+  name: string;
+};
 
-const PreinscriptionHigher = (
-  { data, section }:
-    { data: any, section: "H" | "S" | "P" }
-) => {
+const PreinscriptionHigher = ({ data, section }: { data: any; section: "H" | "S" | "P" | "V" }) => {
+  const { token } = useAuthStore();
 
-  const campusList: RecordMap[] = data?.allSchoolInfos?.edges?.filter((s: EdgeSchoolHigherInfo) => s.node.schoolType.includes("-H")).map((s: EdgeSchoolHigherInfo) => { return { id: parseInt(decodeUrlID(s.node.id) || ""), name: `${s.node?.campus} - ${s.node?.address}`}});
-  const campusName: string[] = data?.allSchoolInfos?.edges?.filter((s: EdgeSchoolHigherInfo) => s.node.schoolType.includes("-H")).map((s: EdgeSchoolHigherInfo) => `${s.node?.campus} - ${s.node?.address}`);
-  const levelList: RecordMap[] = data?.allLevels?.edges?.map((l: EdgeLevel) => { return { id: decodeUrlID(l.node.id), name: l.node.level}});
-  const levelName: string[] = data?.allLevels?.edges?.map((l: EdgeLevel) => l.node.level);
-  const mainSpecialtyList: RecordMap[] = data?.allMainSpecialties?.edges?.map((ms: EdgeMainSpecialty) => { return { id: parseInt(decodeUrlID(ms.node.id) || ""), name: ms.node.specialtyName}});
-  const mainSpecialtyName: string[] = data?.allMainSpecialties?.edges?.map((ms: EdgeMainSpecialty) => ms.node.specialtyName);
-  const programList: RecordMap[] = data?.allPrograms?.edges?.map((ms: EdgeProgram) => { return { id: parseInt(decodeUrlID(ms.node.id) || ""), name: ms.node.name}});
-  const programName: string[] = data?.allPrograms?.edges?.map((ms: EdgeProgram) => ms.node.name);
+  const campusList: RecordMap[] = data?.allSchoolInfos?.edges
+    ?.filter((s: EdgeSchoolHigherInfo) => s.node.schoolType.includes("-H"))
+    .map((s: EdgeSchoolHigherInfo) => ({
+      id: parseInt(decodeUrlID(s.node.id) || ""),
+      name: `${s.node?.campus} - ${s.node?.address}`,
+    }));
+
+  const campusName: string[] = campusList.map((c) => c.name);
+
+  const levelList: RecordMap[] = data?.allLevels?.edges?.map((l: EdgeLevel) => ({
+    id: decodeUrlID(l.node.id),
+    name: l.node.level,
+  }));
+  const levelName: string[] = levelList.map((l) => l.name);
+
+  const mainSpecialtyList: RecordMap[] = data?.allMainSpecialties?.edges?.map((ms: EdgeMainSpecialty) => ({
+    id: parseInt(decodeUrlID(ms.node.id) || ""),
+    name: ms.node.specialtyName,
+  }));
+  const mainSpecialtyName: string[] = mainSpecialtyList.map((ms) => ms.name);
+
+  const programList: RecordMap[] = data?.allPrograms?.edges?.map((ms: EdgeProgram) => ({
+    id: parseInt(decodeUrlID(ms.node.id) || ""),
+    name: ms.node.name,
+  }));
+  const programName: string[] = programList.map((p) => p.name);
 
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
@@ -65,81 +87,90 @@ const PreinscriptionHigher = (
   const handleNext = () => setStep((prev) => prev + 1);
   const handleBack = () => setStep((prev) => prev - 1);
 
-
   const handleSubmit = async () => {
+  // Map names to IDs
+  const campusId = campusList.find((c) => c.name === formData.campusId)?.id;
+  const levelId = levelList.find((l) => l.name === formData.level)?.id;
+  const programId = programList.find((p) => p.name === formData.programId)?.id;
+  const specialtyOne = mainSpecialtyList.find((ms) => ms.name === formData.specialtyoneId)?.id;
+  const specialtyTwo = mainSpecialtyList.find((ms) => ms.name === formData.specialtytwoId)?.id;
 
-    const newData = {
-      language: "en",
-      registrationNumber: formData?.firstName?.toString().toUpperCase(),
-      firstName: formData?.firstName?.toString().toUpperCase(),
-      lastName: formData?.lastName?.toString().toUpperCase(),
-      fullName: formData?.firstName?.toString().toUpperCase() + " " + formData?.lastName?.toString().toUpperCase(),
-      sex: formData?.sex,
-      email: formData?.email?.toString().toLowerCase(),
-      telephone: formData?.telephone,
-      address: formData?.address?.toString().toUpperCase(),
-      pob: formData?.pob,
-      dob: formData?.dob,
+  if (!campusId || !levelId || !programId || !specialtyOne || !specialtyTwo) {
+    throw new Error("Please select all required fields correctly.");
+  }
 
-      fatherName: formData?.fatherName ? formData?.fatherName?.toString().toUpperCase() : "None",
-      motherName: formData?.motherName ? formData?.motherName?.toString().toUpperCase() : "None",
-      parentAddress: formData?.parentAddress ? formData?.parentAddress?.toString().toUpperCase() : "None",
-      fatherTelephone: formData?.fatherTelephone,
-      motherTelephone: formData?.motherTelephone,
-      campusId: campusList.find((c: RecordMap) => c.name === formData?.campusId)?.id,
+  const payload = {
+    section: section, // ✅ add this
+    language: "en",
+    registrationNumber: formData.firstName?.toUpperCase(),
+    firstName: formData.firstName?.toUpperCase(),
+    lastName: formData.lastName?.toUpperCase(),
+    fullName: `${formData.firstName?.toUpperCase()} ${formData.lastName?.toUpperCase()}`,
+    sex: formData.sex,
+    email: formData.email?.toLowerCase(),
+    telephone: formData.telephone,
+    address: formData.address?.toUpperCase(),
+    pob: formData.pob,
+    dob: formData.dob,
 
-      nationality: formData?.nationality,
-      regionOfOrigin: formData.regionOfOrigin === "Other" ? capitalizeFirstLetter(formData?.regionOfOriginOther?.toLowerCase() || "") : formData?.regionOfOrigin,
-      highestCertificate: formData?.highestCertificate === "Other" ? capitalizeFirstLetter(formData?.highestCertificateOther?.toLowerCase() || "") : formData?.highestCertificate,
-      yearObtained: formData?.yearObtained,
-      grade: formData.grade,
+    fatherName: formData.fatherName ? formData.fatherName.toUpperCase() : "None",
+    motherName: formData.motherName ? formData.motherName.toUpperCase() : "None",
+    parentAddress: formData.parentAddress ? formData.parentAddress.toUpperCase() : "None",
+    fatherTelephone: formData.fatherTelephone,
+    motherTelephone: formData.motherTelephone,
+    campusId,
 
-      academicYear: formData?.academicYear,
-      level: levelList.find((lv: RecordMap) => lv.name === formData?.level)?.id,
-      session: formData?.session,
-      programId: programList.find((ms: RecordMap) => ms.name === formData?.programId)?.id,
-      specialtyOne: mainSpecialtyList.find((ms: RecordMap) => ms.name === formData?.specialtyoneId)?.id,
-      specialtyTwo: mainSpecialtyList.find((ms: RecordMap) => ms.name === formData?.specialtytwoId)?.id,
-      status: "PENDING",
-      admissionStatus: false,
-      action: "CREATING",
-      delete: false,
-    }
+    nationality: formData.nationality,
+    regionOfOrigin:
+      formData.regionOfOrigin === "Other"
+        ? capitalizeFirstLetter(formData.regionOfOriginOther?.toLowerCase() || "")
+        : formData.regionOfOrigin,
+    highestCertificate:
+      formData.highestCertificate === "Other"
+        ? capitalizeFirstLetter(formData.highestCertificateOther?.toLowerCase() || "")
+        : formData.highestCertificate,
+    yearObtained: formData.yearObtained,
+    grade: formData.grade,
 
-    if ([newData].length > 0) {
-      for (let index = 0; index < [newData].length; index++) {
-        const dataToSubmit = [newData][index];
-
-        try {
-          const resUserId = await mutationCreateUpdatePreInscription({
-            section: "H",
-            formData: dataToSubmit,
-            p: null,
-            router: null,
-            routeToLink: "",
-          })
-
-          if (resUserId.length > 5) {
-            // alert(t("Operation Successful") + " " + `✅`)
-            alert("Operation Successful" + " " + `✅`)
-            // window.location.reload();
-          }
-        } catch (error) {
-          errorLog(error);
-        }
-
-      }
-    }
+    academicYearHigher: formData.academicYear,
+    levelHigher: levelId,
+    sessionHigher: formData.session,
+    programHigherId: programId,
+    specialtyOne,
+    specialtyTwo,
+    status: "PENDING",
+    admissionStatus: false,
+    action: "CREATING",
+    delete: false,
   };
+
+  try {
+    const resUserId = await mutationCreateUpdatePreInscription({
+      section, // also pass the prop directly
+      formData: payload,
+      p: null,
+      router: null,
+      routeToLink: "",
+      token,
+    });
+
+    if (!resUserId || resUserId.length === 0) {
+      throw new Error("Backend did not accept the data.");
+    }
+
+    return true; // indicate success
+  } catch (error) {
+    errorLog(error);
+    throw error; // propagate to Step4Confirmation
+  }
+};
 
   return (
     <View style={styles.wrapper}>
-      {/* Modern Fixed Header */}
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>Step {step} of 4</Text>
       </View>
 
-      {/* Scrollable Form Area */}
       <ScrollView contentContainerStyle={styles.content}>
         {step === 1 && (
           <Step1PersonalInfo
@@ -147,6 +178,7 @@ const PreinscriptionHigher = (
             data={formData}
             updateField={updateField}
             onNext={handleNext}
+            onPrevious={handleBack}
           />
         )}
         {step === 2 && (
@@ -183,15 +215,15 @@ const PreinscriptionHigher = (
             section={section}
             data={formData}
             onPrevious={handleBack}
-            onSubmit={() => handleSubmit()}
+            onSubmit={handleSubmit}
           />
         )}
       </ScrollView>
     </View>
   );
-}
+};
 
-export default PreinscriptionHigher
+export default PreinscriptionHigher;
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -222,6 +254,6 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 0,
-    backgroundColor: COLORS.background
+    backgroundColor: COLORS.background,
   },
 });

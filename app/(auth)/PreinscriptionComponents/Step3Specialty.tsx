@@ -34,7 +34,7 @@ type Step3Props = {
   apiPrograms: string[];
   apiProgramsSec: string[];
   apiProgramsPrim: string[];
-  section: "H" | "S" | "P";
+  section: "H" | "S" | "P" | "V";
 };
 
 export default function Step3Specialty({
@@ -61,14 +61,18 @@ export default function Step3Specialty({
     section === "H" ? apiLevels : section === "S" ? apiLevelsSec : apiLevelsPrim;
 
   const yearOptions =
-    section === "H" ? apiYears : section === "S" ? apiYearsSec : apiYearsPrim;
+    section === "H"
+      ? apiYears.slice(0, 1)
+      : section === "S"
+      ? apiYearsSec.slice(0, 1)
+      : apiYearsPrim.slice(0, 1);
 
   const programOptions =
     section === "H" ? apiPrograms : section === "S" ? apiProgramsSec : apiProgramsPrim;
 
   const sessionOptions = ["morning", "evening"];
 
-  // Use keys matching Step4Confirmation
+  // Options map
   const optionsMap: Record<string, string[]> = {
     specialtyoneId: apiMainSpecialties,
     specialtytwoId: apiMainSpecialties,
@@ -78,6 +82,7 @@ export default function Step3Specialty({
     session: sessionOptions,
   };
 
+  // Validation schema
   const validationSchema = Yup.object().shape({
     specialtyoneId: Yup.string().required(
       t("validation.required", { field: t("form.specialtyone") })
@@ -125,7 +130,6 @@ export default function Step3Specialty({
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Step indicator (3rd step) */}
         <StepIndicator idx={2} />
 
         <Formik
@@ -156,7 +160,7 @@ export default function Step3Specialty({
                       <Text style={[styles.input, { paddingVertical: 12 }]}>
                         {values[field]
                           ? field === "session"
-                            ? t(`session.${values[field]}`)
+                            ? t(`form.sessionOptions.${values[field]}`)
                             : values[field]
                           : t("form.selectField", { field: getFieldLabel(field) })}
                       </Text>
@@ -175,7 +179,9 @@ export default function Step3Specialty({
                             </Text>
                             <FlatList
                               data={optionsMap[field]}
-                              keyExtractor={(item) => item}
+                              keyExtractor={(item, index) =>
+                                field === "session" ? item : `${item}-${index}`
+                              }
                               renderItem={({ item }) => (
                                 <Pressable
                                   style={local.popupItem}
@@ -185,7 +191,9 @@ export default function Step3Specialty({
                                   }}
                                 >
                                   <Text style={local.popupItemText}>
-                                    {field === "session" ? t(`session.${item}`) : item}
+                                    {field === "session"
+                                      ? t(`form.sessionOptions.${item}`)
+                                      : item}
                                   </Text>
                                 </Pressable>
                               )}
@@ -222,7 +230,10 @@ export default function Step3Specialty({
                   </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.button, { flex: 1 }]} onPress={handleSubmit}>
+                <TouchableOpacity
+                  style={[styles.button, { flex: 1 }]}
+                  onPress={() => handleSubmit()}
+                >
                   <Text style={styles.buttonText}>{t("actions.next")}</Text>
                 </TouchableOpacity>
               </View>

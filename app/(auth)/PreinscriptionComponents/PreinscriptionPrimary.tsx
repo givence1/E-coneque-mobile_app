@@ -12,7 +12,7 @@ import { capitalizeFirstLetter, errorLog } from "@/utils/functions";
 
 const PreinscriptionPrimary = (
   { data, section }:
-    { data: any, section: "H" | "S" | "P" }
+    { data: any, section: "H" | "S" | "P" | "V" }
 ) => {
 
   const [step, setStep] = useState(1);
@@ -80,10 +80,10 @@ const PreinscriptionPrimary = (
       yearObtained: formData?.yearObtained,
       grade: formData.grade,
 
-      academicYear: formData?.academicYear,
-      programId: formData?.programId,
-      level: formData?.level,
-      session: formData?.session,
+      academicYearPrimary: formData?.academicYear,
+      programPrimary: formData?.programId,
+      levelPrimary: formData?.level,
+      sessionPrimary: formData?.session,
       specialtyOne: formData?.specialtyoneId,
       specialtyTwo: formData?.specialtytwoId,
       status: "PENDING",
@@ -99,11 +99,12 @@ const PreinscriptionPrimary = (
         
         try {
           const resUserId = await mutationCreateUpdatePreInscription({
-            section: "S",
+            section: "P",
             formData: dataToSubmit,
             p: null,
             router: null,
             routeToLink: "",
+            token: null,
           })
 
           if (resUserId.length > 5) {
@@ -134,6 +135,7 @@ const PreinscriptionPrimary = (
             data={formData}
             updateField={updateField}
             onNext={handleNext}
+            onPrevious={handleBack}
           />
         )}
         {step === 2 && (

@@ -27,7 +27,7 @@ type Step2Props = {
   updateField: (field: string, value: string) => void;
   onNext: () => void;
   onPrevious: () => void;
-  section: "H" | "S" | "P";
+  section: "H" | "S" | "P" | "V";
   apiSchools: string[];
 };
 
@@ -59,7 +59,6 @@ export default function Step2RoleDept({
       t("certificates.olevel"),
       t("certificates.alevel"),
       t("certificates.hnd"),
-      t("certificates.baccalaureate"),
       t("certificates.bachelor"),
       t("certificates.master"),
     ],

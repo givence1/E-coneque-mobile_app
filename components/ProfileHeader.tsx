@@ -12,10 +12,11 @@ const ProfileHeader = (
 ) => {
   const { t } = useTranslation();
 
+  // 🚨 Handle case: no fees
   if (!fees) {
     return (
-      <View>
-        <Text>{t("profileHeader.noFees")}</Text>
+      <View style={localStyles.noFeesContainer}>
+        <Text style={localStyles.noFeesText}>{t("profileHeader.noFees")}</Text>
       </View>
     );
   }
@@ -82,8 +83,26 @@ export default ProfileHeader;
 
 // Local Styles
 const localStyles = StyleSheet.create({
-  infoCard: {
+  // 🔹 No fees alert card
+  noFeesContainer: {
     backgroundColor: COLORS.cardBackground,
+    borderRadius: 10,
+    padding: 14,
+    margin: 16,
+    borderWidth: 1,
+    borderColor: COLORS.warning,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  noFeesText: {
+    color: COLORS.warning,
+    fontSize: 14,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+
+  infoCard: {
+    backgroundColor: COLORS.primary,
     borderRadius: 10,
     padding: 16,
     margin: 16,
@@ -91,42 +110,42 @@ const localStyles = StyleSheet.create({
     alignItems: "center",
   },
   name: {
-    color: "white",
+    color: COLORS.white,
     fontWeight: "bold",
     fontSize: 16,
     marginBottom: 4,
     flexWrap: "wrap",
   },
   program: {
-    color: "white",
+    color: COLORS.white,
     fontSize: 14,
     marginBottom: 2,
     flexWrap: "wrap",
   },
   level: {
-    color: "white",
+    color: COLORS.white,
     fontSize: 13,
     marginBottom: 2,
   },
   matricule: {
-    color: "white",
+    color: COLORS.white,
     fontSize: 12,
     marginBottom: 10,
   },
   performanceLabel: {
-    color: "white",
+    color: COLORS.white,
     fontSize: 12,
     marginBottom: 4,
   },
   progressBar: {
     height: 6,
-    backgroundColor: "#ccc",
+    backgroundColor: COLORS.border,
     borderRadius: 5,
     width: "90%",
   },
   progress: {
     height: 6,
-    backgroundColor: "#00FFAA",
+    backgroundColor: COLORS.success,
     borderRadius: 5,
   },
   avatar: {
@@ -135,6 +154,6 @@ const localStyles = StyleSheet.create({
     borderRadius: 30,
     marginLeft: 10,
     borderWidth: 2,
-    borderColor: "white",
+    borderColor: COLORS.white,
   },
 });

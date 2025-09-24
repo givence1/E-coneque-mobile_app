@@ -154,9 +154,19 @@ export default function LecturerPortalScreen() {
                   {/* Card Header */}
                   <View style={styles.cardHeader}>
                     <Ionicons name="book-outline" size={22} color={COLORS.primary} />
-                    <View>
-                      <Text style={styles.cardTitle}>{thisCourse.mainCourse.courseName}</Text>
-                      <Text style={styles.cardSubtitle}>
+                    <View style={{ flex: 1 }}>
+                      <Text
+                        style={styles.cardTitle}
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                      >
+                        {thisCourse.mainCourse.courseName}
+                      </Text>
+                      <Text
+                        style={styles.cardSubtitle}
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                      >
                         {thisCourse.specialty.mainSpecialty?.specialtyName} •{" "}
                         {thisCourse.specialty?.level?.level} • {t("portal.semester")}{" "}
                         {thisCourse?.semester}
@@ -256,8 +266,21 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   cardHeader: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 10 },
-  cardTitle: { fontSize: 16, fontWeight: "600", color: COLORS.textPrimary },
-  cardSubtitle: { fontSize: 13, color: COLORS.textSecondary },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: COLORS.textPrimary,
+    flexShrink: 1,
+    flexWrap: "wrap",
+    maxWidth: "95%",
+  },
+  cardSubtitle: {
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    flexShrink: 1,
+    flexWrap: "wrap",
+    maxWidth: "95%",
+  },
   statusRow: { flexDirection: "row", alignItems: "center", marginBottom: 6, gap: 6 },
   statusText: { fontSize: 14, color: COLORS.textPrimary },
   btn: {
@@ -277,7 +300,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
     padding: 20,
   },
-  modalContent: { width: "100%", backgroundColor: "#fff", borderRadius: 12, padding: 20 },
+  modalContent: { width: "100%", backgroundColor: COLORS.cardBackground, borderRadius: 12, padding: 20 },
   modalClose: { position: "absolute", top: 10, right: 10, zIndex: 10 },
   modalTitle: {
     fontSize: 18,

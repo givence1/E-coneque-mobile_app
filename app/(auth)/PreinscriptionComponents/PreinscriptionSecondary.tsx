@@ -80,10 +80,10 @@ const PreinscriptionHigher = (
       yearObtained: formData?.yearObtained,
       grade: formData.grade,
 
-      academicYear: formData?.academicYear,
-      programId: formData?.programId,
-      level: formData?.level,
-      session: formData?.session,
+      academicYearSecondary: formData?.academicYear,
+      programSecondary: formData?.programId,
+      levelSecondary: formData?.level,
+      sessionSecondary: formData?.session,
       specialtyOne: formData?.specialtyoneId,
       specialtyTwo: formData?.specialtytwoId,
       status: "PENDING",
@@ -104,6 +104,7 @@ const PreinscriptionHigher = (
             p: null,
             router: null,
             routeToLink: "",
+            token: null
           })
 
           if (resUserId.length > 5) {
@@ -134,6 +135,7 @@ const PreinscriptionHigher = (
             data={formData}
             updateField={updateField}
             onNext={handleNext}
+            onPrevious={handleBack}
           />
         )}
         {step === 2 && (

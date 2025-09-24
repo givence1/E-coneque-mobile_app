@@ -100,9 +100,9 @@ fees: {
   specialty: "Specialty",
   academicYear: "Academic Year",
   level: "Level",
-  payment1: "First Payment",
-  payment2: "Second Payment",
-  payment3: "Third Payment",
+  payment1: "First installment",
+  payment2: "Second installment",
+  payment3: "Third installment  ",
   transactions: "All Transactions",
   txId: "Transaction ID",
   reason: "Reason",
@@ -114,6 +114,11 @@ fees: {
   accountStatus: "Account Status",
   noFees: "No fees found.",
   noTransactions: "No transactions yet.",
+  singlePayment: "Single Payment",
+  enterAmount: "Enter Amount",
+  enterPhone: "Enter Phone Number",
+  makePayment: "Make a Payment",
+  submit: "Submit",
 },
 
 
@@ -319,8 +324,10 @@ fees: {
   program: "Program",
   level: "Level",
   session: "Session",
-  morning: "Morning",
-  evening: "Evening",
+  sessionOptions: {
+      morning: "Morning",
+      evening: "Evening",
+    },
 
     // Step 4
     confirmation: "Please confirm your details before submitting",
@@ -363,6 +370,12 @@ fees: {
     next: "Next",
     submit: "Submit",
     cancel: "Cancel",
+    ok: "OK",
+  },
+  confirm: {
+    title: "Confirmation",
+    success: "Your form has been submitted successfully!",
+    error: "There was an error submitting your form. Please check all fields are enter correctly and try again.",
   },
 
   footer: {

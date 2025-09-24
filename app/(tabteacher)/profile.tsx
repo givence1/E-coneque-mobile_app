@@ -160,7 +160,13 @@ export default function LecturerProfileScreen() {
 const InfoRow = ({ label, value }: { label: string; value?: string }) => (
   <View style={styles.infoRow}>
     <Text style={styles.infoLabel}>{label}:</Text>
-    <Text style={styles.infoValue}>{value || "N/A"}</Text>
+    <Text
+      style={styles.infoValue}
+      numberOfLines={2}            // prevent overflow
+      ellipsizeMode="tail"         // show "..." if text too long
+    >
+      {value || "N/A"}
+    </Text>
   </View>
 );
 
@@ -200,6 +206,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
   },
+
   sectionTitle: {
     fontSize: 16,
     fontWeight: "600",
@@ -211,8 +218,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 6,
   },
-  infoLabel: { fontSize: 14, color: COLORS.textSecondary },
-  infoValue: { fontSize: 14, fontWeight: "500", color: COLORS.textPrimary },
+  infoLabel: { 
+    flexShrink: 1,
+    fontSize: 14, color: COLORS.textSecondary },
+    infoValue: { 
+    flexShrink: 1,    
+    textAlign: "right",
+    maxWidth: "70%", 
+    fontSize: 14, 
+    fontWeight: "500", 
+    color: COLORS.textPrimary 
+  },
   logoutBtn: {
     flexDirection: "row",
     justifyContent: "center",

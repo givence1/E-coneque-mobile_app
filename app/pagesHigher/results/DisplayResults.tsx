@@ -93,9 +93,9 @@ const DisplayResults = (
                     {result_type === "results" ? (
                         <>
                             <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>{t("results.ca")}</Text>
-                            <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>{t("results.exam")}</Text>
-                            <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>{t("results.resit")}</Text>
-                            <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>{t("results.status")}</Text>
+                            <Text style={[styles.cell, { flex: 2, textAlign: "center" }]}>{t("results.exam")}</Text>
+                            <Text style={[styles.cell, { flex: 3, textAlign: "center" }]}>{t("results.resit")}</Text>
+                            <Text style={[styles.cell, { flex: 2, textAlign: "center" }]}>{t("results.status")}</Text>
                         </>
                     ) : (
                         <>
@@ -133,9 +133,9 @@ const DisplayResults = (
                                                 <View key={index} style={styles.row}>
                                                     <Text style={[styles.cell, { flex: 3 }]}>{item.node.course.mainCourse.courseName}</Text>
                                                     <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>{ca}</Text>
-                                                    <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>{exam}</Text>
-                                                    <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>{resit || "-"}</Text>
-                                                    <Text style={[styles.cell, { flex: 1, textAlign: "center" }]}>
+                                                    <Text style={[styles.cell, { flex: 2, textAlign: "center" }]}>{exam}</Text>
+                                                    <Text style={[styles.cell, { flex: 3, textAlign: "center" }]}>{resit || "-"}</Text>
+                                                    <Text style={[styles.cell, { flex: 2, textAlign: "center" }]}>
                                                         {overallPassed ? t("results.pass") : t("results.fail")}
                                                     </Text>
                                                 </View>
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
         borderColor: COLORS.border,
     },
     cell: {
-        color: COLORS.textDark,
+        color: COLORS.white,
         paddingRight: 1,
         fontWeight: "500",
         justifyContent: "space-between"

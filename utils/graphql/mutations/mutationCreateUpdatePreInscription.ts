@@ -1,5 +1,5 @@
 'use client';
-import { NodeCustomUser } from "@/utils/schemas/interfaceGraphql";
+import { removeEmptyFields } from "@/utils/functions";
 import { gql } from "@apollo/client";
 import { ApiFactory } from "../ApiFactory";
 
@@ -9,15 +9,18 @@ export const mutationCreateUpdatePreInscription = async (
     { section: "H" | "S" | "P" | "V", formData: any, p: any, routeToLink: string, router: any, token: any }
 ) => {
 
-  const data: any = {
-    firstName: formData?.firstName?.toString().toUpperCase(),
-    lastName: formData?.lastName?.toString().toUpperCase(),
-    sex: formData?.sex.toString().toUpperCase(),
-    email: formData?.email?.toString().toLowerCase(),
-    telephone: formData?.telephone,
-    address: formData?.address?.toString().toUpperCase(),
-    pob: formData?.pob?.toString().toUpperCase(),
-    dob: formData?.dob,
+  const newData: any = {
+     id: formData?.id || null,
+  language: p?.locale || formData?.language || "en",
+  section: formData.section,
+  firstName: formData?.firstName?.toString().toUpperCase(),
+  lastName: formData?.lastName?.toString().toUpperCase(),
+  sex: formData?.sex?.toString().toUpperCase(),
+  email: formData?.email?.toString().toLowerCase(),
+  telephone: formData?.telephone,
+  address: formData?.address?.toString().toUpperCase(),
+  pob: formData?.pob?.toString().toUpperCase(),
+  dob: formData?.dob,
 
     nationality: formData?.nationality,
     regionOfOrigin: formData?.regionOfOrigin,
@@ -30,118 +33,40 @@ export const mutationCreateUpdatePreInscription = async (
     fatherTelephone: formData?.fatherTelephone?.toString().toUpperCase(),
     motherTelephone: formData?.motherTelephone?.toString().toUpperCase(),
 
-    academicYear: formData?.academicYear,
-    session: formData?.session,
-    level: formData?.level,
-    programId: formData?.programId,
-    specialtyOne: formData?.specialtyOne,
-    specialtyTwo: formData?.specialtyTwo,
-    action: formData?.action,
-    campusId: formData?.campusId,
-    status: formData?.status,
-    admissionStatus: formData?.admissionStatus,
+    academicYearHigher: formData?.academicYearHigher,
+    academicYearSecondary: formData?.academicYearSecondary,
+    academicYearPrimary: formData?.academicYearPrimary,
+    academicYearVocational: formData?.academicYearVocational,
+    levelHigher: formData?.levelHigher,
+    levelSecondary: formData?.levelSecondary,
+    levelPrimary: formData?.levelPrimary,
+    levelVocational: formData?.levelVocational,
+    programHigherId: formData?.programHigherId,
+    programSecondary: formData?.programSecondary,
+    programPrimary: formData?.programPrimary,
+    programVocational: formData?.programVocational,
+    sessionSecondary: formData?.sessionSecondary,
+    sessionPrimary: formData?.sessionPrimary,
 
-    delete: false,
-  };
-
-
-  let dataSec: any = {
-    language: formData?.language,
-    firstName: formData?.firstName?.toString().toUpperCase(),
-    lastName: formData?.lastName?.toString().toUpperCase(),
-    sex: formData?.sex.toString().toUpperCase(),
-    address: formData?.address?.toString().toUpperCase(),
-    pob: formData?.pob?.toString().toUpperCase(),
-    dob: formData?.dob,
-
-    nationality: formData?.nationality,
-    regionOfOrigin: formData?.regionOfOrigin,
-    highestCertificate: formData?.highestCertificate,
-    yearObtained: formData?.yearObtained,
-    grade: formData?.grade,
-    fatherName: formData?.fatherName?.toString().toUpperCase(),
-    motherName: formData?.motherName?.toString().toUpperCase(),
-    parentAddress: formData?.parentAddress?.toString().toUpperCase(),
-    fatherTelephone: formData?.fatherTelephone?.toString().toUpperCase(),
-    motherTelephone: formData?.motherTelephone?.toString().toUpperCase(),
-    email: formData?.email,
-
-    academicYear: formData?.academicYear,
-    level: formData?.level,
-    program: formData?.program,
-    action: formData?.action,
-    campusId: formData?.campusId,
+    specialtyOneId: formData?.specialtyOne,
+    specialtyTwoId: formData?.specialtyTwo,
     stream: formData?.stream,
-    session: formData?.session,
     seriesOneId: formData?.seriesOneId,
-    status: formData?.status,
-    admissionStatus: formData?.admissionStatus,
-
-    delete: false,
-  };
-
-  let dataPrim: any = {
-    firstName: formData?.firstName?.toString().toUpperCase(),
-    lastName: formData?.lastName?.toString().toUpperCase(),
-    sex: formData?.sex.toString().toUpperCase(),
-    address: formData?.address?.toString().toUpperCase(),
-    pob: formData?.pob?.toString().toUpperCase(),
-    dob: formData?.dob,
-
-    nationality: formData?.nationality,
-    regionOfOrigin: formData?.regionOfOrigin,
-    fatherName: formData?.fatherName?.toString().toUpperCase(),
-    motherName: formData?.motherName?.toString().toUpperCase(),
-    parentAddress: formData?.parentAddress?.toString().toUpperCase(),
-    fatherTelephone: formData?.fatherTelephone?.toString().toUpperCase(),
-    motherTelephone: formData?.motherTelephone?.toString().toUpperCase(),
-    parentEmail: formData?.parentEmail,
-
-    academicYear: formData?.academicYear,
-    level: formData?.level,
-    program: formData?.program,
+    
     action: formData?.action,
     campusId: formData?.campusId,
     status: formData?.status,
     admissionStatus: formData?.admissionStatus,
-
     delete: false,
   };
-
 
   const preInscripSuccessFieldData = await ApiFactory({
-    newData: section === "H" ?
-      { ...data, language: p?.locale || "en" } : section === "S" ?
-        { ...dataSec, language: p?.locale || "en" } : section === "P" ?
-          { ...dataPrim, language: p?.locale || "en" } :
-          { ...data, language: formData.language },
-
-    editData: section === "H" ?
-      { ...data, id: formData?.id } : section === "S" ?
-        { ...dataSec, id: formData?.id } : section === "P" ?
-          { ...dataPrim, id: formData?.id } :
-          { ...data, id: formData?.id },
-
-    mutationName: section === "H" ?
-      "createUpdateDeletePreinscription" : section === "S" ?
-        "createUpdateDeletePreinscriptionSec" : section === "P" ?
-          "createUpdateDeletePreinscriptionPrim" :
-          "createUpdateDeletePreinscription",
-
-    modelName: section === "H" ?
-      "preinscription" : section === "S" ?
-        "preinscriptionsec" : section === "P" ?
-          "preinscriptionprim" :
-          "preinscription",
-
+    newData: removeEmptyFields(newData),
+    editData: removeEmptyFields(newData),
+    mutationName: "createUpdateDeletePreinscription",
+    modelName: "preinscription",
     successField: "id",
-
-    query: section === "H" ?
-      queryPreInscription : section === "S" ?
-        queryPreInscriptionSec : section === "P" ?
-          queryPreInscriptionPrim :
-          queryPreInscription,
-
+    query: queryPreInscription,
     router,
     params: p,
     redirect: false,
@@ -166,9 +91,13 @@ export const mutationCreateUpdatePreInscription = async (
 
 
 
+
+
+
+
 export const mutationCreateUpdatePreInscriptionLecturer = async (
-  { section, formData, p, routeToLink, router, token }:
-    { section: "H" | "S" | "P" | "V", formData: any, p: any, routeToLink: string, router: any, customuser?: NodeCustomUser, token: any }
+  { formData, fileData, p, routeToLink, router, token }:
+    { fileData: any, formData: any, p: any, routeToLink: string, router: any, token: any }
 ) => {
 
   const generateRegNumber = (): string => {
@@ -177,63 +106,72 @@ export const mutationCreateUpdatePreInscriptionLecturer = async (
     return `${year}${random}`.slice(0, 10);
   };
 
+  const fileMap: Record<string, File> = {};
+  ["cv", "niu", "nic"].forEach((key) => {
+    const value = fileData?.get(key);
+    if (value instanceof File) {
+      fileMap[key] = value;
+    }
+  });
+
   const data: any = {
     ...formData,
     registrationNumber: formData?.registrationNumber || generateRegNumber(),
     language: formData?.language || p?.locale,
-    firstName: formData?.firstName?.toString().toUpperCase(),
-    lastName: formData?.lastName?.toString().toUpperCase(),
-    sex: formData?.sex.toString().toUpperCase(),
-    email: formData?.email?.toString().toLowerCase(),
-    telephone: formData?.telephone,
-    address: formData?.address?.toString().toUpperCase() || "-",
-    pob: formData?.pob?.toString().toUpperCase() || "-",
+    firstName: formData?.firstName?.toString().toUpperCase()?.trim(),
+    lastName: formData?.lastName?.toString().toUpperCase()?.trim(),
+    sex: formData?.sex?.toString().toUpperCase(),
+    email: formData?.email?.toString()?.trim().toLowerCase(),
+    telephone: formData?.telephone?.trim(),
+    address: formData?.address?.toString().toUpperCase()?.trim() || "-",
+    pob: formData?.pob?.toString()?.trim().toUpperCase() || "-",
     dob: formData?.dob || "1980-01-01",
 
-    nationality: formData?.nationality,
-    regionOfOrigin: formData?.regionOfOrigin || "-",
-    highestCertificate: formData?.highestCertificate,
+    nationality: formData?.nationality?.trim(),
+    regionOfOrigin: formData?.regionOfOrigin?.trim() || "-",
+    highestCertificate: formData?.highestCertificate?.trim(),
     yearObtained: formData?.yearObtained,
-    fatherName: formData?.fatherName,
-    motherName: formData?.motherName,
-    parentAddress: formData?.parentAddress,
+    fatherName: formData?.fatherName?.trim(),
+    motherName: formData?.motherName?.trim(),
+    parentAddress: formData?.parentAddress?.trim(),
     action: formData?.action,
-    campusId: formData?.campusId || p?.school_id,
+    campusId: formData?.campusId || p.school_id,
     status: formData?.status,
     admissionStatus: formData?.admissionStatus,
-    infoData: formData?.infoData,
+    infoData: formData.infoData,
 
     delete: false,
   };
 
-  const getFileMap = () => {
-    const fileMap: Record<string, File> = {};
-    if (data?.photo instanceof File) {
-      fileMap['photo'] = data.photo;
-    }
-    return fileMap;
-  };
-
-  const resId = await ApiFactory({
+  const preInscripSuccessFieldData = await ApiFactory({
     newData: data,
     editData: data,
     mutationName: "createUpdateDeletePreinscriptionLecturer",
     modelName: "preinscriptionlecturer",
     successField: "id",
     query: queryPreInscriptionLecturer,
-    router: null,
-    params: null,
+    router,
+    params: p,
     redirect: false,
     reload: false,
     returnResponseField: true,
     redirectPath: ``,
     actionLabel: "creating",
-    getFileMap: getFileMap || (() => ({})),
+    getFileMap: () => fileMap,
     token
   });
-  return resId
- 
+
+  if (preInscripSuccessFieldData) {
+    if (routeToLink) {
+      router.push(routeToLink);
+    }
+    return preInscripSuccessFieldData
+  } else {
+    return false
+  }
 }
+
+
 
 
 
@@ -242,27 +180,30 @@ const queryPreInscriptionLecturer = gql`
   mutation Create(
     $id: ID
     $registrationNumber: String
-    $language: String!
-    $firstName: String!
-    $lastName: String!
-    $sex: String!
-    $email: String!
-    $telephone: String!
-    $address: String!
-    $pob: String!
-    $dob: String!
+    $language: String
+    $firstName: String
+    $lastName: String
+    $sex: String
+    $email: String
+    $telephone: String
+    $address: String
+    $pob: String
+    $dob: String
 
-    $nationality: String!
-    $regionOfOrigin: String!
-    $highestCertificate: String!
-    $yearObtained: String!
+    $nationality: String
+    $regionOfOrigin: String
+    $highestCertificate: String
+    $yearObtained: String
     $fatherName: String
     $fatherTelephone: String
     $parentAddress: String
-    $action: String!
-    $status: String!
-    $admissionStatus: Boolean!
+    $action: String
+    $status: String
+    $admissionStatus: Boolean
     $infoData: JSONString!
+    $cv: Upload
+    $niu: Upload
+    $nic: Upload
     $delete: Boolean!
   ) {
     createUpdateDeletePreinscriptionLecturer(
@@ -289,6 +230,9 @@ const queryPreInscriptionLecturer = gql`
       status: $status
       admissionStatus: $admissionStatus
       infoData: $infoData
+      cv: $cv
+      niu: $niu
+      nic: $nic
       delete: $delete
     ) {
       preinscriptionlecturer {
@@ -299,36 +243,51 @@ const queryPreInscriptionLecturer = gql`
 `;
 
 
-
 const queryPreInscription = gql`
   mutation Create(
+    $id: ID
     $language: String!
+    $section: String!
+
     $firstName: String!
     $lastName: String!
     $sex: String!
-    $email: String!
-    $telephone: String!
+    $email: String
+    $telephone: String
     $address: String!
     $pob: String!
     $dob: String!
 
     $nationality: String!
     $regionOfOrigin: String!
-    $highestCertificate: String!
-    $yearObtained: String!
-    $grade: String!
-    $fatherName: String!
-    $motherName: String!
-    $parentAddress: String!
-    $fatherTelephone: String!
-    $motherTelephone: String!
+    $highestCertificate: String
+    $yearObtained: String
+    $grade: String
+    $fatherName: String
+    $motherName: String
+    $parentAddress: String
+    $fatherTelephone: String
+    $motherTelephone: String
 
-    $academicYear: String!
-    $session: String!
-    $level: String!
-    $programId: ID!
-    $specialtyOne: ID!
-    $specialtyTwo: ID
+    $academicYearHigher: String
+    $academicYearSecondary: String
+    $academicYearPrimary: String
+    $levelHigher: String
+    $levelSecondary: String
+    $levelPrimary: String
+    $programHigherId: ID
+    $programSecondary: String
+    $programPrimary: String
+    $sessionHigher: String
+    $sessionSecondary: String
+
+    $specialtyOneId: ID
+    $specialtyTwoId: ID
+    $stream: String
+    $seriesOneId: ID
+
+    $nic: Upload
+    
     $action: String!
     $campusId: ID!
     $status: String!
@@ -336,33 +295,48 @@ const queryPreInscription = gql`
     $delete: Boolean!
   ) {
     createUpdateDeletePreinscription(
+      id: $id      
       language: $language
+      section: $section
       firstName: $firstName
       lastName: $lastName
       sex: $sex
-      address: $address
       email: $email
       telephone: $telephone
+      address: $address
       pob: $pob
       dob: $dob
 
       nationality: $nationality
+      regionOfOrigin: $regionOfOrigin
       highestCertificate: $highestCertificate
       yearObtained: $yearObtained
       grade: $grade
-      regionOfOrigin: $regionOfOrigin
       fatherName: $fatherName
       motherName: $motherName
       parentAddress: $parentAddress
       fatherTelephone: $fatherTelephone
       motherTelephone: $motherTelephone
 
-      academicYear: $academicYear
-      session: $session
-      level: $level
-      programId: $programId
-      specialtyOneId: $specialtyOne
-      specialtyTwoId: $specialtyTwo
+      academicYearHigher: $academicYearHigher
+      academicYearSecondary: $academicYearSecondary
+      academicYearPrimary: $academicYearPrimary
+      levelHigher: $levelHigher
+      levelSecondary: $levelSecondary
+      levelPrimary: $levelPrimary
+      programHigherId: $programHigherId
+      programSecondary: $programSecondary
+      programPrimary: $programPrimary
+      sessionHigher: $sessionHigher
+      sessionSecondary: $sessionSecondary
+
+      specialtyOneId: $specialtyOneId
+      specialtyTwoId: $specialtyTwoId
+      stream: $stream
+      seriesOneId: $seriesOneId
+      
+      nic: $nic
+
       action: $action
       campusId: $campusId
       status: $status
@@ -371,137 +345,6 @@ const queryPreInscription = gql`
     ) {
       preinscription {
         id firstName
-      }
-    }
-  }
-`;
-
-
-const queryPreInscriptionSec = gql`
-  mutation Create(
-    $language: String!
-    $firstName: String!
-    $lastName: String!
-    $sex: String!
-    $address: String!
-    $pob: String!
-    $dob: String!
-
-    $nationality: String!
-    $regionOfOrigin: String!
-    $fatherName: String!
-    $motherName: String!
-    $parentAddress: String!
-    $fatherTelephone: String!
-    $motherTelephone: String!
-    $email: String!
-
-    $academicYear: String!
-    $level: String!
-    $program: String!
-    $action: String!
-    $campusId: ID!
-    $stream: String!
-    $session: String!
-    $seriesOneId: ID
-    $status: String!
-    $admissionStatus: Boolean!
-    $delete: Boolean!
-  ) {
-    createUpdateDeletePreinscriptionSec (
-      language: $language
-      firstName: $firstName
-      lastName: $lastName
-      sex: $sex
-      address: $address
-      pob: $pob
-      dob: $dob
-
-      nationality: $nationality
-      regionOfOrigin: $regionOfOrigin
-      fatherName: $fatherName
-      motherName: $motherName
-      parentAddress: $parentAddress
-      fatherTelephone: $fatherTelephone
-      motherTelephone: $motherTelephone
-      email: $email
-
-      academicYear: $academicYear
-      level: $level
-      program: $program
-      action: $action
-      campusId: $campusId
-      stream: $stream
-      session: $session
-      seriesOneId: $seriesOneId
-      status: $status
-      admissionStatus: $admissionStatus
-      delete: $delete
-    ) {
-      preinscriptionsec {
-        id
-      }  
-    }
-  }
-`;
-
-const queryPreInscriptionPrim = gql`
-  mutation Create(
-    $language: String!
-    $firstName: String!
-    $lastName: String!
-    $sex: String!
-    $address: String!
-    $pob: String!
-    $dob: String!
-
-    $nationality: String!
-    $regionOfOrigin: String!
-    $fatherName: String!
-    $motherName: String!
-    $parentAddress: String!
-    $fatherTelephone: String!
-    $motherTelephone: String!
-    $parentEmail: String!
-
-    $academicYear: String!
-    $level: String!
-    $program: String!
-    $action: String!
-    $campusId: ID!
-    $status: String!
-    $admissionStatus: Boolean!
-    $delete: Boolean!
-  ) {
-    createUpdateDeletePreinscriptionPrim (
-      language: $language
-      firstName: $firstName
-      lastName: $lastName
-      sex: $sex
-      address: $address
-      pob: $pob
-      dob: $dob
-
-      nationality: $nationality
-      regionOfOrigin: $regionOfOrigin
-      fatherName: $fatherName
-      motherName: $motherName
-      parentAddress: $parentAddress
-      fatherTelephone: $fatherTelephone
-      motherTelephone: $motherTelephone
-      parentEmail: $parentEmail
-
-      academicYear: $academicYear
-      level: $level
-      program: $program
-      action: $action
-      campusId: $campusId
-      status: $status
-      admissionStatus: $admissionStatus
-      delete: $delete
-    ) {
-      preinscriptionprim {
-        id
       }
     }
   }

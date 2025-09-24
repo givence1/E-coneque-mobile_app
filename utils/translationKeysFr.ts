@@ -117,6 +117,11 @@ fees: {
   accountStatus: "Statut du compte",
   noFees: "Aucun frais trouvé.",
   noTransactions: "Aucune transaction pour le moment.",
+  singlePayment: "Paiement unique",
+  enterAmount: "Entrez le montant",
+  enterPhone: "Entrez le numéro de téléphone",
+  makePayment: "Effectuer un paiement",
+  submit: "Soumettre",
 },
 
 
@@ -313,7 +318,7 @@ fees: {
     specialty: "Spécialité",
     department: "Département",
     role: "Rôle",
-     specialtyone: "Premier choix de spécialité",
+   specialtyone: "Premier choix de spécialité",
   specialtytwo: "Deuxième choix de spécialité",
   academicYear: "Année académique",
   program: "Programme",
@@ -363,6 +368,12 @@ fees: {
     next: "Suivant",
     submit: "Soumettre",
     cancel: "Annuler",
+    ok: "OK",
+  },
+  confirm: {
+    title: "Confirmation",
+    success: "Votre formulaire a été soumis avec succès !",
+    error: "Une erreur s'est produite lors de la soumission de votre formulaire. Veuillez vérifier que tous les champs sont correctement remplis et réessayer.",
   },
 
 
