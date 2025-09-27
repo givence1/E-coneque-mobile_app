@@ -1,10 +1,10 @@
 import AppHeader from "@/components/AppHeader";
-import { Ionicons } from "@expo/vector-icons";
+import { useAuthStore } from "@/store/authStore";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import React, { useState } from "react";
 import {
   Alert,
   FlatList,
-  Image,
   KeyboardAvoidingView,
   ListRenderItem,
   Modal,
@@ -13,83 +13,144 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import COLORS from "../../../constants/colors";
 
+// ---------- GraphQL ----------
+const GET_COMPLAINTS = gql`
+  query GetComplaints($role: String!, $userprofileId: Decimal!) {
+    allComplains(
+      role: $role
+      last: 20
+      userprofileId: $userprofileId
+      status: false
+      deleted: false
+    ) {
+      edges {
+        node {
+          id
+          message
+          response
+          status
+          complainType
+          updatedAt
+        }
+      }
+    }
+  }
+`;
+
+const UPDATE_COMPLAINT = gql`
+  mutation UpdateComplaint($id: ID!, $message: String!, $complainType: String!) {
+    updateComplain(id: $id, message: $message, complainType: $complainType) {
+      complain {
+        id
+        message
+        complainType
+        updatedAt
+      }
+    }
+  }
+`;
+
 // ---------- Types ----------
-type ComplaintItem = {
+type ComplaintNode = {
   id: string;
-  type: string;
-  date: string;
-  status: "Pending" | "Resolved" | "In Review";
-  attachment: string | null;
-  message?: string;
+  message: string;
+  response?: string | null;
+  status: string;
+  complainType: string;
+  updatedAt: string;
 };
 
-const complaintHistory: ComplaintItem[] = [
-  {
-    id: "1",
-    type: "Result Problem",
-    date: "2025-07-22",
-    status: "Pending",
-    attachment: null,
-    message: "I believe my exam result was not recorded correctly.",
-  },
-  {
-    id: "2",
-    type: "Fee Issue",
-    date: "2025-07-15",
-    status: "Resolved",
-    attachment: "https://res.cloudinary.com/demo/image/upload/sample.jpg",
-    message: "I was charged an incorrect fee.",
-  },
-  {
-    id: "3",
-    type: "Other",
-    date: "2025-06-30",
-    status: "In Review",
-    attachment: null,
-    message: "General complaint.",
-  },
-];
+type ComplaintItem = {
+  node: ComplaintNode;
+};
 
 const ComplaintHistory: React.FC = () => {
-  const [selectedComplaint, setSelectedComplaint] = useState<ComplaintItem | null>(null);
+  const { profileId, role } = useAuthStore();
+
+  const [selectedComplaint, setSelectedComplaint] = useState<ComplaintNode | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
   // Dropdown state
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<string | null>(null);
-  const [items, setItems] = useState([
-    { label: "Fee Issue", value: "Fee Issue" },
-    { label: "Result Problem", value: "Result Problem" },
-    { label: "Lecturer Misconduct", value: "Lecturer Misconduct" },
-    { label: "Attendance", value: "Attendance" },
-    { label: "Other", value: "Other" },
-  ]);
   const [message, setMessage] = useState("");
 
-  const handleEdit = (complaint: ComplaintItem) => {
+  const [updateComplaint] = useMutation(UPDATE_COMPLAINT);
+
+  // Query complaints
+  const { data, loading, error, refetch } = useQuery(GET_COMPLAINTS, {
+    variables: {
+      role: role || "student",
+      userprofileId: profileId || 0,
+    },
+    skip: !profileId,
+    fetchPolicy: "network-only",
+    onError: (err) => {
+      console.log("❌ Complaints query error:", err.message);
+    },
+  });
+
+  const handleEdit = (complaint: ComplaintNode) => {
     setSelectedComplaint(complaint);
-    setType(complaint.type);
+    setType(complaint.complainType);
     setMessage(complaint.message || "");
     setModalVisible(true);
   };
 
-  const handleSave = () => {
-    if (!type || !message.trim()) {
+  const handleSave = async () => {
+    if (!type || !message.trim() || !selectedComplaint) {
       Alert.alert("Error", "Please select a type and enter your message.");
       return;
     }
 
-    Alert.alert("Updated", "Your complaint has been updated.");
-    setModalVisible(false);
-    setSelectedComplaint(null);
+    try {
+      const res = await updateComplaint({
+        variables: {
+          id: selectedComplaint.id,
+          message,
+          complainType: type,
+        },
+      });
+      console.log("✅ Complaint updated:", res.data);
+      Alert.alert("Updated", "Your complaint has been updated.");
+      setModalVisible(false);
+      setSelectedComplaint(null);
+      refetch();
+    } catch (err: any) {
+      console.log("❌ Update mutation error:", err.message);
+      Alert.alert("Error", "Failed to update complaint.");
+    }
   };
 
-  const renderComplaint: ListRenderItem<ComplaintItem> = ({ item }) => {
+  // Data mapping
+  const complaints: ComplaintNode[] = data?.allComplains?.edges?.map((e: ComplaintItem) => e.node) || [];
+
+  if (loading) return <Text style={{ marginTop: 100, textAlign: "center" }}>Loading complaints...</Text>;
+  if (error) {
+    console.log("❌ Apollo error object:", error);
+    return <Text style={{ marginTop: 100, textAlign: "center" }}>Error loading complaints.</Text>;
+  }
+
+  if (complaints.length === 0) {
+    return (
+      <View style={styles.container}>
+        <AppHeader showBack showTitle />
+        <View style={styles.content}>
+          <Text style={styles.title}>Complaint History</Text>
+          <Text style={{ textAlign: "center", marginTop: 20 }}>No complaints yet.</Text>
+        </View>
+      </View>
+    );
+  }
+
+  console.log("✅ Complaints data:", complaints);
+
+  const renderComplaint: ListRenderItem<ComplaintNode> = ({ item }) => {
     const isEditable = item.status === "Pending";
 
     return (
@@ -101,12 +162,12 @@ const ComplaintHistory: React.FC = () => {
       >
         <View style={styles.row}>
           <Text style={styles.label}>Type:</Text>
-          <Text style={styles.value}>{item.type}</Text>
+          <Text style={styles.value}>{item.complainType}</Text>
         </View>
 
         <View style={styles.row}>
           <Text style={styles.label}>Date:</Text>
-          <Text style={styles.value}>{item.date}</Text>
+          <Text style={styles.value}>{new Date(item.updatedAt).toLocaleDateString()}</Text>
         </View>
 
         <View style={styles.row}>
@@ -124,17 +185,6 @@ const ComplaintHistory: React.FC = () => {
             {item.status}
           </Text>
         </View>
-
-        {item.attachment && (
-          <TouchableOpacity
-            style={styles.attachment}
-            onPress={() => console.log("Open attachment", item.attachment)}
-          >
-            <Image source={{ uri: item.attachment }} style={styles.imagePreview} />
-            <Text style={styles.attachmentText}>View Attachment</Text>
-            <Ionicons name="open-outline" size={16} color={COLORS.primary} />
-          </TouchableOpacity>
-        )}
       </TouchableOpacity>
     );
   };
@@ -145,7 +195,7 @@ const ComplaintHistory: React.FC = () => {
       <View style={styles.content}>
         <Text style={styles.title}>Complaint History</Text>
         <FlatList
-          data={complaintHistory}
+          data={complaints}
           keyExtractor={(item) => item.id}
           renderItem={renderComplaint}
           contentContainerStyle={{ paddingBottom: 20 }}
@@ -171,10 +221,16 @@ const ComplaintHistory: React.FC = () => {
             <DropDownPicker
               open={open}
               value={type}
-              items={items}
+              items={[
+                { label: "Fee Issue", value: "fee" },
+                { label: "Result Problem", value: "result" },
+                { label: "Lecturer Misconduct", value: "lecturer" },
+                { label: "Attendance", value: "attendance" },
+                { label: "Other", value: "other" },
+              ]}
               setOpen={setOpen}
               setValue={setType}
-              setItems={setItems}
+              setItems={() => {}}
               placeholder="Select type"
               style={styles.dropdown}
               dropDownContainerStyle={{ borderColor: "#ccc" }}
@@ -216,7 +272,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 80, // space below header
+    paddingTop: 80,
     paddingHorizontal: 16,
   },
   title: {
@@ -267,21 +323,6 @@ const styles = StyleSheet.create({
   inReview: {
     backgroundColor: "#cce5ff",
     color: "#004085",
-  },
-  attachment: {
-    marginTop: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  imagePreview: {
-    width: 40,
-    height: 40,
-    borderRadius: 6,
-  },
-  attachmentText: {
-    color: COLORS.primary,
-    fontWeight: "500",
   },
   modalOverlay: {
     flex: 1,

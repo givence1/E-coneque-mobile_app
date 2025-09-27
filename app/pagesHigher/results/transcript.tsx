@@ -1,113 +1,152 @@
 import AppHeader from "@/components/AppHeader";
 import COLORS from "@/constants/colors";
-import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+import { useAuthStore } from "@/store/authStore";
+import { NodeTranscriptApplications } from "@/utils/schemas/interfaceGraphql";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import React, { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Alert,
+  RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 
+// GraphQL
+const GET_TRANSCRIPT = gql`
+  query AllTranscriptApplications($userprofileId: ID!) {
+    allTranscriptApplications(userprofileId: $userprofileId) {
+      edges {
+        node {
+          id
+          status
+          approvedAt
+        }
+      }
+    }
+  }
+`;
+
+const APPLY_TRANSCRIPT = gql`
+  mutation ApplyTranscript($userprofileId: ID!) {
+    createTranscriptApplication(input: { userprofileId: $userprofileId }) {
+      transcriptApplication {
+        id
+        status
+      }
+    }
+  }
+`;
+
 export default function TranscriptScreen() {
   const { t } = useTranslation();
+  const { profileId } = useAuthStore();
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Mock values (replace with actual API data)
-  const platformPaid = false; // boolean
-  const schoolFeesPaid = true; // boolean
+  // Fetch current transcript application (if any)
+  const { data, loading, refetch } = useQuery(GET_TRANSCRIPT, {
+    variables: { userprofileId: profileId },
+    skip: !profileId,
+    fetchPolicy: "network-only",
+  });
 
-  const canApplyTranscript = platformPaid && schoolFeesPaid;
+  const transcript: NodeTranscriptApplications | null =
+    data?.allTranscriptApplications?.edges?.[0]?.node || null;
+
+  const [applyTranscript, { loading: applying }] = useMutation(APPLY_TRANSCRIPT, {
+    onCompleted: () => {
+      Alert.alert(t("transcript.submitted"), t("transcript.submittedMessage"));
+      refetch();
+    },
+    onError: (err) => {
+      console.error(err);
+      Alert.alert(t("ui.error"), t("ui.serverError"));
+    },
+  });
 
   const handleTranscriptApply = () => {
-    if (canApplyTranscript) {
-      // ✅ proceed to transcript application
-      console.log(t("transcript.submitted"));
-    } else {
-      // ❌ Show message about missing fees
-      let missing: string[] = [];
-      if (!platformPaid) missing.push(t("transcript.platformFee"));
-      if (!schoolFeesPaid) missing.push(t("transcript.schoolFees"));
-
-      Alert.alert(
-        t("transcript.paymentRequired"),
-        t("transcript.paymentMessage", { missing: missing.join(" & ") })
-      );
-    }
+    if (transcript && transcript.status === "PENDING") return;
+    applyTranscript({ variables: { userprofileId: profileId } });
   };
 
-  const handleAttestationApply = () => {
-    console.log(t("transcript.attestationSubmitted"));
-  };
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    refetch().finally(() => setRefreshing(false));
+  }, [refetch]);
+
+  const isPending = transcript?.status === "PENDING";
+  const isApproved = transcript?.status === "APPROVED";
 
   return (
-    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-      {/* ✅ Fixed header outside the ScrollView */}
+     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+      {/* Header fixed at top */}
       <AppHeader showBack showTitle />
-      <View style={[styles.container, { paddingTop: 70 }]}>
-        {/* Transcript Application Card */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>{t("transcript.title")}</Text>
-          <Text style={styles.cardDescription}>
-            {t("transcript.description")}
-          </Text>
+    <ScrollView
+      contentContainerStyle={{ padding: 16, paddingTop: 70 }}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      style={{ flex: 1, backgroundColor: COLORS.background }}
+    >
 
-          <View style={styles.row}>
-            <Ionicons
-              name={platformPaid ? "checkmark-circle" : "close-circle"}
-              size={20}
-              color={platformPaid ? "green" : "red"}
-            />
-            <Text style={styles.rowText}>{t("transcript.platformFee")}</Text>
-          </View>
+      {/* Transcript Card */}
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>{t("transcript.title")}</Text>
+        <Text style={styles.cardDescription}>{t("transcript.description")}</Text>
 
-          <View style={styles.row}>
-            <Ionicons
-              name={schoolFeesPaid ? "checkmark-circle" : "close-circle"}
-              size={20}
-              color={schoolFeesPaid ? "green" : "red"}
-            />
-            <Text style={styles.rowText}>{t("transcript.schoolFees")}</Text>
-          </View>
-
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: COLORS.primary }]}
-            onPress={handleTranscriptApply}
-          >
-            <Text style={[styles.buttonText, { color: "#fff" }]}>
-              {t("transcript.apply")}
+        {transcript ? (
+          <View style={{ marginVertical: 12 }}>
+            <Text style={{ fontWeight: "600", color: COLORS.textPrimary }}>
+              {t("transcript.status")}:{" "}
+              <Text
+                style={{
+                  color: isPending ? "orange" : isApproved ? "green" : COLORS.textSecondary,
+                }}
+              >
+                {transcript.status}
+              </Text>
             </Text>
-          </TouchableOpacity>
-        </View>
+            {transcript.approvedAt && (
+              <Text style={{ color: COLORS.textSecondary, marginTop: 4 }}>
+                {t("transcript.approvedAt")}: {new Date(transcript.approvedAt).toLocaleString()}
+              </Text>
+            )}
+          </View>
+        ) : null}
 
-        {/* School Attestation Card */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>{t("attestation.title")}</Text>
-          <Text style={styles.cardDescription}>
-            {t("attestation.description")}
+        <TouchableOpacity
+          style={[
+            styles.button,
+            { backgroundColor: isPending ? COLORS.textSecondary : COLORS.primary },
+          ]}
+          onPress={handleTranscriptApply}
+          disabled={isPending || applying}
+        >
+          <Text style={[styles.buttonText, { color: "#fff" }]}>
+            {isPending ? t("transcript.pending") : t("transcript.apply")}
           </Text>
-
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: COLORS.primary }]}
-            onPress={handleAttestationApply}
-          >
-            <Text style={[styles.buttonText, { color: "#fff" }]}>
-              {t("attestation.apply")}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
       </View>
+
+      {/* Attestation Card */}
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>{t("attestation.title")}</Text>
+        <Text style={styles.cardDescription}>{t("attestation.description")}</Text>
+
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: COLORS.primary }]}
+          onPress={() => Alert.alert(t("attestation.submitted"))}
+        >
+          <Text style={[styles.buttonText, { color: "#fff" }]}>{t("attestation.apply")}</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-    paddingHorizontal: 16,
-  },
   card: {
     backgroundColor: COLORS.cardBackground,
     borderRadius: 16,
@@ -130,16 +169,6 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     marginBottom: 12,
     lineHeight: 20,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  rowText: {
-    marginLeft: 8,
-    fontSize: 15,
-    color: COLORS.textPrimary,
   },
   button: {
     marginTop: 12,
