@@ -68,7 +68,7 @@ export default function StudentProfileScreen() {
 
       <ScrollView
         style={styles.container}
-        contentContainerStyle={{ paddingTop: 50, paddingBottom: 50 }}
+        contentContainerStyle={{ paddingTop: 65, paddingBottom: 50 }}
         showsVerticalScrollIndicator={false}
       >
         {/* Profile Header */}
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
     paddingHorizontal: 16,
-    marginTop: 16,
+    marginTop: 40,
   },
   headerCard: {
     alignItems: "center",

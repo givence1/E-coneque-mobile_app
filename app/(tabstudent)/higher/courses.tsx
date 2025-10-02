@@ -13,20 +13,14 @@ import {
   View,
 } from "react-native";
 
-
 export default function CoursesScreen() {
   const { t } = useTranslation();
   const { specialtyId } = useAuthStore();
-  // const
-
 
   const { data, loading, error } = useQuery(GET_COURSES, {
-    variables: {
-      specialtyId: Number(specialtyId)
-    },
+    variables: { specialtyId: Number(specialtyId) },
     skip: !specialtyId,
   });
-
 
   if (loading) {
     return (
@@ -49,22 +43,18 @@ export default function CoursesScreen() {
       <AppHeader showBack showTabs showTitle />
 
       <ScrollView
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingTop: 50 },
-          { paddingBottom: 2 },
-        ]}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.title}>{t("courses.myCourses")}</Text>
 
         <View
-          key={data?.allCourses?.edges[0].node?.specialty?.academicYear}
+          key={data?.allCourses?.edges[0]?.node?.specialty?.academicYear}
           style={styles.yearGroup}
         >
           <Text style={styles.yearTitle}>
             {t("courses.academicYear", {
-              year: data?.allCourses?.edges[0].node?.specialty?.academicYear,
+              year: data?.allCourses?.edges[0]?.node?.specialty?.academicYear,
             })}
           </Text>
 
@@ -97,9 +87,7 @@ export default function CoursesScreen() {
   );
 }
 
-
 function renderTable(courses: EdgeCourse[], semester: string, t: any) {
-
   return (
     <View style={styles.table}>
       <View style={styles.headerRow}>
@@ -116,7 +104,7 @@ function renderTable(courses: EdgeCourse[], semester: string, t: any) {
 
       {courses?.map((course, index) => (
         <View
-          key={course.node.id} // ✅ unique key now
+          key={course.node.id}
           style={[
             styles.row,
             index % 2 === 0 ? styles.rowEven : styles.rowOdd,
@@ -158,10 +146,8 @@ const GET_COURSES = gql`
 
 const styles = StyleSheet.create({
   scrollContent: {
-    paddingTop: 80,
     paddingHorizontal: 16,
     paddingBottom: 40,
-    marginTop: 10,
   },
   loadingContainer: {
     flex: 1,
@@ -171,12 +157,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    alignItems: "center",
-    justifyContent: "center",
     textAlign: "center",
     fontWeight: "700",
     color: COLORS.primary,
     marginBottom: 16,
+    marginTop: 16,
   },
   yearGroup: {
     marginBottom: 24,

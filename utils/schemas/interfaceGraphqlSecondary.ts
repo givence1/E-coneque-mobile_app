@@ -1,4 +1,4 @@
-import { NodeCustomUser, NodeProgram, NodeSchoolIdentification, NodeSchoolHigherInfo } from "./interfaceGraphql";
+import { NodeCustomUser, NodeProgram, NodeSchoolHigherInfo } from "./interfaceGraphql";
 
 interface PageInfo {
   hasNextPage: boolean;
@@ -38,9 +38,11 @@ export interface NodeSeries {
 export interface NodeClassRoomSec {
   id: string;
   school: NodeSchoolHigherInfo;
+  series: NodeSeries;
   stream: string;
   cycle: string;
   level: string;
+  classType: string;
   select: boolean;
   option: string;
   academicYear: string;
@@ -93,8 +95,8 @@ export interface NodePublishSecondary {
   id: string;
   classroomsec: NodeClassRoomSec;
   publishTerm: "I" | "II" | "III"; // Restricted to the defined term choices
-  portalSeq: Record<string, boolean>; // JSON structure as key-value pairs (e.g., {"seq_1": false, "seq_2": false})
-  publishSeq: Record<string, boolean>; // JSON structure as key-value pairs (e.g., {"seq_1": false, "seq_2": false})
+  portalSeq: string; // JSON structure as key-value pairs (e.g., {"seq_1": false, "seq_2": false})
+  publishSeq: string; // JSON structure as key-value pairs (e.g., {"seq_1": false, "seq_2": false})
   updatedAt: string;
   updatedBy: NodeCustomUser;
 }
@@ -214,9 +216,4 @@ export interface EdgeNotificationSec {
 
 export interface EdgeComplainSec {
   node: NodeComplainSec;
-}
-
-
-
-
-
+} 

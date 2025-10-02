@@ -1,5 +1,5 @@
-import { NodeClassRoomPrim } from "./interfaceGraphqlPrimary";
-import { NodeSeries } from "./interfaceGraphqlSecondary";
+import { NodeClassRoomPrim, NodeUserProfilePrim } from "./interfaceGraphqlPrimary";
+import { NodeSeries, NodeUserProfileSec } from "./interfaceGraphqlSecondary";
 
 // PageInfo interface
 interface PageInfo {
@@ -504,11 +504,22 @@ export interface NodeNotification {
 
 export interface NodeComplain {
   id: string;
+  campus: NodeSchoolHigherInfo;
   userprofile: NodeUserProfile;
   message: string;
+  response: string;
   complainType: string;
   status: string;
+  role: string;
+  deleted: boolean;
+  deletedBy: NodeCustomUser;
   endingAt: string;
+  createdAt: string;
+  updatedAt: string;
+  customuser: NodeCustomUser;
+  resolvedBy: NodeCustomUser;
+  createdBy: NodeCustomUser;
+  updatedBy: NodeCustomUser;
 }
 
 
@@ -553,7 +564,7 @@ export interface NodeSchoolFees {
   idPaid: boolean;
   balance: number;
   transactions: SetTransactions[];
-  moratoires: NodeMoratoire[];
+  moratoire: NodeMoratoire;
   updatedAt: string;
   updatedBy: NodeCustomUser;
 }
@@ -580,9 +591,13 @@ export interface NodeTransactions {
 }
 
 
-export interface NodeTranscriptApplications {
+export interface NodeDocumentApplications {
   id: string | number;
   userprofile: NodeUserProfile,
+  userprofilelec: NodePreInscriptionLecturer,
+  userprofilesec: NodeUserProfileSec,
+  userprofileprim: NodeUserProfilePrim,
+  document: string,
   printCount: number,
   status: "PENDING" | "APPROVED" | "PRINTED",
   approvedBy: NodeCustomUser,
@@ -739,8 +754,8 @@ export interface EdgeTransactions {
   node: NodeTransactions;
 }
 
-export interface EdgeTranscriptApplications {
-  node: NodeTranscriptApplications;
+export interface EdgeDocumentApplications {
+  node: NodeDocumentApplications;
 }
 
 export interface EdgeAccount {

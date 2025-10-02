@@ -10,7 +10,7 @@ import { useAuthStore } from '@/store/authStore';
 import BootingScreen from '@/components/BootingScreen';
 import '../utils/i18n';
 
-// Prevent auto-hide before everything is loaded
+
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -25,7 +25,6 @@ export default function RootLayout() {
     checkAuth();
   }, []);
 
-  // Step 2: When auth check completes, mark layout ready
   useEffect(() => {
     if (!isCheckingAuth) {
       setLayoutReady(true);
@@ -43,10 +42,10 @@ export default function RootLayout() {
     if (!isSignedIn && !inAuthScreen) {
       router.replace('/(auth)');
     } else if (isSignedIn && inAuthScreen) {
-      if (role === "admin") router.replace('/(tabteacher)');
-      if (role === "student") router.replace('/(auth)/select-profile');
+      if (role === "admin") router.replace('/(auth)/select-campus');
       if (role === "teacher") router.replace('/(auth)/select-campus');
-      if (role === "parent") router.replace('/(tabparent)');
+      if (role === "parent") router.replace('/(auth)/select-profile');
+      if (role === "student") router.replace('/(auth)/select-profile');
     }
 
     SplashScreen.hideAsync(); // 👈 Only hide once layout and auth are ready

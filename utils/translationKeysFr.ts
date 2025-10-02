@@ -122,6 +122,9 @@ fees: {
   enterPhone: "Entrez le numéro de téléphone",
   makePayment: "Effectuer un paiement",
   submit: "Soumettre",
+  accountActivated: "Compte actif",
+  activateAccount: "Activer le compte",
+  activateMessage: "Vous pouvez maintenant accéder à toutes les fonctionnalités de l'application.",
 },
 
 
@@ -156,6 +159,7 @@ fees: {
   // UI Labels
   ui: {
   complaintType: "Type de réclamation",
+  noComplaints: "Aucune réclamation pour le moment.",
   selectType: "Sélectionner un type",
   feeIssue: "Problème de frais",
   resultProblem: "Problème de résultat",
@@ -176,6 +180,19 @@ fees: {
   choose: "Choisir",
   add: "Ajouter",
   remove: "Supprimer",
+  serverError: "Un problème est survenu. Veuillez réessayer.",
+  confirmation: "Confirmation",
+  ok: "OK",
+  areYouSureSubmit: "Êtes-vous sûr de vouloir soumettre {{document}} ?",
+  pending: "En attente",
+  resolved: "Approuvé",
+  rejected: "Rejeté",
+  readMore: "Lire la suite",
+  readLess: "Lire moins",
+  announcements: "Annonces",
+  complaints: "Réclamations",
+
+
 
   // École & Connexion
   mySchool: "Mon École",
@@ -233,12 +250,16 @@ fees: {
     year: "Année académique",
     level: "Niveau",
     program: "Programme",
+    selectChild: "Sélectionnez un enfant",
   },
 
   // Status
   status: {
     active: "Actif",
     inactive: "Inactif",
+    pending: "En attente",
+    approved: "Approuvé",
+    rejected: "Rejeté",
   },
 
   // Sections / Pre-inscriptions
@@ -369,6 +390,9 @@ fees: {
     submit: "Soumettre",
     cancel: "Annuler",
     ok: "OK",
+    pending: "En attente",
+    approved: "Approuvé",
+    rejected: "Rejeté",
   },
   confirm: {
     title: "Confirmation",
@@ -458,9 +482,15 @@ lecturer:{
     apply: "Demander un Relevé de Notes",
     submitted: "Demande de relevé de notes soumise !",
     paymentRequired: "Paiement Requis",
+    submittedMessage: "success ✅ Votre demande a été soumise.",
     paymentMessage: "Vous devez payer les éléments suivants avant de demander un relevé de notes :\n\n{{missing}}",
     history: "Historique",
     request: "Demande",
+    status: "Statut",
+    pending: "En attente",
+    approved: "Approuvé",
+    rejected: "Rejeté",
+    approvedAt: "Approuvé le",
   },
   attestation: {
     title: "Attestation Scolaire",

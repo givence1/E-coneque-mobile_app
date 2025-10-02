@@ -30,7 +30,7 @@ export default function StudentProfileScreen() {
       {/* Scrollable Content */}
       <ScrollView
         style={styles.container}
-        contentContainerStyle={{ paddingTop: 80, paddingBottom: 30 }}
+        contentContainerStyle={{ paddingTop: 90, paddingBottom: 30 }}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>

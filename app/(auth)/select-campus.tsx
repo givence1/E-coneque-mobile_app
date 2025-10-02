@@ -20,7 +20,7 @@ import {
 
 export default function SelectCampusScreen(): JSX.Element {
   const router = useRouter();
-  const { user, token } = useAuthStore();
+  const { user, token, storeSection, storeCampusInfo } = useAuthStore();
   const { t } = useTranslation();
 
   const { data: dataSchools, loading } = useQuery(GET_DATA, {
@@ -33,10 +33,13 @@ export default function SelectCampusScreen(): JSX.Element {
       user?.school?.includes(parseInt(decodeUrlID(sch.node.id) || ""))
   );
 
-  const handleSelect = (item: EdgeSchoolHigherInfo): void => {
+  const handleSelect = (item: EdgeSchoolHigherInfo, section: "higher" | "secondary" | "primary" | "vocational"): void => {
+
+    storeSection(section)
+    storeCampusInfo(item?.node)
+
     router.replace({
-      pathname: "/(tabteacher)",
-      params: { schoolId: item.node.id, schoolType: item.node.schoolType },
+      pathname: `/(tabteacher)/${section}`,
     });
   };
 
@@ -54,7 +57,7 @@ export default function SelectCampusScreen(): JSX.Element {
         registrationNumber: customuser?.matricle,
         firstName: customuser?.firstName?.toString().toUpperCase(),
         lastName: customuser?.lastName?.toString().toUpperCase(),
-        sex: customuser?.sex.toString().toUpperCase(),
+        sex: customuser?.sex?.toString().toUpperCase(),
         email: customuser?.email?.toString().toLowerCase(),
         telephone: customuser?.telephone,
         address: customuser?.address?.toString().toUpperCase() || "-",
@@ -84,7 +87,7 @@ export default function SelectCampusScreen(): JSX.Element {
           mutationName: "createUpdateDeletePreinscriptionLecturer",
           modelName: "preinscriptionlecturer",
           successField: "id",
-          query: queryPreInscriptionLecturer,
+          query: mutationPreInscriptionLecturer,
           router: null,
           params: null,
           redirect: false,
@@ -112,7 +115,7 @@ export default function SelectCampusScreen(): JSX.Element {
                 mutationName: "createUpdateDeleteCustomuser",
                 modelName: "customuser",
                 successField: "id",
-                query: queryCustomUser,
+                query: mutationCustomUser,
                 router,
                 params: null,
                 redirect: false,
@@ -143,27 +146,31 @@ export default function SelectCampusScreen(): JSX.Element {
     <View style={styles.container}>
       <Text style={styles.header}>{t("campus.selectCampus")}</Text>
 
-      {loading ? (
+      {loading ?
         <ActivityIndicator />
-      ) : !user?.registration_lec_id ? (
-        <View>
-          <Text>{t("campus.incompleteLecturerInfo")}</Text>
-          <Text>{t("campus.updateProfilePrompt")}</Text>
-          <TouchableOpacity
-            onPress={() => updateRegistrationLecturer({ customuser })}
-            style={styles.button}
-          >
-            <Text style={styles.buttonText}>{t("ui.update")}</Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
+        : !user?.registration_lec_id ?
+          <View>
+            <Text>{t("campus.incompleteLecturerInfo")}</Text>
+            <Text>{t("campus.updateProfilePrompt")}</Text>
+            <TouchableOpacity
+              onPress={() => updateRegistrationLecturer({ customuser })}
+              style={styles.button}
+            >
+              <Text style={styles.buttonText}>{t("ui.update")}</Text>
+            </TouchableOpacity>
+          </View> : null}
+
+      {!loading ?
         <FlatList
           data={mySchools}
           keyExtractor={(item) => item.node.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() => handleSelect(item)}
+          renderItem={({ item }) => {
+            const section = item?.node?.schoolType === "Section-H" ? "higher" :
+              item?.node?.schoolType === "Section-S" ? "secondary" :
+                item?.node?.schoolType === "Section-P" ? "primary" : "vocational"
+            return <TouchableOpacity
+              style={[styles.card, { backgroundColor: `${section === "higher" ? "green" : section === "secondary" ? "red" : section === "primary" ? "yellow" : "blue"}` }]}
+              onPress={() => handleSelect(item, section)}
             >
               <Text style={styles.title}>{item.node.schoolName}</Text>
               <Text style={styles.text}>
@@ -173,10 +180,10 @@ export default function SelectCampusScreen(): JSX.Element {
                 {item.node.campus.replace("_", "-")}
               </Text>
             </TouchableOpacity>
-          )}
+          }}
           contentContainerStyle={{ paddingVertical: 20 }}
-        />
-      )}
+        /> : null}
+
     </View>
   );
 }
@@ -199,26 +206,25 @@ const GET_DATA = gql`
     allCustomusers(id: $userId) {
       edges {
         node {
-          id
-          matricle
-          role
-          fullName
-          firstName
-          lastName
-          sex
-          dob
-          pob
-          address
-          telephone
-          email
-          nationality
-          regionOfOrigin
-          highestCertificate
-          yearObtained
-          fatherName
-          fatherTelephone
-          parentAddress
-          infoData
+          id matricle role infoData
+          preinscriptionLecturer {
+            fullName
+            firstName
+            lastName
+            sex
+            dob
+            pob
+            address
+            telephone
+            email
+            nationality
+            regionOfOrigin
+            highestCertificate
+            yearObtained
+            fatherName
+            fatherTelephone
+            parentAddress
+          }
         }
       }
     }
@@ -226,50 +232,103 @@ const GET_DATA = gql`
 `;
 
 // Add the missing query for customuser
-const queryCustomUser = gql`
-  query CustomUser($id: ID!) {
-    customuser(id: $id) {
-      id
-      preinscriptionLecturerId
-      infoData
-      language
-      delete
+const mutationCustomUser = gql`
+  mutation CustomUser (
+    $id: ID!
+    $preinscriptionLecturerId: ID!
+    $infoData: JSONString!
+    $language: String!
+    $delete: Boolean!
+  ) {
+    createUpdateDeleteCustomuser(
+      id: $id
+      preinscriptionLecturerId: $preinscriptionLecturerId
+      infoData: $infoData
+      language: $language
+      delete: $delete
+    ) {
+      customuser {
+        id
+      }
     }
   }
 `;
 
-// Add the missing query for preinscription lecturer
-const queryPreInscriptionLecturer = gql`
-  query PreInscriptionLecturer($id: ID!) {
-    preinscriptionlecturer(id: $id) {
-      id
-      registrationNumber
-      firstName
-      lastName
-      sex
-      email
-      telephone
-      address
-      pob
-      dob
-      nationality
-      regionOfOrigin
-      highestCertificate
-      yearObtained
-      fatherName
-      motherName
-      parentAddress
-      action
-      campusId
-      status
-      admissionStatus
-      infoData
-      delete
+
+
+
+
+
+
+const mutationPreInscriptionLecturer = gql`
+  mutation CreateUpdateDeletePreinscriptionLecturer (
+    $id: ID
+    $registrationNumber: String
+    $firstName: String
+    $lastName: String
+    $sex: String
+    $email: String
+    $telephone: String
+    $address: String
+    $pob: String
+    $dob: String
+    $nationality: String
+    $regionOfOrigin: String
+    $highestCertificate: String
+  
+    $yearObtained: String
+    $fatherName: String
+    $motherName: String
+    $parentAddress: String
+    $action: String
+    
+    $status: String
+    $admissionStatus: Boolean
+    $infoData: JSONString!
+    $delete: Boolean!
+  ) {
+    createUpdateDeletePreinscriptionLecturer (
+      id: $id
+      registrationNumber: $registrationNumber
+      firstName: $firstName
+      lastName: $lastName
+      sex: $sex
+      email: $email
+      telephone: $telephone
+      address: $address
+      pob: $pob
+      dob: $dob
+      nationality: $nationality
+      regionOfOrigin: $regionOfOrigin
+      highestCertificate: $highestCertificate
+    
+      yearObtained: $yearObtained
+      fatherName: $fatherName
+      motherName: $motherName
+      parentAddress: $parentAddress
+      action: $action
+      
+      status: $status
+      admissionStatus: $admissionStatus
+      infoData: $infoData
+      delete: $delete
+    ) {
+      preinscriptionlecturer {
+        id
+      }
     }
   }
 `;
+
+
+
+
+
 
 // Styles unchanged…
+
+
+
 const styles = StyleSheet.create<{
   container: ViewStyle;
   header: TextStyle;

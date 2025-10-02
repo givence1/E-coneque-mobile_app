@@ -1,5 +1,5 @@
 import { client } from '@/utils/graphql/client';
-import i18n from '@/utils/i18n'; // we’ll create this
+import i18n from '@/utils/i18n';
 import { JwtPayload } from '@/utils/interfaces';
 import { NodeSchoolHigherInfo, NodeSchoolIdentification } from '@/utils/schemas/interfaceGraphql';
 import { gql } from '@apollo/client';
@@ -12,7 +12,9 @@ interface AuthStore {
   feesId: number | null;
   profileId: number | null;
   specialtyId: number | null;
+  parentNumber: number | string | null;
   token: string | null; 
+  section: "higher" | "secondary" | "primary" | "vocational" | null; 
   isCheckingAuth: boolean;
   isLoading: boolean;
   schoolIdentification: NodeSchoolIdentification | null;
@@ -26,17 +28,21 @@ interface AuthStore {
   storeFeesId: (id: number) => void;
   storeProfileId: (id: number) => void;
   storeSpecialtyId: (id: number) => void;
+  storeParentNumber: (id: number | string) => void;
   storeRegistrationId: (field: "registration_lec_id" | "registration_hig_id" | "registration_sec_id" | "registration_pri_id", value: number) => void;
   storeCampusInfo: (data: NodeSchoolHigherInfo) => void;
+  storeSection: (section: "higher" | "secondary" | "primary" | "vocational" | null) => void;
   setLanguage: (lang: string) => void;
   loadLanguage: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
+  section: null,
   user: null,
   feesId: null,
   profileId: null,
   specialtyId: null,
+  parentNumber: null,
   token: null,
   isCheckingAuth: false,
   isLoading: false,
@@ -48,6 +54,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   storeFeesId: async (feesId: number) => { set({ feesId }) },
   storeProfileId: async (profileId: number) => { set({ profileId }) },
   storeSpecialtyId: async (specialtyId: number) => { set({ specialtyId }) },
+  storeParentNumber: async (parentNumber: number | string) => { set({ parentNumber }) },
   storeCampusInfo: async (campusInfo: NodeSchoolHigherInfo) => { set({ campusInfo }) },
 
   storeRegistrationId: (field, value) => {
@@ -92,7 +99,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }
   },
 
-  logout: () => set({ user: null, token: null }),
+  logout: () => set({ user: null, token: null, feesId: null, profileId: null, specialtyId: null }),
 
   checkAuth: async () => {
     set({ isCheckingAuth: true });
@@ -118,6 +125,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     AsyncStorage.setItem("appLanguage", lang);
   },
 
+  storeSection: (section: "higher" | "secondary" | "primary" | "vocational" | null ) => {
+    set({ section });
+  },
+
   loadLanguage: async () => {
     const savedLang = await AsyncStorage.getItem("appLanguage");
     if (savedLang) {
@@ -136,6 +147,8 @@ const querySchool = gql`
           schoolIdentification {
             name
             logo
+            platformCharges idCharges
+            supportNumberOne
             hasHigher
             hasSecondary
             hasPrimary

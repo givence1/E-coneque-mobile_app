@@ -119,6 +119,9 @@ fees: {
   enterPhone: "Enter Phone Number",
   makePayment: "Make a Payment",
   submit: "Submit",
+  accountActivated: "Account active",
+  activateAccount: "Activate Account",
+  activateMessage: "You can now access all features of the app.",
 },
 
 
@@ -152,7 +155,8 @@ fees: {
 
   // UI Labels
   ui: {
-    complaintType: "Complaint Type",
+  complaintType: "Complaint Type",
+  noComplaints: "No complaints submitted yet.",
   selectType: "Select type",
   feeIssue: "Fee Issue",
   resultProblem: "Result Problem",
@@ -173,8 +177,21 @@ fees: {
   choose: "Choose",
   add: "Add",
   remove: "Remove",
+  serverError: "Something went wrong. Please try again.",
+  confirmation: "Confirmation",
+  ok: "OK",
+  areYouSureSubmit: "Are you sure you want to submit {{document}}?",
+  pending: "Pending",
+  resolved: "Approved",
+  rejected: "Rejected",
+  readMore: "Read More",
+  readLess: "Read Less",
+  present: "Present",
+  absent: "Absent",
+  announcements: "Announcements",
+  complaints: "Complaints",  
 
-  // School & Login
+  // School & Login 
   mySchool: "My School",
   checkUser: "Check User",
   matriculeOrUsername: "Matricule or Username",
@@ -230,12 +247,16 @@ fees: {
     year: "Academic Year",
     level: "Level",
     program: "Program",
+    selectChild: "Select Child",
   },
 
   // Status
   status: {
     active: "Active",
     inactive: "Inactive",
+    pending: "Pending",
+    approved: "Approved",
+    rejected: "Rejected",
   },
 
   // Sections / Pre-inscriptions
@@ -371,6 +392,9 @@ fees: {
     submit: "Submit",
     cancel: "Cancel",
     ok: "OK",
+    pending: "Pending",
+    approved: "Approved",
+    rejected: "Rejected",
   },
   confirm: {
     title: "Confirmation",
@@ -460,9 +484,15 @@ transcript: {
     apply: "Apply for Transcript",
     submitted: "Transcript application submitted!",
     paymentRequired: "Payment Required",
+    submittedMessage: "You have successfuly submitted your application it is currently pending and under review",
     paymentMessage: "You need to pay the following before applying for transcript:\n\n{{missing}}",
      history: "History",
     request: "Request",
+    status: "Status",
+    pending: "Pending",
+    approved: "Approved",
+    rejected: "Rejected",
+    approvedAt: "Approved At",
 
 },
 
@@ -470,7 +500,10 @@ transcript: {
     title: "School Attestation",
     description: "You may apply for your school attestation at any time. No payment or additional fee is required.",
     apply: "Apply for Attestation",
-    attestationSubmitted: "School attestation application submitted!"
+    attestationSubmitted: "School attestation application submitted!",
+     pedding: "Pending",
+    approved: "Approved",
+    rejected: "Rejected",
   },
   profileHeader: {
   noFees: "No Fees",

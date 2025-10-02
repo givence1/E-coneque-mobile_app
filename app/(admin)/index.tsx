@@ -11,7 +11,8 @@ import {
 } from "react-native";
 import styles from "../../assets/styles/home.styles";
 import TabsHeader from "../../components/AppHeader";
-import COLORS from "../../constants/colors";
+import COLORS from "@/constants/colors";
+
 
 const StudentHome = () => {
   const router = useRouter();
@@ -30,7 +31,7 @@ const StudentHome = () => {
         {/* Student Info Card */}
         <View style={localStyles.infoCard}>
           <View style={{ flex: 1 }}>
-            <Text style={localStyles.name}>PATRISCO GIVENCE</Text>
+            <Text style={localStyles.name}>PATRISCO GIVENCE student</Text>
             <Text style={localStyles.program}>NURSING</Text>
             <Text style={localStyles.level}>2024/2025 | 200</Text>
             <Text style={localStyles.matricule}>

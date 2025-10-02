@@ -18,9 +18,12 @@ import {
   View,
 } from "react-native";
 import styles from "../../assets/styles/login.styles";
-import COLORS from "../../constants/colors";
+import COLORS from "@/constants/colors";
+
+
 
 export default function Login() {
+  const { storeParentNumber } = useAuthStore();
   const [matricle, setMatricle] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [parent, setParent] = useState<boolean>(false);
@@ -53,6 +56,9 @@ export default function Login() {
           setPassword(savedPassword);
           setParent(savedParent === "true");
           setRememberMe(true);
+          if (savedParent === "true"){
+            storeParentNumber(savedMatricle)
+          }
         }
       } catch (error) {
         console.error("Error loading credentials:", error);
@@ -82,14 +88,17 @@ export default function Login() {
 
     if (password.trim().length < 4) {
       Alert.alert(t("login.invalidInput"), t("login.password"));
-      return;
     }
+    // return
 
     try {
       const result = await login({ matricle, password, parent });
       if (!result?.token || result.token.length < 10) {
         Alert.alert(t("login.loginFailed"), t("login.invalidCredentials"));
       } else {
+        if (parent) {
+          storeParentNumber(matricle);
+        }
         if (rememberMe) {
           await AsyncStorage.setItem("savedMatricle", matricle);
           await AsyncStorage.setItem("savedPassword", password);
@@ -106,9 +115,8 @@ export default function Login() {
   };
 
   const handleSupport = () => {
-    const phoneNumber = "237693358642";
     const message = "Hello, I need help with my login.";
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+    const url = `https://wa.me/${schoolIdentification?.supportNumberOne}?text=${encodeURIComponent(message)}`;
     Linking.openURL(url);
   };
 

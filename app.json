@@ -2,7 +2,7 @@
   "expo": {
     "name": "The Brains University",
     "slug": "mobile",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "mobile",
@@ -19,7 +19,7 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.econneque.mobile",
-      "versionCode": 7
+      "versionCode": 8
     },
     "web": {
       "bundler": "metro",

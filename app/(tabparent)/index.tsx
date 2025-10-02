@@ -31,7 +31,7 @@ const ParentHome = () => {
         {/* Student Info Card */}
         <View style={localStyles.infoCard}>
           <View style={{ flex: 1 }}>
-            <Text style={localStyles.name}>PATRISCO GIVENCE</Text>
+            <Text style={localStyles.name}>PATRISCO GIVENCE parent</Text>
             <Text style={localStyles.program}>NURSING</Text>
             <Text style={localStyles.level}>2024/2025 | 200</Text>
             <Text style={localStyles.matricule}>
