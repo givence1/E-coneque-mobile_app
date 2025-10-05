@@ -5,7 +5,6 @@ import { ApiFactory } from "@/utils/graphql/ApiFactory";
 import { NodeSchoolFees } from "@/utils/schemas/interfaceGraphql";
 import { gql } from "@apollo/client";
 import { Ionicons } from "@expo/vector-icons";
-import { TFunction } from "i18next";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -111,8 +110,12 @@ const ModalMoratorium = ({
   };
 
   /** APPLY FUNCTION */
+
+
+
+
   const handleApply = async () => {
-    const validation = validateMoratoriumApplication(schedules, reason, fees?.balance, t);
+    const validation = validateMoratoriumApplication(schedules, reason, fees?.balance);
     if (!validation.isValid) {
       alert(validation.message);
       return;
@@ -179,73 +182,74 @@ const ModalMoratorium = ({
             <Ionicons name="close" size={24} color={COLORS.textDark} />
           </TouchableOpacity>
 
-          <Text style={styles.modalTitle}>{t("Moratorium Application")}</Text>
+         <Text style={styles.modalTitle}>{t("fees.moratoriumApplication")}</Text>
 
-          {/* Student Info */}
-          <View style={styles.infoCard}>
-            <Text style={styles.infoText}>
-              {t("Class")}: {fees?.userprofile?.specialty?.mainSpecialty?.specialtyName}
-            </Text>
-            <Text style={styles.infoText}>
-              {t("Accademic Year")}: {fees?.userprofile?.specialty?.academicYear} -{" "}
-              {fees?.userprofile?.specialty?.level?.level}
-            </Text>
-            <Text style={styles.infoText}>
-              {t("Balance")}: {fees?.balance.toLocaleString()} F
-            </Text>
-          </View>
+        {/* Student Info */}
+        <View style={styles.infoCard}>
+          <Text style={styles.infoText}>
+            {t("fees.class")}: {fees?.userprofile?.specialty?.mainSpecialty?.specialtyName}
+          </Text>
+          <Text style={styles.infoText}>
+            {t("fees.academicYear")}: {fees?.userprofile?.specialty?.academicYear} -{" "}
+            {fees?.userprofile?.specialty?.level?.level}
+          </Text>
+          <Text style={styles.infoText}>
+            {t("fees.balance")}: {fees?.balance.toLocaleString()} F
+          </Text>
+        </View>
 
-          <Text style={styles.modalSubtitle}>{t("Requested Schedule")}</Text>
+        <Text style={styles.modalSubtitle}>{t("fees.requestedSchedule")}</Text>
 
-          {/* SCHEDULE LIST */}
-          <FlatList
-            data={schedules}
-            keyExtractor={(item) => item.id.toString()}
-            style={{ maxHeight: 250 }}
-            renderItem={({ item }) => (
-              <View style={styles.scheduleRow}>
-                <TextInput
-                  style={styles.amountInput}
-                  placeholder={t("Amount")}
-                  keyboardType="numeric"
-                  value={item.amount}
-                  onChangeText={(val) => updateSchedule(item.id, "amount", val)}
-                />
-                <TouchableOpacity
-                  style={styles.dateInputTouchable}
-                  onPress={() => openDatePicker(item.id)}
-                >
-                  <Text style={[styles.dateText, item.error && { color: "red" }]}>
-                    {item.due_date || t("Select Date")}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => removeSchedule(item.id)}>
-                  <Ionicons name="close-circle" size={24} color="red" />
-                </TouchableOpacity>
-              </View>
-            )}
-          />
-
-          {schedules.length < 4 && (
-            <TouchableOpacity style={styles.addButton} onPress={addSchedule}>
-              <Ionicons name="add-circle" size={40} color={COLORS.primary} />
-              <Text style={styles.addText}>{t("Add Schedule")}</Text>
-            </TouchableOpacity>
+        {/* SCHEDULE LIST */}
+        <FlatList
+          data={schedules}
+          keyExtractor={(item) => item.id.toString()}
+          style={{ maxHeight: 250 }}
+          renderItem={({ item }) => (
+            <View style={styles.scheduleRow}>
+              <TextInput
+                style={styles.amountInput}
+                placeholder={t("fees.amount")}
+                keyboardType="numeric"
+                value={item.amount}
+                onChangeText={(val) => updateSchedule(item.id, "amount", val)}
+              />
+              <TouchableOpacity
+                style={styles.dateInputTouchable}
+                onPress={() => openDatePicker(item.id)}
+              >
+                <Text style={[styles.dateText, item.error && { color: "red" }]}>
+                  {item.due_date || t("fees.selectDate")}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => removeSchedule(item.id)}>
+                <Ionicons name="close-circle" size={24} color="red" />
+              </TouchableOpacity>
+            </View>
           )}
+        />
 
-          {/* Reason Input */}
-          <TextInput
-            placeholder={t("Enter Reason Here...")}
-            style={styles.input}
-            multiline
-            value={reason}
-            onChangeText={setReason}
-          />
-
-          {/* Apply Button */}
-          <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
-            <Text style={styles.applyButtonText}>{t("apply")}</Text>
+        {schedules.length < 4 && (
+          <TouchableOpacity style={styles.addButton} onPress={addSchedule}>
+            <Ionicons name="add-circle" size={40} color={COLORS.primary} />
+            <Text style={styles.addText}>{t("fees.addSchedule")}</Text>
           </TouchableOpacity>
+        )}
+
+        {/* Reason Input */}
+        <TextInput
+          placeholder={t("fees.enterReason")}
+          style={styles.input}
+          multiline
+          value={reason}
+          onChangeText={setReason}
+        />
+
+        {/* Apply Button */}
+        <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
+          <Text style={styles.applyButtonText}>{t("fees.apply")}</Text>
+        </TouchableOpacity>
+
         </View>
 
         <DateTimePickerModal
@@ -391,24 +395,24 @@ const query = gql`
 `;
 
 function validateMoratoriumApplication(
-  schedules: { id: number; amount: string; due_date: string; error?: string; }[],
+  schedules: { id: number; amount: string; due_date: string; error?: string }[],
   reason: string,
-  balance: number,
-  t: TFunction<"translation", undefined>
+  balance: number
 ): { isValid: boolean; message: string } {
+  const { t } = useTranslation();
   if (!reason.trim()) {
-    return { isValid: false, message: t("Reason Required") };
+    return { isValid: false, message: t("fees.reasonRequired") };
   }
   if (schedules.length === 0) {
-    return { isValid: false, message: t("AtLeast One Schedule") };
+    return { isValid: false, message: t("fees.atLeastOneSchedule") };
   }
   let totalAmount = 0;
   for (const schedule of schedules) {
     if (!schedule.amount || isNaN(Number(schedule.amount)) || Number(schedule.amount) <= 0) {
-      return { isValid: false, message: t("Invalid Amount") };
+      return { isValid: false, message: t("fees.invalidAmount") };
     }
     if (!schedule.due_date) {
-      return { isValid: false, message: t("Date Required") };
+      return { isValid: false, message: t("fees.dateRequired") };
     }
     if (schedule.error) {
       return { isValid: false, message: schedule.error };
@@ -416,7 +420,7 @@ function validateMoratoriumApplication(
     totalAmount += Number(schedule.amount);
   }
   if (totalAmount < balance) {
-    return { isValid: false, message: t("total AmountLess ThanBalance") };
+    return { isValid: false, message: t("fees.totalAmountLessThanBalance") };
   }
   return { isValid: true, message: "" };
 }

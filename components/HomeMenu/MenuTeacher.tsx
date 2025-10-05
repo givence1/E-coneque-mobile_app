@@ -19,16 +19,16 @@ export const MenuTeacher = (
     return [
 
         // HIGHER SECTION
-        {
-            label: t("ui.attendance"),
-            route: "/pagesAll/attendance/attendance",
-            icon: <Feather
-                    name="credit-card"
-                    size={24}
-                    color={COLORS.primary}
-                />,
-            display: (role === "admin" || role === "teacher") && (section === "higher")
-        },
+        // {
+        //     label: t("ui.attendance"),
+        //     route: "/pagesAll/attendance/attendance",
+        //     icon: <Feather
+        //             name="credit-card"
+        //             size={24}
+        //             color={COLORS.primary}
+        //         />,
+        //     display: (role === "admin" || role === "teacher") && (section === "higher")
+        // },
         {
             label: t("ui.announcements"),
             route: "/pagesAll/announcements/announcements",

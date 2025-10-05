@@ -145,7 +145,7 @@ export default function SelectYearScreen(): JSX.Element {
       <Text style={styles.header}>
         {role === "parent" && !showProfile
           ? t("academic.selectChild")
-          : t("academic.selectProfile")}
+          : t("academic.selectYear")}
       </Text>
 
       {/* ✅ Selected Student Name */}

@@ -79,7 +79,7 @@ const UserProfile = () => {
           <Image source={userPhoto} style={styles.avatar} />
           <Text style={styles.name}>{profile?.customuser?.preinscriptionStudent?.fullName || userLect?.preinscriptionLecturer?.fullName || t("ui.noData")}</Text>
           <Text style={styles.matric}>
-            {t("profile.id")}: {profile?.customuser?.matricle || "N/A"}
+            {t("profile.username")}: {profile?.customuser?.matricle || profile?.customuser?.userName || user?.matricle || "N/A"}
           </Text>
         </View>
 

@@ -1,92 +1,97 @@
-import AppHeader from "@/components/AppHeader";
-import { MenuStudent } from "@/components/HomeMenu/MenuStudent";
-import { MenuTeacher } from "@/components/HomeMenu/MenuTeacher";
-import ProfileHeader from "@/components/ProfileHeader";
-import COLORS from "@/constants/colors";
-import { useAuthStore } from "@/store/authStore";
-import { gql, useQuery } from "@apollo/client";
-import { useRouter } from "expo-router";
-import React from "react";
-import { useTranslation } from "react-i18next";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import AppHeader from '@/components/AppHeader';
+import { MenuStudent } from '@/components/HomeMenu/MenuStudent';
+import ProfileHeader from '@/components/ProfileHeader';
+import COLORS from '@/constants/colors';
+import { useAuthStore } from '@/store/authStore';
+import { gql, useQuery } from '@apollo/client';
+import { useRouter } from 'expo-router';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { MenuTeacher } from './HomeMenu/MenuTeacher';
+
+
 
 const HomePage = () => {
   const { t } = useTranslation();
   const router = useRouter();
   const { section, feesId, user, role } = useAuthStore();
 
-  // ✅ Student fees query
-  const { data: dataFees } = useQuery(GET_FEES, {
+  const { data: dataFees, loading, error } = useQuery(GET_FEES, {
     variables: { id: feesId },
   });
 
-  // ✅ Teacher user query
-  const { data: dataUser } = useQuery(GET_TEACHER_USER, {
+  const { data: dataUser } = useQuery(GET_LECTURER_USER, {
     variables: { id: user?.user_id },
   });
 
-  // Determine student fee node or teacher node
-  const profileData =
-    role === "student"
-      ? section === "higher"
-        ? dataFees?.allSchoolFees?.edges[0]
-        : section === "secondary"
-        ? dataFees?.allSchoolFeesSec?.edges[0]
-        : section === "primary"
-        ? dataFees?.allSchoolFeesPrim?.edges[0]
-        : dataFees?.allSchoolFees?.edges[0]
-      : dataUser?.allCustomusers?.edges[0]; // teacher node
-
   return (
     <View style={{ flex: 1, backgroundColor: COLORS.background }}>
-      <AppHeader showTabs showTitle />
 
+      <AppHeader
+        showTabs
+        showTitle
+      />
+
+      {/* Scrollable Content */}
       <ScrollView
-        contentContainerStyle={{ paddingTop: 70, paddingBottom: 20 }}
+        contentContainerStyle={{
+          paddingTop: 70,
+          paddingBottom: 2,
+        }}
         showsVerticalScrollIndicator={false}
       >
-        {/* ✅ Profile Card */}
-        <ProfileHeader fees={profileData} role={role} />
+        {/* Student / Lecturer Info Card */}
+        <ProfileHeader
+          fees={
+            section === "higher" ? dataFees?.allSchoolFees?.edges[0] :
+            section === "secondary" ? dataFees?.allSchoolFeesSec?.edges[0] :
+            section === "primary" ? dataFees?.allSchoolFeesPrim?.edges[0] :
+            dataFees?.allSchoolFees?.edges[0]
+          }
+          user={dataUser?.allCustomusers?.edges[0]?.node}
+        />
 
-        {/* Student Quick Action */}
+
+        {/* Quick Action Boxes */}
         <View style={localStyles.gridContainer}>
-          {(role === "student" || role === "parent") &&
-            MenuStudent({ role, section })
-              .filter((item: any) => item.display)
-              .map((item, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={localStyles.box}
-                  onPress={() => router.push(item.route as any)}
-                >
-                  {item.icon}
-                  <Text style={localStyles.boxLabel}>{item.label}</Text>
-                </TouchableOpacity>
-              ))}
+          {(role === "student" || role === "parent") ? MenuStudent({ role, section }).filter((item: any) => item.display).map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={localStyles.box}
+              onPress={() => router.push(item.route as any)}
+            >
+              {item.icon}
+              <Text style={localStyles.boxLabel}>{item.label}</Text>
+            </TouchableOpacity>
+          )) : null}
         </View>
 
-        {/* Teacher Quick Action */}
+
+        {/* Quick Action Boxes */}
         <View style={localStyles.gridContainer}>
-          {(role === "admin" || role === "teacher") &&
-            MenuTeacher({ role, section })
-              .filter((item: any) => item.display)
-              .map((item, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={localStyles.box}
-                  onPress={() => router.push(item.route as any)}
-                >
-                  {item.icon}
-                  <Text style={localStyles.boxLabel}>{item.label}</Text>
-                </TouchableOpacity>
-              ))}
+          {(role === "admin" || role === "teacher") ? MenuTeacher({ role, section }).filter((item: any) => item.display).map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={localStyles.box}
+              onPress={() => router.push(item.route as any)}
+            >
+              {item.icon}
+              <Text style={localStyles.boxLabel}>{item.label}</Text>
+            </TouchableOpacity>
+          )) : null}
         </View>
+
+
+
       </ScrollView>
     </View>
   );
-};
+}
 
 export default HomePage;
+
+
 
 const localStyles = StyleSheet.create({
   gridContainer: {
@@ -116,7 +121,8 @@ const localStyles = StyleSheet.create({
   },
 });
 
-// 🔹 GraphQL queries
+
+
 const GET_FEES = gql`
   query GetData($id: ID!) {
     allSchoolFees(id: $id) {
@@ -124,17 +130,26 @@ const GET_FEES = gql`
         node {
           id
           platformPaid
-          customuser {
-            matricle
-            preinscriptionStudent {
-              fullName
+          userprofile {
+            id
+            program {
+              name
             }
-          }
-          program { name }
-          specialty {
-            academicYear
-            level { level }
-            mainSpecialty { specialtyName }
+            customuser {
+              id matricle
+              preinscriptionStudent {
+                fullName
+              }
+            }
+            specialty {
+              academicYear
+              level {
+                level
+              }
+              mainSpecialty {
+                specialtyName
+              }
+            }
           }
         }
       }
@@ -144,29 +159,20 @@ const GET_FEES = gql`
         node {
           id
           platformPaid
-          customuser {
-            matricle
-            preinscriptionStudent { fullName }
-          }
-          classroomsec {
-            level
-            academicYear
-          }
-        }
-      }
-    }
-    allSchoolFeesPrim(id: $id) {
-      edges {
-        node {
-          id
-          platformPaid
-          customuser {
-            matricle
-            preinscriptionStudent { fullName }
-          }
-          classroomprim {
-            level
-            academicYear
+          userprofilesec {
+            id
+            programsec
+            customuser {
+              id matricle
+              preinscriptionStudent {
+                fullName
+              }
+            }
+            classroomsec {
+              academicYear
+              level classType
+              series { name }
+            }
           }
         }
       }
@@ -174,15 +180,18 @@ const GET_FEES = gql`
   }
 `;
 
-const GET_TEACHER_USER = gql`
-  query GetTeacher($id: ID!) {
-    allCustomusers(id: $id) {
+const GET_LECTURER_USER = gql`
+  query GetData(
+    $id: ID!
+  ) {
+    allCustomusers(
+      id: $id
+    ) {
       edges {
         node {
-          id
-          matricle
+          id matricle          
           preinscriptionLecturer {
-            fullName
+            id fullName 
           }
         }
       }

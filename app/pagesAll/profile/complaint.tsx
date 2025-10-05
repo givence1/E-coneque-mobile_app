@@ -199,7 +199,7 @@ const Complaint: React.FC = () => {
 
               <TouchableOpacity style={styles.submitBtn} onPress={handleSubmit}>
                 <LinearGradient
-                  colors={[COLORS.primary, COLORS.secondary]}
+                  colors={[COLORS.primary, COLORS.primary]}
                   style={styles.gradientBtn}
                 >
                   <Text style={styles.buttonText}>{t("ui.submitComplaint")}</Text>

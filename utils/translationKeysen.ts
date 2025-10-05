@@ -24,6 +24,7 @@ export const translationKeys = {
     forgotPasswordSubtitle: "Enter the email of your account",
     enterEmail: "Enter email",
     backToLogin: "Back to Login",
+     
   },
 
   // Profile
@@ -43,6 +44,7 @@ export const translationKeys = {
     highestCertificate: "Highest Certificate",
     yearObtained: "Year Obtained",
     email: "Email",
+    username: "Username",
     phone: "Phone",
     dob: "Date of Birth",
     pob: "Place of Birth",
@@ -122,6 +124,29 @@ fees: {
   accountActivated: "Account active",
   activateAccount: "Activate Account",
   activateMessage: "You can now access all features of the app.",
+  activation: "Account activation",
+   reasonRequired: "Reason is required.",
+  atLeastOneSchedule: "Please add at least one schedule.",
+  invalidAmount: "Please enter a valid amount.",
+  dateRequired: "Due date is required.",
+  totalAmountLessThanBalance: "Total scheduled amount cannot be less than balance.",
+    // Student Info
+  class: "Class",
+  yearLevel: "Year/Level",
+
+  // Inputs
+  telephone: "Telephone",
+  operator: "Operator",
+
+  // Buttons
+  apply: "Apply",
+  // Moratorium
+  moratoriumApplication: "Moratorium Application",
+  requestedSchedule: "Requested Schedule",
+  selectDate: "Select Date",
+  addSchedule: "Add Schedule",
+  submittedSuccessfully: "Submitted successfully",
+
 },
 
 

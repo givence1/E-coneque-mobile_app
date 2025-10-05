@@ -65,7 +65,7 @@ export const MenuStudent = (
                     size={24}
                     color={COLORS.primary}
                 />,
-            display: (role === "student" || role === "parent") && (section === "higher")
+            display: (role === "student") && (section === "higher")
         },
         {
             label: t("studentHome.complaints"),

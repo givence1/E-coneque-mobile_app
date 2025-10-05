@@ -1,15 +1,14 @@
 import COLORS from "@/constants/colors";
 import { useAuthStore } from "@/store/authStore";
-import { Picker } from "@react-native-picker/picker";
 import { ApiFactory } from "@/utils/graphql/ApiFactory";
 import { NodeSchoolFees } from "@/utils/schemas/interfaceGraphql";
 import { gql } from "@apollo/client";
 import { Ionicons } from "@expo/vector-icons";
-import { TFunction } from "i18next";
+import { Picker } from "@react-native-picker/picker";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  FlatList,
+  ActivityIndicator,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -17,10 +16,8 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-
 
 const ModalActivation = ({
   refetch,
@@ -39,11 +36,11 @@ const ModalActivation = ({
   const [amount, setAmount] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [operator, setOperator] = useState("");
+  const [loading, setLoading] = useState(false); // ✅ NEW loading state
 
   /** APPLY FUNCTION */
   const handleApply = async () => {
-
-    if ( phoneNumber?.length < 9) {
+    if (phoneNumber?.length < 9) {
       alert("Invalid Telephone");
       return;
     }
@@ -63,29 +60,37 @@ const ModalActivation = ({
       origin: "student",
       status: "Pending",
     };
-    console.log(dataForMutation);
 
-    const successData = await ApiFactory({
-      newData: dataForMutation,
-      editData: dataForMutation,
-      mutationName: "makePaymentTransaction",
-      modelName: "payment",
-      successField: "id",
-      query,
-      router: null,
-      params: null,
-      redirect: false,
-      reload: false,
-      returnResponseField: true,
-      redirectPath: ``,
-      actionLabel: "creating",
-      token: useAuthStore.getState().token,
-    });
+    try {
+      setLoading(true); // ✅ start loading
 
-    if (successData?.length > 10) {
-      alert(t("submittedSuccessfully"));
-      refetch();
-      setModalVisible(false);
+      const successData = await ApiFactory({
+        newData: dataForMutation,
+        editData: dataForMutation,
+        mutationName: "makePaymentTransaction",
+        modelName: "payment",
+        successField: "id",
+        query,
+        router: null,
+        params: null,
+        redirect: false,
+        reload: false,
+        returnResponseField: true,
+        redirectPath: ``,
+        actionLabel: "creating",
+        token: useAuthStore.getState().token ?? undefined,
+      });
+
+      if (successData?.length > 10) {
+        alert("✅ Account Active"); // or use t("messages.success")
+        refetch();
+        setModalVisible(false);
+      }
+    } catch (error) {
+      console.log("Payment error", error);
+      alert("❌ Payment Failed");
+    } finally {
+      setLoading(false); // ✅ stop loading
     }
   };
 
@@ -100,25 +105,25 @@ const ModalActivation = ({
             <Ionicons name="close" size={24} color={COLORS.textDark} />
           </TouchableOpacity>
 
-          <Text style={styles.modalTitle}>{t("feesActivation")}</Text>
+          <Text style={styles.modalTitle}>{t("fees.activation")}</Text>
 
           {/* Student Info */}
           <View style={styles.infoCard}>
             <Text style={styles.infoText}>
-              {t("class")}: {fees?.userprofile?.specialty?.mainSpecialty?.specialtyName}
+              {t("fees.class")}: {fees?.userprofile?.specialty?.mainSpecialty?.specialtyName}
             </Text>
             <Text style={styles.infoText}>
-              {t("yearLevel")}: {fees?.userprofile?.specialty?.academicYear} -{" "}
+              {t("fees.yearLevel")}: {fees?.userprofile?.specialty?.academicYear} -{" "}
               {fees?.userprofile?.specialty?.level?.level}
             </Text>
             <Text style={styles.infoText}>
-              {t("balance")}: {fees?.balance.toLocaleString()} F
+              {t("fees.balance")}: {fees?.balance.toLocaleString()} F
             </Text>
           </View>
 
           {/* Amount Input */}
           <TextInput
-            placeholder={t("amount")}
+            placeholder={t("fees.amount")}
             style={styles.input}
             value={schoolIdentification?.platformCharges.toString() || "1000"}
             onChangeText={setAmount}
@@ -126,7 +131,7 @@ const ModalActivation = ({
 
           {/* Telephone Input */}
           <TextInput
-            placeholder={t("telephone")}
+            placeholder={t("fees.telephone")}
             style={styles.input}
             value={phoneNumber}
             onChangeText={setPhoneNumber}
@@ -146,8 +151,16 @@ const ModalActivation = ({
           </View>
 
           {/* Apply Button */}
-          <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
-            <Text style={styles.applyButtonText}>{t("apply")}</Text>
+          <TouchableOpacity
+            style={[styles.applyButton, loading && { backgroundColor: "#ccc" }]}
+            onPress={handleApply}
+            disabled={loading} // ✅ disable while loading
+          >
+            {loading ? (
+              <ActivityIndicator color="white" />
+            ) : (
+              <Text style={styles.applyButtonText}>{t("fees.apply")}</Text>
+            )}
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -156,6 +169,7 @@ const ModalActivation = ({
 };
 
 export default ModalActivation;
+
 
 const styles = StyleSheet.create({
   modalOverlay: {
@@ -295,34 +309,3 @@ const query = gql`
     }
   }
 `;
-function validateMoratoriumApplication(
-  schedules: { id: number; amount: string; due_date: string; error?: string; }[],
-  reason: string,
-  balance: number,
-  t: TFunction<"translation", undefined>
-): { isValid: boolean; message: string } {
-  if (!reason.trim()) {
-    return { isValid: false, message: t("reasonRequired") };
-  }
-  if (schedules.length === 0) {
-    return { isValid: false, message: t("atLeastOneSchedule") };
-  }
-  let totalAmount = 0;
-  for (const schedule of schedules) {
-    if (!schedule.amount || isNaN(Number(schedule.amount)) || Number(schedule.amount) <= 0) {
-      return { isValid: false, message: t("invalidAmount") };
-    }
-    if (!schedule.due_date) {
-      return { isValid: false, message: t("dateRequired") };
-    }
-    if (schedule.error) {
-      return { isValid: false, message: schedule.error };
-    }
-    totalAmount += Number(schedule.amount);
-  }
-  if (totalAmount < balance) {
-    return { isValid: false, message: t("totalAmountLessThanBalance") };
-  }
-  return { isValid: true, message: "" };
-}
-

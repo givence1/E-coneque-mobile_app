@@ -187,7 +187,9 @@ const styles = StyleSheet.create({
     },
     rowHeader: {
         flexDirection: "row",
-        backgroundColor: COLORS.primary,
+        backgroundColor: "#fff",
+        borderBottomColor: COLORS.border,
+        borderBottomWidth: 1,
         padding: 10,
         borderRadius: 8,
     },
@@ -198,7 +200,7 @@ const styles = StyleSheet.create({
         borderColor: COLORS.border,
     },
     cell: {
-        color: COLORS.white,
+        color: COLORS.textDark,
         paddingRight: 1,
         fontWeight: "500",
         justifyContent: "space-between"
