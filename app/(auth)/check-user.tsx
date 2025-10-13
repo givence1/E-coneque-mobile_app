@@ -54,11 +54,10 @@ export default function CheckUserScreen() {
   };
 
   const handleSupport = () => {
-    const phoneNumber = "237673351854";
-    const message = t("ui.supportMessage");
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
-    Linking.openURL(url);
-  };
+      const message = t("support.resetMessage");
+      const url = `https://wa.me/${schoolIdentification?.supportNumberOne}?text=${encodeURIComponent(message)}`;
+      Linking.openURL(url);
+    };
 
   return (
     <View style={styles.container}>

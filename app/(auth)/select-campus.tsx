@@ -169,7 +169,7 @@ export default function SelectCampusScreen(): JSX.Element {
               item?.node?.schoolType === "Section-S" ? "secondary" :
                 item?.node?.schoolType === "Section-P" ? "primary" : "vocational"
             return <TouchableOpacity
-              style={[styles.card, { backgroundColor: `${section === "higher" ? "green" : section === "secondary" ? "red" : section === "primary" ? "yellow" : "blue"}` }]}
+              style={[styles.card, { backgroundColor: `${section === "higher" ? "#E8EAF6" : section === "secondary" ? "red" : section === "primary" ? "yellow" : "blue"}` }]}
               onPress={() => handleSelect(item, section)}
             >
               <Text style={styles.title}>{item.node.schoolName}</Text>

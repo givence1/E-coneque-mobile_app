@@ -19,16 +19,26 @@ export const MenuTeacher = (
     return [
 
         // HIGHER SECTION
-        // {
-        //     label: t("ui.attendance"),
-        //     route: "/pagesAll/attendance/attendance",
-        //     icon: <Feather
-        //             name="credit-card"
-        //             size={24}
-        //             color={COLORS.primary}
-        //         />,
-        //     display: (role === "admin" || role === "teacher") && (section === "higher")
-        // },
+        {
+            label: t("ui.availibility"),
+            route: "/pagesAll/attendance/availability",
+            icon: <Feather
+                    name="credit-card"
+                    size={24}
+                    color={COLORS.primary}
+                />,
+            display: (role === "admin" || role === "teacher") && (section === "higher")
+        },
+        {
+            label: t("ui.questions"),
+            route: "/pagesAll/quiz/LecturerQuestionSubmission",
+            icon: <Feather
+                    name="credit-card"
+                    size={24}
+                    color={COLORS.primary}
+                />,
+            display: (role === "admin" || role === "teacher") && (section === "higher")
+        },
         {
             label: t("ui.announcements"),
             route: "/pagesAll/announcements/announcements",
@@ -41,7 +51,7 @@ export const MenuTeacher = (
         },
         {
             label: t("ui.complaints"),
-            route: "/pagesAll/profile/complaint",
+            route: "/pagesAll/profile/lectComplaint",
             icon: <Ionicons
                     name="alert-circle-outline"
                     size={24}
@@ -49,16 +59,16 @@ export const MenuTeacher = (
                 />,
             display: (role === "admin" || role === "teacher") && (section === "higher")
         },
-        // {
-        //     label: t("studentHome.more"),
-        //     route: "/pagesAll/results/more",
-        //     icon: <Ionicons
-        //             name="ellipsis-horizontal"
-        //             size={24}
-        //             color={COLORS.primary}
-        //         />,
-        //     display: (role === "admin" || role === "teacher") && (section === "higher")
-        // },
+        {
+            label: t("studentHome.more"),
+            route: "/pagesAll/results/more",
+            icon: <Ionicons
+                    name="ellipsis-horizontal"
+                    size={24}
+                    color={COLORS.primary}
+                />,
+            display: (role === "admin" || role === "teacher") && (section === "higher")
+        },
 
 
 

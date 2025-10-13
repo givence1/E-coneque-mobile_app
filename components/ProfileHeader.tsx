@@ -79,7 +79,7 @@ const ProfileHeader = (
           </Text>
         </>
           :
-          <Text style={{ fontWeight: 700, fontSize: 18, color: "white" }}>Role:
+          <Text style={{ fontWeight: 700, fontSize: 18, color: "white" }}>
             {role.toUpperCase()}
           </Text>
         }

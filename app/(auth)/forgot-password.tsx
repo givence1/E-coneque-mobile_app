@@ -23,11 +23,8 @@ export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
 
   const handleSupport = () => {
-    const phoneNumber = "237673351854";
     const message = t("support.resetMessage");
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-      message
-    )}`;
+    const url = `https://wa.me/${schoolIdentification?.supportNumberOne}?text=${encodeURIComponent(message)}`;
     Linking.openURL(url);
   };
 

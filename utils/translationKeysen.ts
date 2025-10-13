@@ -182,7 +182,13 @@ fees: {
   ui: {
   complaintType: "Complaint Type",
   noComplaints: "No complaints submitted yet.",
-  selectType: "Select type",
+  questions: "Material",
+  availibility: "Availability",
+  studentMisconduct: "Student Misconduct",
+  salaryIssue: "Salary Issue",
+  availability: "Availability",
+
+  selectType: "Material type",
   feeIssue: "Fee Issue",
   resultProblem: "Result Problem",
   lecturerMisconduct: "Lecturer Misconduct",
@@ -409,6 +415,11 @@ fees: {
     hnd: "HND",
     bachelor: "Bachelor",
     master: "Master",
+    bacaleaureat: "Bac Aleaureat",
+    bts: "BTS",
+    probatoire: "Probatoire",
+    bepc: "BEPC",
+    others: "Others",
   },
 
   actions: {
@@ -483,9 +494,9 @@ results: {
   ca: "CA",
   exam: "Exam",
   status: "Status",
-  accountNotActive: "Account Not Active",
-  schoolFees: "School Fees",
-  resultsNotPublished: "Results Not Published",
+  accountNotActive: "Your platform access charges haven't been paid yet.",
+  schoolFees: "Kindly update your fee payment to keep enjoying full access.",
+  resultsNotPublished: "Results haven’t been published",
   pass: "✅",
   fail: "❌",
 },
@@ -529,6 +540,8 @@ transcript: {
      pedding: "Pending",
     approved: "Approved",
     rejected: "Rejected",
+    status: "Status",
+    pending: "Pending",
   },
   profileHeader: {
   noFees: "No Fees",

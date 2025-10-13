@@ -54,6 +54,7 @@ export default function Step2RoleDept({
       t("regions.adamawa"),
       t("regions.nord"),
       t("regions.farNord"),
+      t("regions.Others"),
     ],
     highestCertificate: [
       t("certificates.olevel"),
@@ -61,6 +62,11 @@ export default function Step2RoleDept({
       t("certificates.hnd"),
       t("certificates.bachelor"),
       t("certificates.master"),
+      t("certificates.bacaleaureat"),
+      t("certificates.bts"),
+      t("certificates.probatoire"),
+      t("certificates.bepc"),
+      t("certificates.others"),
     ],
     yearObtained: Array.from({ length: 15 }, (_, i) => `${new Date().getFullYear() - i}`),
   };

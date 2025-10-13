@@ -25,14 +25,11 @@ export default function EnterTokenScreen() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSupport = () => {
-    const phoneNumber = "237673351854";
-    const message = t("support.resetMessage"); // 🔑 translatable
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-      message
-    )}`;
-    Linking.openURL(url);
-  };
+ const handleSupport = () => {
+     const message = t("support.resetMessage");
+     const url = `https://wa.me/${schoolIdentification?.supportNumberOne}?text=${encodeURIComponent(message)}`;
+     Linking.openURL(url);
+   };
 
   // ✅ Validate password rules
   const validatePassword = (password: string): boolean => {

@@ -1,3 +1,4 @@
+import COLORS from "@/constants/colors";
 import { useAuthStore } from "@/store/authStore";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -18,7 +19,6 @@ import {
   View,
 } from "react-native";
 import styles from "../../assets/styles/login.styles";
-import COLORS from "@/constants/colors";
 
 
 

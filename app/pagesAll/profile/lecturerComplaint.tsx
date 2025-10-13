@@ -9,18 +9,18 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
-  Alert,
-  FlatList,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    KeyboardAvoidingView,
+    Modal,
+    Platform,
+    RefreshControl,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 
@@ -34,12 +34,10 @@ const LecturerComplaint: React.FC = () => {
 
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<string | null>(null);
-
-  // 👇 Lecturer complaint types
   const [items, setItems] = useState([
-    { label: t("ui.studentMisconduct"), value: "student" },
+    { label: t("ui.lecturerMisconduct"), value: "student" },
     { label: t("ui.attendance"), value: "attendance" },
-    { label: t("ui.salaryIssue"), value: "salary" },
+    { label: t("ui.salary"), value: "salary" },
     { label: t("ui.availability"), value: "availability" },
     { label: t("ui.resultProblem"), value: "results" },
     { label: t("ui.other"), value: "others" },
@@ -51,7 +49,7 @@ const LecturerComplaint: React.FC = () => {
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
 
   const { data, loading, refetch } = useQuery(GET_COMPLAINS, {
-    variables: { userprofileId: profileId, role },
+    variables: { customerId: profileId, role },
     skip: !profileId,
   });
 
@@ -59,14 +57,14 @@ const LecturerComplaint: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!type || !message.trim()) {
-      Alert.alert("Error", "Please select a complaint type and enter a message.");
+      Alert.alert(t("ui.error"), t("ui.errorMessage"));
       return;
     }
 
     try {
       const res = await createUpdateDeleteComplain({
         variables: {
-          userprofileId: String(profileId),
+          customerId: String(profileId),
           campusId: decodeUrlID(campusInfo?.id || ""),
           message,
           complainType: type,
@@ -76,8 +74,8 @@ const LecturerComplaint: React.FC = () => {
         },
       });
 
-      if (res?.data?.createUpdateDeleteComplain?.complain?.id?.length > 10) {
-        Alert.alert("Success", "Your complaint has been submitted successfully.");
+      if (res?.data?.createUpdateDeleteComplain?.complain?.id?.length > 5) {
+        Alert.alert(t("ui.submitted"), t("ui.submittedMessage"));
         setType(null);
         setMessage("");
         setModalVisible(false);
@@ -85,7 +83,7 @@ const LecturerComplaint: React.FC = () => {
       }
     } catch (err) {
       console.error(err);
-      Alert.alert("Error", "Failed to submit complaint. Try again later.");
+      Alert.alert(t("ui.error"), t("ui.serverError"));
     }
   };
 
@@ -113,9 +111,7 @@ const LecturerComplaint: React.FC = () => {
           <FlatList
             data={data.allComplains.edges}
             keyExtractor={(edge: EdgeComplain) => edge.node.id.toString()}
-            refreshControl={
-              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-            }
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
             renderItem={({ item }: { item: EdgeComplain }) => {
               const c: NodeComplain = item.node;
               const isExpanded = expanded[c.id];
@@ -137,19 +133,19 @@ const LecturerComplaint: React.FC = () => {
                   {c.message.length > 100 && (
                     <TouchableOpacity onPress={() => toggleExpand(c.id)}>
                       <Text style={styles.readMore}>
-                        {isExpanded ? "Read Less" : "Read More"}
+                        {isExpanded ? t("ui.readLess") : t("ui.readMore")}
                       </Text>
                     </TouchableOpacity>
                   )}
 
                   {c.status ? (
-                    <Text style={styles.cardResolved}>Resolved</Text>
+                    <Text style={styles.cardResolved}>{t("ui.resolved")}</Text>
                   ) : c.response ? (
                     <Text style={styles.cardResponse}>
-                      Response: {c.response}
+                      {t("ui.response")}: {c.response}
                     </Text>
                   ) : (
-                    <Text style={styles.cardPending}>Pending</Text>
+                    <Text style={styles.cardPending}>{t("ui.pending")}</Text>
                   )}
 
                   <Text style={styles.cardDate}>
@@ -161,19 +157,14 @@ const LecturerComplaint: React.FC = () => {
           />
         ) : (
           <View style={styles.emptyBox}>
-            <Text style={styles.emptyText}>No complaints yet.</Text>
+            <Text style={styles.emptyText}>{t("ui.noComplaints")}</Text>
           </View>
         )}
 
-        {/* Floating Add Button */}
-        <TouchableOpacity
-          style={styles.fab}
-          onPress={() => setModalVisible(true)}
-        >
+        <TouchableOpacity style={styles.fab} onPress={() => setModalVisible(true)}>
           <Ionicons name="add" size={28} color="#fff" />
         </TouchableOpacity>
 
-        {/* Modal */}
         <Modal visible={modalVisible} animationType="slide" transparent>
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
@@ -184,9 +175,9 @@ const LecturerComplaint: React.FC = () => {
                 <Ionicons name="close" size={24} color={COLORS.textPrimary} />
               </TouchableOpacity>
 
-              <Text style={styles.modalTitle}>Submit Lecturer Complaint</Text>
+              <Text style={styles.modalTitle}>{t("ui.submitComplaint")}</Text>
 
-              <Text style={styles.label}>Complaint Type</Text>
+              <Text style={styles.label}>{t("ui.complaintType")}</Text>
               <DropDownPicker
                 open={open}
                 value={type}
@@ -194,14 +185,14 @@ const LecturerComplaint: React.FC = () => {
                 setOpen={setOpen}
                 setValue={setType}
                 setItems={setItems}
-                placeholder="Select Complaint Type"
+                placeholder={t("ui.selectType")}
                 style={styles.dropdown}
                 dropDownContainerStyle={{ borderColor: "#ccc" }}
               />
 
-              <Text style={styles.label}>Message</Text>
+              <Text style={styles.label}>{t("ui.message")}</Text>
               <TextInput
-                placeholder="Describe your issue..."
+                placeholder={t("ui.describeIssue")}
                 value={message}
                 onChangeText={setMessage}
                 style={[styles.input, { height: 120 }]}
@@ -213,7 +204,7 @@ const LecturerComplaint: React.FC = () => {
                   colors={[COLORS.primary, COLORS.primary]}
                   style={styles.gradientBtn}
                 >
-                  <Text style={styles.buttonText}>Submit Complaint</Text>
+                  <Text style={styles.buttonText}>{t("ui.submitComplaint")}</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </View>
@@ -338,12 +329,14 @@ const styles = StyleSheet.create({
   },
 });
 
+
+// ---------- GraphQL ----------
 const GET_COMPLAINS = gql`
-  query GetComplains($userprofileId: Decimal!, $role: String!) {
+  query GetComplains($customerId: ID!, $role: String!) {
     allComplains(
       role: $role
       last: 20
-      userprofileId: $userprofileId
+      customerId: $customerId
       deleted: false
     ) {
       edges {
@@ -362,7 +355,7 @@ const GET_COMPLAINS = gql`
 
 const CREATE_COMPLAIN = gql`
   mutation CRUDComplain(
-    $userprofileId: ID!
+    $customerId: ID!
     $campusId: ID!
     $message: String!
     $complainType: String!
@@ -371,7 +364,7 @@ const CREATE_COMPLAIN = gql`
     $status: Boolean!
   ) {
     createUpdateDeleteComplain(
-      userprofileId: $userprofileId
+      customerId: $customerId
       campusId: $campusId
       message: $message
       complainType: $complainType

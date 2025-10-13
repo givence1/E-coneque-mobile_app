@@ -183,7 +183,12 @@ fees: {
   ui: {
   complaintType: "Type de réclamation",
   noComplaints: "Aucune réclamation pour le moment.",
-  selectType: "Sélectionner un type",
+  questions: "Matériel",
+  availibility: "Disponibilité",
+  studentMisconduct: "Mauvais comportement de l’étudiant",
+  salaryIssue: "Problème de salaire",
+  availability: "Disponibilité",
+  selectType: "Type de matériel",
   feeIssue: "Problème de frais",
   resultProblem: "Problème de résultat",
   lecturerMisconduct: "Mauvais comportement de l’enseignant",
@@ -405,6 +410,11 @@ fees: {
     hnd: "BTS",
     bachelor: "Licence",
     master: "Master",
+    bacaleaureat: "Bac Aléaureat",
+    bts: "BTS",
+    probatoire: "Probatoire",
+    bepc: "BEPC",
+    others: "Autres",
   },
 
   actions: {
@@ -480,9 +490,10 @@ results: {
   ca: "CC",
   exam: "Examen",
   status: "Statut",
-  accountNotActive: "Compte inactif",
-  schoolFees: "Frais scolaires",
-  resultsNotPublished: "Résultats non publiés",
+ accountNotActive: "Les frais d’accès à la plateforme n’ont pas encore été payés.",
+schoolFees: "Veuillez mettre à jour le paiement de vos frais pour continuer à profiter d’un accès complet.",
+resultsNotPublished: "Les résultats n’ont pas encore été publiés.",
+
   pass: "✅",
   fail: "❌",
 },
@@ -519,7 +530,12 @@ lecturer:{
     title: "Attestation Scolaire",
     description: "Vous pouvez demander votre attestation scolaire à tout moment. Aucun paiement ou frais supplémentaire n’est requis.",
     apply: "Demander une Attestation",
-    attestationSubmitted: "Demande d’attestation scolaire soumise !"
+    attestationSubmitted: "Demande d’attestation scolaire soumise !",
+    status: "Statut",
+    pending: "En attente",
+    approved: "Approuvé",
+    rejected: "Rejeté",
+    approvedAt: "Approuvé le",
   },
 
   profileHeader: {
