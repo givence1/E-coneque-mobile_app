@@ -9,18 +9,18 @@ import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-    ActivityIndicator,
-    Alert,
-    FlatList,
-    KeyboardAvoidingView,
-    Modal,
-    Platform,
-    RefreshControl,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 
@@ -30,7 +30,7 @@ futureDate.setMonth(today.getMonth() + 2);
 
 const LecturerComplaint: React.FC = () => {
   const { t } = useTranslation();
-  const { profileId, role, campusInfo } = useAuthStore();
+  const { user, role, campusInfo } = useAuthStore();
 
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<string | null>(null);
@@ -49,8 +49,8 @@ const LecturerComplaint: React.FC = () => {
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
 
   const { data, loading, refetch } = useQuery(GET_COMPLAINS, {
-    variables: { customerId: profileId, role },
-    skip: !profileId,
+    variables: { customerId: user?.user_id, role },
+    skip: !user?.user_id || !role,
   });
 
   const [createUpdateDeleteComplain] = useMutation(CREATE_COMPLAIN);
@@ -59,12 +59,28 @@ const LecturerComplaint: React.FC = () => {
     if (!type || !message.trim()) {
       Alert.alert(t("ui.error"), t("ui.errorMessage"));
       return;
-    }
+    }console.log("🚀 handleSubmit called");
+    console.log("Auth Store:", { user, role, campusInfo });
+
+
+
+   console.warn("📤 Complaint Data Submitted:", {
+  customerId: String(user?.user_id),
+  campusId: decodeUrlID(campusInfo?.id || ""),
+  message,
+  complainType: type,
+  endingAt: futureDate.toISOString().split("T")[0],
+  delete: false,
+  status: false,
+});
+
+Alert.alert("Debug Log", `Type: ${type}\nMessage: ${message}`);
+
 
     try {
       const res = await createUpdateDeleteComplain({
         variables: {
-          customerId: String(profileId),
+          customerId: String(user?.user_id),
           campusId: decodeUrlID(campusInfo?.id || ""),
           message,
           complainType: type,

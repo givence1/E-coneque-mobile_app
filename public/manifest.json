@@ -1,0 +1,24 @@
+{
+  "name": "Econneq",
+  "short_name": "Econneq",
+  "description": "Smart solutions by E-Conneq Technologies",
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#2D7A7A",
+  "theme_color": "#2D7A7A",
+  "icons": [
+    {
+      "src": "icons/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

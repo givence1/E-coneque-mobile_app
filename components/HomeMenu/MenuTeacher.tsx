@@ -51,7 +51,7 @@ export const MenuTeacher = (
         },
         {
             label: t("ui.complaints"),
-            route: "/pagesAll/profile/lectComplaint",
+            route: "/pagesAll/profile/lecturerComplaint",
             icon: <Ionicons
                     name="alert-circle-outline"
                     size={24}
