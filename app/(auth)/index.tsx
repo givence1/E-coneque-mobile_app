@@ -320,9 +320,9 @@ export default function Login() {
                     {t("ui.contactSupport", "Contact Support")}
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => router.push("/(auth)/check-user")}>
+                {/* <TouchableOpacity onPress={() => router.push("/(auth)/check-user")}>
                   <Text style={styles.linkText}>{t("login.checkUser")}</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
 
               {/* Footer */}

@@ -90,12 +90,11 @@ const PreinscriptionHigher = ({ data, section }: { data: any; section: "H" | "S"
   const handleSubmit = async () => {
   // Map names to IDs
   const campusId = campusList.find((c) => c.name === formData.campusId)?.id;
-  const levelId = levelList.find((l) => l.name === formData.level)?.id;
   const programId = programList.find((p) => p.name === formData.programId)?.id;
   const specialtyOne = mainSpecialtyList.find((ms) => ms.name === formData.specialtyoneId)?.id;
   const specialtyTwo = mainSpecialtyList.find((ms) => ms.name === formData.specialtytwoId)?.id;
 
-  if (!campusId || !levelId || !programId || !specialtyOne || !specialtyTwo) {
+  if (!campusId || !programId || !specialtyOne || !specialtyTwo || !formData.level) {
     throw new Error("Please select all required fields correctly.");
   }
 
@@ -133,7 +132,7 @@ const PreinscriptionHigher = ({ data, section }: { data: any; section: "H" | "S"
     grade: formData.grade,
 
     academicYearHigher: formData.academicYear,
-    levelHigher: levelId,
+    levelHigher: String(formData.level),
     sessionHigher: formData.session,
     programHigherId: programId,
     specialtyOne,
