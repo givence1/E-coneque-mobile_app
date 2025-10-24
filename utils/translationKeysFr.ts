@@ -1,7 +1,7 @@
 export const translationKeysFr = {
   // Login & Auth
   login: {
-    matricule: "Matricule",
+    matricule: "Matricule/Nom d'utilisateur",
     password: "Mot de passe",
     rememberMe: "Se souvenir de moi",
     loginButton: "Connexion",
@@ -190,10 +190,12 @@ fees: {
   availability: "Disponibilité",
   selectType: "Type de matériel",
   feeIssue: "Problème de frais",
+  timetable: "Emploi du temps",
   resultProblem: "Problème de résultat",
   lecturerMisconduct: "Mauvais comportement de l’enseignant",
   attendance: "Présence",
   other: "Autre",
+  material: "Matériel",
   message: "Message",
   describeIssue: "Décrivez votre problème...",
   submitComplaint: "Soumettre la réclamation",

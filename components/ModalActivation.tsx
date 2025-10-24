@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -18,6 +19,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 
 const ModalActivation = ({
   refetch,
@@ -40,60 +42,62 @@ const ModalActivation = ({
 
   /** APPLY FUNCTION */
   const handleApply = async () => {
-    if (phoneNumber?.length < 9) {
-      alert("Invalid Telephone");
-      return;
-    }
+  if (phoneNumber?.length < 9) {
+    Alert.alert("Error", "Invalid Telephone");
+    return;
+  }
 
-    if (operator?.length < 3) {
-      alert("Invalid Operator");
-      return;
-    }
+  if (operator?.length < 3) {
+    Alert.alert("Error", "Invalid Operator");
+    return;
+  }
 
-    const dataForMutation = {
-      schoolfeesIds: [feesId],
-      amount: parseInt(schoolIdentification?.platformCharges.toString() || "1000"),
-      operator,
-      phoneNumber,
-      reason: "PLATFORM CHARGES",
-      section: "H",
-      origin: "student",
-      status: "Pending",
-    };
-
-    try {
-      setLoading(true); // ✅ start loading
-
-      const successData = await ApiFactory({
-        newData: dataForMutation,
-        editData: dataForMutation,
-        mutationName: "makePaymentTransaction",
-        modelName: "payment",
-        successField: "id",
-        query,
-        router: null,
-        params: null,
-        redirect: false,
-        reload: false,
-        returnResponseField: true,
-        redirectPath: ``,
-        actionLabel: "creating",
-        token: useAuthStore.getState().token ?? undefined,
-      });
-
-      if (successData?.length > 10) {
-        alert("✅ Account Active"); // or use t("messages.success")
-        refetch();
-        setModalVisible(false);
-      }
-    } catch (error) {
-      console.log("Payment error", error);
-      alert("❌ Payment Failed");
-    } finally {
-      setLoading(false); // ✅ stop loading
-    }
+  const dataForMutation = {
+    schoolfeesIds: [feesId],
+    amount: parseInt(schoolIdentification?.platformCharges?.toString() || "1000"),
+    operator,
+    phoneNumber,
+    reason: "PLATFORM CHARGES",
+    section: "H",
+    origin: "student",
+    status: "Pending",
   };
 
+  try {
+    setLoading(true);
+
+    const successData = await ApiFactory({
+      newData: dataForMutation,
+      editData: dataForMutation,
+      mutationName: "makePaymentTransaction",
+      modelName: "payment",
+      successField: "id",
+      query,
+      router: null,
+      params: null,
+      redirect: false,
+      reload: false,
+      returnResponseField: true,
+      redirectPath: ``,
+      actionLabel: "creating",
+      token: useAuthStore.getState().token ?? undefined,
+    });
+
+    if (successData?.length > 10) {
+      Alert.alert("Success", "✅ Account Active");
+      refetch();
+      setModalVisible(false);
+    } else {
+      Alert.alert("Error", "Payment Failed. Try again.");
+    }
+
+  } catch (error) {
+    console.log("Payment error", error);
+    Alert.alert("Error", "Payment Failed. Please check your connection.");
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <Modal visible={modalVisible} animationType="slide" transparent={true}>
       <KeyboardAvoidingView
@@ -159,7 +163,7 @@ const ModalActivation = ({
             {loading ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Text style={styles.applyButtonText}>{t("fees.apply")}</Text>
+              <Text style={styles.applyButtonText}>{t("fees.submit")}</Text>
             )}
           </TouchableOpacity>
         </View>
@@ -169,7 +173,6 @@ const ModalActivation = ({
 };
 
 export default ModalActivation;
-
 
 const styles = StyleSheet.create({
   modalOverlay: {

@@ -1,7 +1,7 @@
 export const translationKeys = {
   // Login & Auth
   login: {
-    matricule: "Matricule",
+    matricule: "Matricule/Username",
     password: "Password",
     rememberMe: "Remember Me",
     loginButton: "Login",
@@ -187,7 +187,7 @@ fees: {
   studentMisconduct: "Student Misconduct",
   salaryIssue: "Salary Issue",
   availability: "Availability",
-
+  timetable: "Timetable",
   selectType: "Material type",
   feeIssue: "Fee Issue",
   resultProblem: "Result Problem",
@@ -207,6 +207,7 @@ fees: {
   select: "Select",
   choose: "Choose",
   add: "Add",
+  materials: "Materials",
   remove: "Remove",
   serverError: "Something went wrong. Please try again.",
   confirmation: "Confirmation",
